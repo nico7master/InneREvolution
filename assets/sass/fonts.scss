@@ -1,0 +1,95 @@
+// Fedra Sans Pro
+@font-face {
+    font-family: 'FedraSansPro';
+    src: url('../webfonts/fedrasanspro-book-webfont.woff2') format('woff2'),
+         url('../webfonts/fedrasanspro-book-webfont.woff') format('woff');
+    font-weight: 400; // Book
+    font-style: normal;
+}
+@font-face {
+    font-family: 'FedraSansPro';
+    src: url('../webfonts/fedrasanspro-light-webfont.woff2') format('woff2'),
+         url('../webfonts/fedrasanspro-light-webfont.woff') format('woff');
+    font-weight: 300; // Light
+    font-style: normal;
+}
+@font-face {
+    font-family: 'FedraSansPro';
+    src: url('../webfonts/fedrasanspro-lightitalic-webfont.woff2') format('woff2'),
+         url('../webfonts/fedrasanspro-lightitalic-webfont.woff') format('woff');
+    font-weight: 300; // Light
+    font-style: italic;
+}
+@font-face {
+    font-family: 'FedraSansPro';
+    src: url('../webfonts/fedrasanspro-normal-webfont.woff2') format('woff2'),
+         url('../webfonts/fedrasanspro-normal-webfont.woff') format('woff');
+    font-weight: 400; // Normal
+    font-style: normal;
+}
+
+// Fedra Serif A Pro
+@font-face {
+    font-family: 'FedraSerifAPro';
+    src: url('../webfonts/fedra-serif-a-pro-bold-webfont.woff2') format('woff2'),
+         url('../webfonts/fedra-serif-a-pro-bold-webfont.woff') format('woff');
+    font-weight: 700; // Bold
+    font-style: normal;
+}
+@font-face {
+    font-family: 'FedraSerifAPro';
+    src: url('../webfonts/fedra-serif-a-pro-bold-italic-webfont.woff2') format('woff2'),
+         url('../webfonts/fedra-serif-a-pro-bold-italic-webfont.woff') format('woff');
+    font-weight: 700;
+    font-style: italic;
+}
+@font-face {
+    font-family: 'FedraSerifAPro';
+    src: url('../webfonts/fedra-serif-a-pro-book-webfont.woff2') format('woff2'),
+         url('../webfonts/fedra-serif-a-pro-book-webfont.woff') format('woff');
+    font-weight: 400; // Book
+    font-style: normal;
+}
+@font-face {
+    font-family: 'FedraSerifAPro';
+    src: url('../webfonts/fedra-serif-a-pro-book-italic-webfont.woff2') format('woff2'),
+         url('../webfonts/fedra-serif-a-pro-book-italic-webfont.woff') format('woff');
+    font-weight: 400;
+    font-style: italic;
+}
+@font-face {
+    font-family: 'FedraSerifAPro';
+    src: url('../webfonts/fedra-serif-a-pro-medium-webfont.woff2') format('woff2'),
+         url('../webfonts/fedra-serif-a-pro-medium-webfont.woff') format('woff');
+    font-weight: 500; // Medium
+    font-style: normal;
+}
+@font-face {
+    font-family: 'FedraSerifAPro';
+    src: url('../webfonts/fedra-serif-a-pro-medium-italic-webfont.woff2') format('woff2'),
+         url('../webfonts/fedra-serif-a-pro-medium-italic-webfont.woff') format('woff');
+    font-weight: 500;
+    font-style: italic;
+}
+@font-face {
+    font-family: 'FedraSerifAPro';
+    src: url('../webfonts/fedra-serif-a-pro-normal-webfont.woff2') format('woff2'),
+         url('../webfonts/fedra-serif-a-pro-normal-webfont.woff') format('woff');
+    font-weight: 400; // Normal
+    font-style: normal;
+}
+@font-face {
+    font-family: 'FedraSerifAPro';
+    src: url('../webfonts/fedra-serif-a-pro-normal-italic-webfont.woff2') format('woff2'),
+         url('../webfonts/fedra-serif-a-pro-normal-italic-webfont.woff') format('woff');
+    font-weight: 400;
+    font-style: italic;
+}
+
+// Existing FedraSerifAStdBook
+@font-face {
+    font-family: 'FedraSerifAStdBook';
+    src: url('../webfonts/FedraSerifAStdBook.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+}
