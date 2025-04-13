@@ -178,6 +178,38 @@
 						window.clearInterval(timerId);
 					});
 
+			// Anchor link handling.
+				$('a[href^="#"]').on('click', function(e) {
+					var target = $(this).attr('href');
+					if (target.match(/^#surya-kriya|#yogasanas|#angamardana|#upa-yoga|#bhuta-shuddhi$/)) {
+						e.preventDefault();
+
+						var $targetArticle = $(target);
+						if ($targetArticle.length) {
+							// Scroll page to carousel.
+							$('html, body').animate({
+								scrollTop: $t.offset().top
+							}, 500);
+
+							// Center article in reel.
+							itemWidth = $items.first().outerWidth(true);
+							var articleIndex = $items.index($targetArticle);
+							var newPos = -articleIndex * itemWidth + ($window.width() - itemWidth) / 2;
+
+							// Clamp position within limits.
+							newPos = Math.min(leftLimit, Math.max(rightLimit, newPos));
+							pos = newPos;
+							$t._updatePos();
+
+							// Highlight article for 1 second.
+							$targetArticle.addClass('highlight');
+							setTimeout(function() {
+								$targetArticle.removeClass('highlight');
+							}, 3500);
+						}
+					}
+				});
+
 			// Init.
 				$window.on('load', function() {
 

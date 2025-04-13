@@ -1825,6 +1825,12 @@ header .icon.circled {
   display: inline-block;
   vertical-align: middle;
 }
+#header .inner h2 a {
+  color: #f4c430;
+}
+#header .inner h2 a:hover {
+  color: #ffe066;
+}
 #header header {
   display: inline-block;
 }
@@ -2192,6 +2198,26 @@ body.homepage.is-preload #header:after {
   padding: 2em 0 2em 0;
   margin-bottom: 0;
 }
+.carousel h2 {
+  text-align: center;
+  font-size: 3em;
+  color: #ef8376;
+}
+.carousel article {
+  position: relative;
+}
+.carousel article.highlight::after {
+  content: "";
+  position: absolute;
+  top: -5px;
+  left: -5px;
+  right: -5px;
+  bottom: -5px;
+  border: 5px solid #ef8376;
+  border-radius: 0em;
+  animation: highlightBorder 3.5s ease-in-out forwards;
+  pointer-events: none;
+}
 .carousel .forward, .carousel .backward {
   position: absolute;
   top: 50%;
@@ -2276,6 +2302,20 @@ body.homepage.is-preload #header:after {
   text-align: center;
 }
 
+@keyframes highlightBorder {
+  0% {
+    border-color: transparent;
+    opacity: 0;
+  }
+  50% {
+    border-color: #ef8376;
+    opacity: 1;
+  }
+  100% {
+    border-color: transparent;
+    opacity: 0;
+  }
+}
 /* Wide */
 @media screen and (max-width: 1680px) {
   /* Basic */
