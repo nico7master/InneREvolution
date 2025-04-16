@@ -751,15 +751,6 @@
 			margin: 0;
 			display: inline-block;
 			vertical-align: middle;
-
-			//font-size: 1.75em;
-			//margin: 1em 0 0 0;
-			//color: #da782e;
-			//text-align: center;
-			//h2 a {
-			//	color: #f4c430;
-			//	&:hover { color: #ffe066; }
-			//}
 		}
 
 		header {
@@ -772,14 +763,11 @@
 		}
 
 		.header-icon {
-			width: 650px;
+			width: 36em;
 			//height: 40px;
-			//vertical-align: middle;
-			display: block;
+			vertical-align: middle;
+			//display: block;
     		margin: 0 auto 1em;
-    		fill: #e709f76d;
-			color: #e709f76d;
-			//margin-right: 4em;
 		}
 
 		h1 {
@@ -834,16 +822,16 @@
 			padding: 0;
 		}
 
-		hr {
-			top: 1.5em;
-			margin-bottom: 3em;
-			border-bottom-color: rgba(192, 192, 192, 0.35);
-			box-shadow: inset 0 1px 0 0 rgba(192, 192, 192, 0.35);
+		//hr {
+		//	top: 1.5em;
+		//	margin-bottom: 3em;
+		//	border-bottom-color: rgba(192, 192, 192, 0.35);
+		//	box-shadow: inset 0 1px 0 0 rgba(192, 192, 192, 0.35);
 
-			&:before, &:after {
-				background: rgba(192, 192, 192, 0.35);
-			}
-		}
+		//	&:before, &:after {
+		//		background: rgba(192, 192, 192, 0.35);
+		//	}
+		//}
 
 		footer {
 			margin: 1em 0 0 0;
@@ -1008,24 +996,85 @@
 	}
 
 /* Banner */
+#banner {
+    background: #c2c2c2;
+    text-align: center;
+    padding: 4.5em 0 4.5em 0;
+    margin-bottom: 0;
+    display: flex;
+    align-items: center; /* Vertically aligns items */
+    justify-content: center; /* Centers items horizontally */
+    flex-wrap: wrap; /* Allows wrapping if needed on smaller screens */
 
-	#banner {
-		background: #fff;
-		text-align: center;
-		padding: 4.5em 0 4.5em 0;
-		margin-bottom: 0;
+    h1 {
+        font-family: 'FedraSerifAPro', serif;
+        vertical-align: middle;
+        font-weight: 700;
+    }
 
-		h1 {
-			font-family: 'FedraSerifAPro', serif;
-			font-weight: 700;
-		}
+    header {
+        > p {
+            margin-bottom: 0;
+        }
+    }
 
-		header {
-			> p {
-				margin-bottom: 0;
-			}
-		}
-	}
+    .quote-container {
+        display: flex;
+        align-items: flex-start; /* Align items to the top */
+        justify-content: center; /* Centers content horizontally */
+        flex-wrap: nowrap; /* Prevents wrapping of quote images and text */
+        margin-bottom: 1em; /* Space before divider */
+    }
+
+    .banner-quote {
+        width: auto;
+        height: 2em; /* Adjusted size for better proportion */
+        display: inline-block;
+        margin-top: 0.2em; /* Fine-tune vertical position to align with text top */
+    }
+
+    .quote-start {
+        margin-right: 0.5em; /* Space between start quote and text */
+    }
+
+    .quote-end {
+        margin-left: 0.5em; /* Space between text and end quote */
+    }
+
+    .quote-text {
+        display: inline-block;
+        h2 {
+            margin: 0; /* Remove default margin for tighter alignment */
+            text-align: center;
+        }
+    }
+
+    .banner-icon {
+        width: 10em;
+        vertical-align: middle;
+        margin: 1em auto 0;
+        display: block;
+    }
+
+    @include breakpoint('<=mobile') {
+        .quote-container {
+            flex-wrap: wrap; /* Allow wrapping if text is too long */
+        }
+        
+        .banner-quote {
+            height: 0.5em; /* Smaller quotes on mobile */
+            margin-top: 0.15em; /* Adjust for mobile */
+        }
+        
+        .quote-text h2 {
+            font-size: 1.75em; /* Adjust text size for mobile */
+        }
+        
+        .quote-start, .quote-end {
+            margin: 0 0.3em; /* Tighter margins on mobile */
+        }
+    }
+}
 
 /* Content */
 
@@ -1057,79 +1106,257 @@
 		}
 	}
 
-	/* Hatha Yoga Image Overlay */
-#HathaYoga {
-	padding: 2em 0 0 0;
-    margin-top: 2em;
-    h3 {
-        text-align: center;
-		margin: 0 0 0.5em 0;
-    }
-
-    .image-header-wrapper {
-        position: relative; /* Creates a positioning context for the overlay */
-        width: 100%;
-        margin-bottom: 2em; /* Space below the image, similar to original .image.featured */
-    }
-
-    .featured-image {
-        display: block;
-        width: 100%;
-        height: auto; /* Maintain aspect ratio */
-    }
-
-    .image-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-start;
-        align-items: center;
-        background: rgba(0, 0, 0, 0); /* Semi-transparent background for readability */
-        color: #fff; /* White text for contrast */
-        padding: 2em;
-        box-sizing: border-box;
-        text-align: center;
-
-        h2 {
-            color: #ff760d; /* Override default h2 color for visibility */
-            margin-top: 0em;
-            font-size: 2.5em; /* Match existing h2 size */
-        }
-
-        p {
-            color: #fff; /* Ensure quote is visible */
-            font-size: 1.2em; /* Slightly larger for emphasis */
-            margin: 0;
-            max-width: 80%; /* Prevent text from touching edges */
-        }
-    }
-
-    /* Responsive adjustments */
-    @include breakpoint('<=mobile') {
-        .image-overlay {
-            padding: 1em;
-            h2 {
-                font-size: 1.75em; /* Smaller for mobile */
-            }
-            p {
-                font-size: 1em;
-                max-width: 90%;
-            }
-        }
-    }
-}
+	/* Hatha Yoga Section */
+	#HathaYoga {
+		padding: 2em 0 0 0;
+		margin-top: 0em;
+	
+		.image-header-wrapper {
+			position: relative;
+			width: 100%;
+			margin-bottom: 3em;
+			border-radius: 0.5em;
+			box-shadow: 0 0.5em 1em rgba(0, 0, 0, 0.3);
+			overflow: hidden;
+		}
+	
+		.featured-image {
+			display: block;
+			width: 100%;
+			height: auto;
+			filter: drop-shadow(0 0 8px rgba(255, 118, 13, 0.6)); /* Static glow, matches #ff760d */
+		}
+	
+		.image-overlay {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			display: flex;
+			flex-direction: column;
+			justify-content: middle;
+			align-items: center;
+			background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.7));
+			color: #fff;
+			padding: 2em;
+			box-sizing: border-box;
+			text-align: center;
+	
+			h2 {
+				color: #ff760d;
+				font-size: 3em;
+				text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+				margin: 0;
+			}
+	
+			p {
+				color: #fff;
+				font-size: 1.2em;
+				max-width: 80%;
+				text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+			}
+		}
+	
+		.hatha-content {
+			display: flex;
+			flex-direction: column;
+			gap: 2em;
+		}
+	
+		.hatha-section {
+			display: flex;
+			align-items: center;
+			gap: 2em;
+	
+			&.hatha-reverse {
+				flex-direction: row-reverse;
+			}
+		}
+	
+		.hatha-text {
+			flex: 1;
+			padding: 1em;
+	
+			h3 {
+				text-align: left;
+				margin: 0 0 0.5em 0;
+				color: #da782e;
+				font-size: 2em;
+			}
+	
+			p {
+				text-align: left;
+				font-size: 1.1em;
+				line-height: 1.8em;
+				color: #d3d3d3;
+			}
+		}
+	
+		.hatha-icon-container {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			gap: 0.5em; /* Space between image and caption */
+		}
+	
+		.hatha-icon {
+			width: 10em;
+			height: auto;
+	
+			&.hatha-sun {
+				filter: drop-shadow(0 0 10px rgba(255, 165, 0, 0.7));
+			}
+	
+			&.hatha-moon {
+				filter: drop-shadow(0 0 10px rgba(135, 206, 235, 0.7));
+			}
+		}
+	
+		.hatha-caption {
+			font-family: 'FedraSansPro', sans-serif;
+			font-size: 1em;
+			font-weight: 500;
+			text-align: center;
+			margin: 0;
+		}
+	
+		.hatha-section .hatha-icon-container .hatha-caption {
+			color: #ffa500; /* Sun color */
+		}
+	
+		.hatha-section.hatha-reverse .hatha-icon-container .hatha-caption {
+			color: #87ceeb; /* Moon color */
+		}
+	
+		.highlight {
+			font-weight: 600;
+			transition: color 0.3s ease;
+	
+			&.highlight-sun {
+				color: #ffa500;
+				&:hover {
+					color: #ff760d;
+				}
+			}
+	
+			&.highlight-moon {
+				color: #87ceeb;
+				&:hover {
+					color: #4682b4;
+				}
+			}
+		}
+	
+		.hatha-button {
+			border: 2px solid #ff760d;
+			background: transparent;
+			padding: 0.6em 2em;
+			font-family: 'FedraSansPro', sans-serif;
+			font-size: 1.1em;
+			color: #ff760d;
+			cursor: pointer;
+			transition: background 0.3s ease;
+	
+			&:hover {
+				background: rgba(255, 118, 13, 0.2); /* Subtle fill on hover */
+			}
+		}
+	
+		/* Responsive Adjustments */
+		@include breakpoint('<=mobile') {
+			.image-header-wrapper {
+				margin-bottom: 2em;
+			}
+	
+			.image-overlay {
+				padding: 1em;
+				h2 {
+					font-size: 2em;
+				}
+				p {
+					font-size: 1em;
+					max-width: 90%;
+				}
+			}
+	
+			.hatha-section {
+				flex-direction: column;
+				align-items: center;
+	
+				&.hatha-reverse {
+					flex-direction: column;
+				}
+			}
+	
+			.hatha-text {
+				padding: 0.5em;
+				h3 {
+					font-size: 1.5em;
+					text-align: center;
+				}
+				p {
+					text-align: center;
+					font-size: 1em;
+				}
+			}
+	
+			.hatha-icon-container {
+				gap: 0.3em;
+			}
+	
+			.hatha-icon {
+				width: 6em;
+			}
+	
+			.hatha-caption {
+				font-size: 0.8em;
+			}
+	
+			.hatha-button {
+				padding: 0.6em 2em;
+				font-size: 1em;
+			}
+		}
+	}
+	
+	.hatha-yoga-wrapper {
+		background: url('/images/Ib_secion1bg2.jpg') repeat;
+		background-size: 100% auto; /* Stretch to full width */
+		background-color: #5b5336;
+		padding: 6em 0;
+		position: relative;
+		margin: 0; /* Remove side margins */
+		width: 100vw; /* Full viewport width */
+		left: 50%;
+		transform: translateX(-50%);
+	
+		> * {
+			position: relative;
+			z-index: 1;
+		}
+	}
 
 /* Biography Section */
 #Bio {
-	padding: 2em 0 0 0;
+	padding: 5em 0 0 0;
+
+	h2 {
+		color: #ff760d;
+		font-size: 3em;
+		text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+		margin: 0;
+	}
 
 	p {
+		color: #d3d3d3;
 		text-align: center;
+		text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 		margin: 0 0 0em 0;
+	}
+
+	b strong{
+		color: #ff760d;
 	}
 	
     .bio-content {
@@ -1157,6 +1384,22 @@
         display: block;
         border-radius: 0.5em; /* Match button style */
         box-shadow: 0 0.15em 0.25em rgba(0, 0, 0, 0); /* Subtle shadow */
+    }
+
+	background: url('/images/BackgroundBio.jpg') repeat !important;
+    background-size: 100% auto !important;
+    background-position: center center !important; /* Center horizontally and vertically */
+    background-color: #5b5336 !important;
+    padding: 4em 0;
+    position: relative;
+    margin: 0 !important;
+    width: 100vw !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+
+    > * {
+        position: relative;
+        z-index: 1;
     }
 
     /* Responsive adjustments */
@@ -1242,10 +1485,19 @@
 		padding: 2em 0 2em 0;
 		margin-bottom: 0;
 
+		p {
+			color: #d3d3d3;
+			text-align: center;
+			text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+			margin: 0 0 0em 0;
+		}
+
 		h2 {
 			text-align: center;
+			color: #ff760d;
 			font-size: 3em;
-			color: #ef8376;
+			text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+			margin: 0;
 		}
 
 		article {
@@ -1343,7 +1595,7 @@
 		article {
 			display: inline-block;
 			width: 18em;
-			background: #fff;
+			background: #808080;
 			text-align: center;
 			padding: 0 1em 3em 1em;
 			margin: 0 2em 0 0;
@@ -1368,6 +1620,21 @@
 				text-align: center;
 			}
 		}
+
+		background: url('/images/homeCardBg.png') repeat !important;
+		background-size: 100% auto !important;
+		background-color: #5b5336 !important;
+		padding: 4em 0;
+		position: relative;
+		margin: 0 !important;
+		width: 100vw !important;
+		left: 50% !important;
+		transform: translateX(-50%) !important;
+
+		> * {
+			position: relative;
+			z-index: 1;
+		}	
 	}
 
 	@keyframes highlightBorder {

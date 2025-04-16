@@ -1835,11 +1835,9 @@ header .icon.circled {
   margin: 0;
 }
 #header .header-icon {
-  width: 650px;
-  display: block;
+  width: 36em;
+  vertical-align: middle;
   margin: 0 auto 1em;
-  fill: rgba(231, 9, 247, 0.4274509804);
-  color: rgba(231, 9, 247, 0.4274509804);
 }
 #header h1 {
   color: rgba(0, 0, 0, 0);
@@ -1881,15 +1879,6 @@ header .icon.circled {
   text-align: center;
   font-size: 1.25em;
   padding: 0;
-}
-#header hr {
-  top: 1.5em;
-  margin-bottom: 3em;
-  border-bottom-color: rgba(192, 192, 192, 0.35);
-  box-shadow: inset 0 1px 0 0 rgba(192, 192, 192, 0.35);
-}
-#header hr:before, #header hr:after {
-  background: rgba(192, 192, 192, 0.35);
 }
 #header footer {
   margin: 1em 0 0 0;
@@ -2028,17 +2017,69 @@ body.homepage.is-preload #header:after {
 
 /* Banner */
 #banner {
-  background: #fff;
+  background: #c2c2c2;
   text-align: center;
   padding: 4.5em 0 4.5em 0;
   margin-bottom: 0;
+  display: flex;
+  align-items: center; /* Vertically aligns items */
+  justify-content: center; /* Centers items horizontally */
+  flex-wrap: wrap; /* Allows wrapping if needed on smaller screens */
 }
 #banner h1 {
   font-family: "FedraSerifAPro", serif;
+  vertical-align: middle;
   font-weight: 700;
 }
 #banner header > p {
   margin-bottom: 0;
+}
+#banner .quote-container {
+  display: flex;
+  align-items: flex-start; /* Align items to the top */
+  justify-content: center; /* Centers content horizontally */
+  flex-wrap: nowrap; /* Prevents wrapping of quote images and text */
+  margin-bottom: 1em; /* Space before divider */
+}
+#banner .banner-quote {
+  width: auto;
+  height: 2em; /* Adjusted size for better proportion */
+  display: inline-block;
+  margin-top: 0.2em; /* Fine-tune vertical position to align with text top */
+}
+#banner .quote-start {
+  margin-right: 0.5em; /* Space between start quote and text */
+}
+#banner .quote-end {
+  margin-left: 0.5em; /* Space between text and end quote */
+}
+#banner .quote-text {
+  display: inline-block;
+}
+#banner .quote-text h2 {
+  margin: 0; /* Remove default margin for tighter alignment */
+  text-align: center;
+}
+#banner .banner-icon {
+  width: 10em;
+  vertical-align: middle;
+  margin: 1em auto 0;
+  display: block;
+}
+@media screen and (max-width: 736px) {
+  #banner .quote-container {
+    flex-wrap: wrap; /* Allow wrapping if text is too long */
+  }
+  #banner .banner-quote {
+    height: 0.5em; /* Smaller quotes on mobile */
+    margin-top: 0.15em; /* Adjust for mobile */
+  }
+  #banner .quote-text h2 {
+    font-size: 1.75em; /* Adjust text size for mobile */
+  }
+  #banner .quote-start, #banner .quote-end {
+    margin: 0 0.3em; /* Tighter margins on mobile */
+  }
 }
 
 /* Content */
@@ -2062,25 +2103,25 @@ body.homepage.is-preload #header:after {
   margin-bottom: 0;
 }
 
-/* Hatha Yoga Image Overlay */
+/* Hatha Yoga Section */
 #HathaYoga {
   padding: 2em 0 0 0;
-  margin-top: 2em;
-  /* Responsive adjustments */
-}
-#HathaYoga h3 {
-  text-align: center;
-  margin: 0 0 0.5em 0;
+  margin-top: 0em;
+  /* Responsive Adjustments */
 }
 #HathaYoga .image-header-wrapper {
-  position: relative; /* Creates a positioning context for the overlay */
+  position: relative;
   width: 100%;
-  margin-bottom: 2em; /* Space below the image, similar to original .image.featured */
+  margin-bottom: 3em;
+  border-radius: 0.5em;
+  box-shadow: 0 0.5em 1em rgba(0, 0, 0, 0.3);
+  overflow: hidden;
 }
 #HathaYoga .featured-image {
   display: block;
   width: 100%;
-  height: auto; /* Maintain aspect ratio */
+  height: auto;
+  filter: drop-shadow(0 0 8px rgba(255, 118, 13, 0.6)); /* Static glow, matches #ff760d */
 }
 #HathaYoga .image-overlay {
   position: absolute;
@@ -2090,46 +2131,205 @@ body.homepage.is-preload #header:after {
   height: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
+  justify-content: middle;
   align-items: center;
-  background: rgba(0, 0, 0, 0); /* Semi-transparent background for readability */
-  color: #fff; /* White text for contrast */
+  background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.7));
+  color: #fff;
   padding: 2em;
   box-sizing: border-box;
   text-align: center;
 }
 #HathaYoga .image-overlay h2 {
-  color: #ff760d; /* Override default h2 color for visibility */
-  margin-top: 0em;
-  font-size: 2.5em; /* Match existing h2 size */
+  color: #ff760d;
+  font-size: 3em;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  margin: 0;
 }
 #HathaYoga .image-overlay p {
-  color: #fff; /* Ensure quote is visible */
-  font-size: 1.2em; /* Slightly larger for emphasis */
+  color: #fff;
+  font-size: 1.2em;
+  max-width: 80%;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+#HathaYoga .hatha-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2em;
+}
+#HathaYoga .hatha-section {
+  display: flex;
+  align-items: center;
+  gap: 2em;
+}
+#HathaYoga .hatha-section.hatha-reverse {
+  flex-direction: row-reverse;
+}
+#HathaYoga .hatha-text {
+  flex: 1;
+  padding: 1em;
+}
+#HathaYoga .hatha-text h3 {
+  text-align: left;
+  margin: 0 0 0.5em 0;
+  color: #da782e;
+  font-size: 2em;
+}
+#HathaYoga .hatha-text p {
+  text-align: left;
+  font-size: 1.1em;
+  line-height: 1.8em;
+  color: #d3d3d3;
+}
+#HathaYoga .hatha-icon-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5em; /* Space between image and caption */
+}
+#HathaYoga .hatha-icon {
+  width: 10em;
+  height: auto;
+}
+#HathaYoga .hatha-icon.hatha-sun {
+  filter: drop-shadow(0 0 10px rgba(255, 165, 0, 0.7));
+}
+#HathaYoga .hatha-icon.hatha-moon {
+  filter: drop-shadow(0 0 10px rgba(135, 206, 235, 0.7));
+}
+#HathaYoga .hatha-caption {
+  font-family: "FedraSansPro", sans-serif;
+  font-size: 1em;
+  font-weight: 500;
+  text-align: center;
   margin: 0;
-  max-width: 80%; /* Prevent text from touching edges */
+}
+#HathaYoga .hatha-section .hatha-icon-container .hatha-caption {
+  color: #ffa500; /* Sun color */
+}
+#HathaYoga .hatha-section.hatha-reverse .hatha-icon-container .hatha-caption {
+  color: #87ceeb; /* Moon color */
+}
+#HathaYoga .highlight {
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+#HathaYoga .highlight.highlight-sun {
+  color: #ffa500;
+}
+#HathaYoga .highlight.highlight-sun:hover {
+  color: #ff760d;
+}
+#HathaYoga .highlight.highlight-moon {
+  color: #87ceeb;
+}
+#HathaYoga .highlight.highlight-moon:hover {
+  color: #4682b4;
+}
+#HathaYoga .hatha-button {
+  border: 2px solid #ff760d;
+  background: transparent;
+  padding: 0.6em 2em;
+  font-family: "FedraSansPro", sans-serif;
+  font-size: 1.1em;
+  color: #ff760d;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+#HathaYoga .hatha-button:hover {
+  background: rgba(255, 118, 13, 0.2); /* Subtle fill on hover */
 }
 @media screen and (max-width: 736px) {
+  #HathaYoga .image-header-wrapper {
+    margin-bottom: 2em;
+  }
   #HathaYoga .image-overlay {
     padding: 1em;
   }
   #HathaYoga .image-overlay h2 {
-    font-size: 1.75em; /* Smaller for mobile */
+    font-size: 2em;
   }
   #HathaYoga .image-overlay p {
     font-size: 1em;
     max-width: 90%;
   }
+  #HathaYoga .hatha-section {
+    flex-direction: column;
+    align-items: center;
+  }
+  #HathaYoga .hatha-section.hatha-reverse {
+    flex-direction: column;
+  }
+  #HathaYoga .hatha-text {
+    padding: 0.5em;
+  }
+  #HathaYoga .hatha-text h3 {
+    font-size: 1.5em;
+    text-align: center;
+  }
+  #HathaYoga .hatha-text p {
+    text-align: center;
+    font-size: 1em;
+  }
+  #HathaYoga .hatha-icon-container {
+    gap: 0.3em;
+  }
+  #HathaYoga .hatha-icon {
+    width: 6em;
+  }
+  #HathaYoga .hatha-caption {
+    font-size: 0.8em;
+  }
+  #HathaYoga .hatha-button {
+    padding: 0.6em 2em;
+    font-size: 1em;
+  }
+}
+
+.hatha-yoga-wrapper {
+  background: url("/images/Ib_secion1bg2.jpg") repeat;
+  background-size: 100% auto; /* Stretch to full width */
+  background-color: #5b5336;
+  padding: 6em 0;
+  position: relative;
+  margin: 0; /* Remove side margins */
+  width: 100vw; /* Full viewport width */
+  left: 50%;
+  transform: translateX(-50%);
+}
+.hatha-yoga-wrapper > * {
+  position: relative;
+  z-index: 1;
 }
 
 /* Biography Section */
 #Bio {
-  padding: 2em 0 0 0;
+  padding: 5em 0 0 0;
+  background: url("/images/BackgroundBio.jpg") repeat !important;
+  background-size: 100% auto !important;
+  background-position: center center !important; /* Center horizontally and vertically */
+  background-color: #5b5336 !important;
+  padding: 4em 0;
+  position: relative;
+  margin: 0 !important;
+  width: 100vw !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
   /* Responsive adjustments */
 }
+#Bio h2 {
+  color: #ff760d;
+  font-size: 3em;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  margin: 0;
+}
 #Bio p {
+  color: #d3d3d3;
   text-align: center;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
   margin: 0 0 0em 0;
+}
+#Bio b strong {
+  color: #ff760d;
 }
 #Bio .bio-content {
   display: flex;
@@ -2153,6 +2353,10 @@ body.homepage.is-preload #header:after {
   display: block;
   border-radius: 0.5em; /* Match button style */
   box-shadow: 0 0.15em 0.25em rgba(0, 0, 0, 0); /* Subtle shadow */
+}
+#Bio > * {
+  position: relative;
+  z-index: 1;
 }
 @media screen and (max-width: 736px) {
   #Bio .bio-content {
@@ -2222,11 +2426,28 @@ body.homepage.is-preload #header:after {
   overflow: hidden;
   padding: 2em 0 2em 0;
   margin-bottom: 0;
+  background: url("/images/homeCardBg.png") repeat !important;
+  background-size: 100% auto !important;
+  background-color: #5b5336 !important;
+  padding: 4em 0;
+  position: relative;
+  margin: 0 !important;
+  width: 100vw !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+}
+.carousel p {
+  color: #d3d3d3;
+  text-align: center;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  margin: 0 0 0em 0;
 }
 .carousel h2 {
   text-align: center;
+  color: #ff760d;
   font-size: 3em;
-  color: #ef8376;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  margin: 0;
 }
 .carousel article {
   position: relative;
@@ -2304,7 +2525,7 @@ body.homepage.is-preload #header:after {
 .carousel article {
   display: inline-block;
   width: 18em;
-  background: #fff;
+  background: #808080;
   text-align: center;
   padding: 0 1em 3em 1em;
   margin: 0 2em 0 0;
@@ -2325,6 +2546,10 @@ body.homepage.is-preload #header:after {
 }
 .carousel article p {
   text-align: center;
+}
+.carousel > * {
+  position: relative;
+  z-index: 1;
 }
 
 @keyframes highlightBorder {
