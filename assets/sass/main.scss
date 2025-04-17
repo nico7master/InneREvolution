@@ -1337,86 +1337,291 @@
 		}
 	}
 
-/* Biography Section */
-#Bio {
-	padding: 5em 0 0 0;
-
-	h2 {
-		color: #ff760d;
-		font-size: 3em;
-		text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-		margin: 0;
-	}
-
-	p {
-		color: #d3d3d3;
-		text-align: center;
-		text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-		margin: 0 0 0em 0;
-	}
-
-	b strong{
-		color: #ff760d;
-	}
-	
-    .bio-content {
-        display: flex;
-        flex-wrap: wrap; /* Allow wrapping if needed */
-        align-items: flex-start; /* Align items at the top */
-        margin-bottom: 0em; /* Space before footer */
-    }
-
-    .bio-text {
-        flex: 1; /* Take remaining space */
-        min-width: 50%; /* Ensure text doesn’t get too narrow */
-        padding-right: 2em; /* Space between text and image */
-        box-sizing: border-box;
-    }
-
-    .bio-image {
-        flex: 0 0 300px; /* Fixed width for image */
-        max-width: 100%; /* Prevent overflow */
-    }
-
-    .side-image {
-        width: 100%; /* Fill container */
-        height: auto; /* Maintain aspect ratio */
-        display: block;
-        border-radius: 0.5em; /* Match button style */
-        box-shadow: 0 0.15em 0.25em rgba(0, 0, 0, 0); /* Subtle shadow */
-    }
-
-	background: url('../../images/BackgroundBio.jpg') repeat !important;
-    background-size: 100% auto !important;
-    background-position: center center !important; /* Center horizontally and vertically */
-    background-color: #5b5336 !important;
-    padding: 4em 0;
+/* Bio Wrapper */
+.bio-wrapper {
+    background: url('../../images/BackgroundBio.jpg') no-repeat center center fixed;
+    background-size: cover;
+    background-color: #5b5336;
+    padding: 6em 0;
     position: relative;
-    margin: 0 !important;
-    width: 100vw !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
+    margin: 0;
+    width: 100vw;
+    left: 50%;
+    transform: translateX(-50%);
+
+    &:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.3)); /* Overlay for readability */
+        z-index: 0;
+    }
 
     > * {
         position: relative;
         z-index: 1;
     }
+}
 
-    /* Responsive adjustments */
+/* Bio Wrapper */
+.bio-wrapper {
+    background: url('../../images/BackgroundBio.jpg') no-repeat center center fixed;
+    background-size: cover;
+    background-color: #5b5336;
+    padding: 6em 0;
+    position: relative;
+    margin: 0;
+    width: 100vw;
+    left: 50%;
+    transform: translateX(-50%);
+
+    &:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.3)); /* Overlay for readability */
+        z-index: 0;
+    }
+
+    > * {
+        position: relative;
+        z-index: 1;
+    }
+}
+
+/* Bio Wrapper */
+.bio-wrapper {
+    background: url('../../images/BackgroundBio.jpg') no-repeat center center fixed;
+    background-size: cover;
+    background-color: #5b5336;
+    padding: 6em 0;
+    position: relative;
+    margin: 0;
+    width: 100vw;
+    left: 50%;
+    transform: translateX(-50%);
+
+    &:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.3)); /* Overlay for readability */
+        z-index: 0;
+    }
+
+    > * {
+        position: relative;
+        z-index: 1;
+    }
+}
+
+/* Bio Wrapper */
+.bio-wrapper {
+    background: url('../../images/BackgroundBio.jpg') no-repeat center center fixed;
+    background-size: cover;
+    background-color: #5b5336;
+    padding: 6em 0;
+    position: relative;
+    margin: 0;
+    width: 100vw;
+    left: 50%;
+    transform: translateX(-50%);
+
+    &:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.3)); /* Overlay for readability */
+        z-index: 0;
+    }
+
+    > * {
+        position: relative;
+        z-index: 1;
+    }
+}
+
+/* Biography Section */
+#Bio {
+    padding: 2em;
+    margin: 0 auto;
+    max-width: 1200px;
+
+    header {
+        text-align: center;
+        margin-bottom: 2em;
+
+        h2 {
+            color: #ff760d;
+            font-size: 3.5em;
+            font-family: 'FedraSerifAPro', serif;
+            font-weight: 500;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            margin: 0;
+        }
+    }
+
+    .bio-content {
+        display: flex;
+        align-items: flex-start;
+        gap: 3em; /* Increased for airiness */
+        margin-bottom: 2em;
+    }
+
+    .bio-text {
+        flex: 1;
+        min-width: 50%;
+        padding: 1em;
+
+        .bio-section {
+            margin-bottom: 2em;
+
+            h3 {
+                color: #ff760d;
+                font-size: 2em;
+                font-family: 'FedraSerifAPro', serif;
+                font-weight: 500;
+                text-align: left;
+                margin: 0 0 0.5em 0;
+                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            }
+
+            p {
+                color: #d3d3d3;
+                font-size: 0.95em; /* Smaller text */
+                font-family: 'FedraSansPro', sans-serif;
+                font-weight: 400;
+                line-height: 1.8em;
+                text-align: left;
+                text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+                margin-bottom: 1em;
+            }
+
+            .namaskaram-meaning {
+                color: #b0b0b0; /* More gray */
+                font-size: 0.85em; /* Slightly smaller */
+                font-style: italic;
+                text-decoration: none;
+                border-bottom: 1px solid rgba(176, 176, 176, 0.5); /* Subtle gray underline */
+                transition: color 0.3s ease, border-color 0.3s ease;
+
+                &:hover {
+                    color: #d3d3d3; /* Lighten to body text color on hover */
+                    border-color: #ff760d; /* Orange underline on hover */
+                }
+            }
+        }
+
+		.bio-divider {
+			display: block;
+			width: 100%;
+			height: auto;
+			margin: 1em auto;
+			filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.3));
+		}
+    }
+
+    .bio-image {
+        flex: 0 0 300px;
+        max-width: 100%;
+        text-align: center;
+
+        .side-image {
+            width: 100%;
+            max-width: 300px;
+            height: auto;
+            border-radius: 50%; /* Circular image */
+            filter: drop-shadow(0 0 10px rgba(255, 118, 13, 0.7)); /* Glow shadow */
+            transition: filter 0.3s ease;
+        }
+
+        .side-image:hover {
+            filter: drop-shadow(0 0 15px rgba(255, 118, 13, 0.9)); /* Stronger glow on hover */
+        }
+    }
+
+    footer {
+        text-align: center;
+        margin-top: 2em;
+
+        .hatha-button {
+            border: 2px solid #ff760d;
+            background: transparent;
+            padding: 0.6em 2em;
+            font-family: 'FedraSansPro', sans-serif;
+            font-size: 1.1em;
+            color: #ff760d;
+            cursor: pointer;
+            transition: background 0.3s ease;
+
+            &:hover {
+                background: rgba(255, 118, 13, 0.2);
+            }
+        }
+    }
+
+    /* Responsive Adjustments */
     @include breakpoint('<=mobile') {
         .bio-content {
-            flex-direction: column; /* Stack vertically */
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5em;
         }
 
         .bio-text {
-            padding-right: 0; /* Remove right padding */
-            margin-bottom: 1em; /* Space before image */
+            padding: 0.5em;
+
+            .bio-section {
+                h3 {
+                    font-size: 1.5em;
+                    text-align: center;
+                }
+
+                p {
+                    font-size: 0.9em;
+                    text-align: center;
+                }
+
+                .namaskaram-meaning {
+                    font-size: 0.8em; /* Slightly smaller on mobile */
+                }
+
+                .bio-divider {
+                    width: 80%;
+                    max-width: 150px;
+                }
+            }
         }
 
         .bio-image {
-            flex: 0 0 auto; /* Allow image to size naturally */
-            max-width: 300px; /* Limit width on small screens */
-            margin: 0 auto; /* Center image */
+            flex: 0 0 auto;
+            max-width: 200px;
+            margin: 0 auto;
+        }
+
+        header {
+            h2 {
+                font-size: 2.5em;
+            }
+        }
+
+        footer {
+            .hatha-button {
+                padding: 0.6em 2em;
+                font-size: 1em;
+            }
         }
     }
 }
@@ -1550,7 +1755,7 @@
 				position: absolute;
 				top: 50%;
 				margin: -1.5em 0 0 0;
-				background: url('../../images/arrow.svg') no-repeat center center;
+				background: url('images/arrow.svg') no-repeat center center;
 			}
 
 			&:hover {
