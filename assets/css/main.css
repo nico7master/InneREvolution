@@ -1791,16 +1791,6 @@ header .icon.circled {
   margin: 0 0 2em 0;
 }
 
-/* Wrapper */
-.wrapper {
-  background: #fff;
-  margin: 0 0 2em 0;
-  padding: 6em 0 6em 0;
-}
-.wrapper.style2 {
-  padding-top: 0;
-}
-
 /* Header */
 #header {
   position: relative;
@@ -1837,6 +1827,7 @@ header .icon.circled {
   width: 36em;
   vertical-align: middle;
   margin: 0 auto 1em;
+  filter: drop-shadow(5px 5px 5px rgb(4, 12, 255)); /* Orange glow */
 }
 #header h1 {
   color: rgba(0, 0, 0, 0);
@@ -2285,15 +2276,14 @@ body.homepage.is-preload #header:after {
 }
 
 .hatha-yoga-wrapper {
-  background: url("../../images/Ib_secion1bg2.jpg") repeat;
-  background-size: 100% auto; /* Stretch to full width */
-  background-color: #5b5336;
+  background: url("../../images/Ib_secion1bg5.jpg") no-repeat center center fixed;
+  background-size: cover; /* Show entire image, adjust to cover if needed */
+  background-color: #5b5336; /* Fallback color */
   padding: 6em 0;
+  margin: 0;
+  width: 100%; /* Simplified full-width */
+  min-height: 100vh; /* Ensure enough height to see the image */
   position: relative;
-  margin: 0; /* Remove side margins */
-  width: 100vw; /* Full viewport width */
-  left: 50%;
-  transform: translateX(-50%);
 }
 .hatha-yoga-wrapper > * {
   position: relative;
@@ -2302,96 +2292,14 @@ body.homepage.is-preload #header:after {
 
 /* Bio Wrapper */
 .bio-wrapper {
-  background: url("../../images/BackgroundBio.jpg") no-repeat center center fixed;
-  background-size: cover;
-  background-color: #5b5336;
+  background: url("../../images/wallpaper-411editedLarge.jpeg") no-repeat center center fixed;
+  background-size: cover; /* Show entire image, adjust to cover if needed */
+  background-color: #5b5336; /* Fallback color */
   padding: 6em 0;
-  position: relative;
   margin: 0;
-  width: 100vw;
-  left: 50%;
-  transform: translateX(-50%);
-}
-.bio-wrapper:before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.3)); /* Overlay for readability */
-  z-index: 0;
-}
-.bio-wrapper > * {
+  width: 100%; /* Simplified full-width */
+  min-height: 100vh; /* Ensure enough height to see the image */
   position: relative;
-  z-index: 1;
-}
-
-/* Bio Wrapper */
-.bio-wrapper {
-  background: url("../../images/BackgroundBio.jpg") no-repeat center center fixed;
-  background-size: cover;
-  background-color: #5b5336;
-  padding: 6em 0;
-  position: relative;
-  margin: 0;
-  width: 100vw;
-  left: 50%;
-  transform: translateX(-50%);
-}
-.bio-wrapper:before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.3)); /* Overlay for readability */
-  z-index: 0;
-}
-.bio-wrapper > * {
-  position: relative;
-  z-index: 1;
-}
-
-/* Bio Wrapper */
-.bio-wrapper {
-  background: url("../../images/BackgroundBio.jpg") no-repeat center center fixed;
-  background-size: cover;
-  background-color: #5b5336;
-  padding: 6em 0;
-  position: relative;
-  margin: 0;
-  width: 100vw;
-  left: 50%;
-  transform: translateX(-50%);
-}
-.bio-wrapper:before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.3)); /* Overlay for readability */
-  z-index: 0;
-}
-.bio-wrapper > * {
-  position: relative;
-  z-index: 1;
-}
-
-/* Bio Wrapper */
-.bio-wrapper {
-  background: url("../../images/BackgroundBio.jpg") no-repeat center center fixed;
-  background-size: cover;
-  background-color: #5b5336;
-  padding: 6em 0;
-  position: relative;
-  margin: 0;
-  width: 100vw;
-  left: 50%;
-  transform: translateX(-50%);
 }
 .bio-wrapper:before {
   content: "";
@@ -2413,6 +2321,7 @@ body.homepage.is-preload #header:after {
   padding: 2em;
   margin: 0 auto;
   max-width: 1200px;
+  /* Responsive Adjustments */
   /* Responsive Adjustments */
 }
 #Bio header {
@@ -2448,7 +2357,7 @@ body.homepage.is-preload #header:after {
   font-weight: 500;
   text-align: left;
   margin: 0 0 0.5em 0;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5);
 }
 #Bio .bio-text .bio-section p {
   color: #d3d3d3;
@@ -2457,7 +2366,7 @@ body.homepage.is-preload #header:after {
   font-weight: 400;
   line-height: 1.8em;
   text-align: left;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
   margin-bottom: 1em;
 }
 #Bio .bio-text .bio-section .namaskaram-meaning {
@@ -2477,7 +2386,7 @@ body.homepage.is-preload #header:after {
   width: 100%;
   height: auto;
   margin: 1em auto;
-  filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.3));
+  filter: drop-shadow(0 0 5px rgba(255, 118, 13, 0.7)); /* Orange glow */
 }
 #Bio .bio-image {
   flex: 0 0 300px;
@@ -2494,6 +2403,14 @@ body.homepage.is-preload #header:after {
 }
 #Bio .bio-image .side-image:hover {
   filter: drop-shadow(0 0 15px rgba(255, 118, 13, 0.9)); /* Stronger glow on hover */
+}
+@media screen and (max-width: 736px) {
+  #Bio #Readings .section-divider {
+    width: 80%;
+    max-width: 200px;
+    margin: 1.5em auto;
+    filter: drop-shadow(0 0 5px rgba(255, 118, 13, 0.7)); /* Orange glow */
+  }
 }
 #Bio footer {
   text-align: center;
@@ -2535,6 +2452,7 @@ body.homepage.is-preload #header:after {
   #Bio .bio-text .bio-section .bio-divider {
     width: 80%;
     max-width: 150px;
+    filter: drop-shadow(0 0 5px rgba(255, 118, 13, 0.7)); /* Orange glow */
   }
   #Bio .bio-image {
     flex: 0 0 auto;
@@ -2547,6 +2465,115 @@ body.homepage.is-preload #header:after {
   #Bio footer .hatha-button {
     padding: 0.6em 2em;
     font-size: 1em;
+  }
+}
+
+/* Readings Wrapper */
+.readings-wrapper {
+  background: url("../../images/lingabhairavi_chi.png") no-repeat center center fixed;
+  background-size: cover;
+  background-color: #5b5336; /* Fallback color */
+  padding: 6em 0;
+  margin: 0;
+  width: 100%;
+  position: relative;
+}
+.readings-wrapper h2 {
+  font-size: 3em;
+  color: #ff760d;
+  text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
+}
+.readings-wrapper h3 {
+  font-size: 1.5em;
+  color: #808080;
+  text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
+}
+.readings-wrapper h4 {
+  font-size: 1.5em;
+  color: #ff760d;
+  text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
+}
+.readings-wrapper p {
+  font-size: 1em;
+  color: #e4e4e4;
+  text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
+}
+.readings-wrapper:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.3)); /* Overlay for readability */
+  z-index: 0;
+}
+.readings-wrapper > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Readings Section */
+#Readings {
+  padding: 0em;
+  margin: 0 auto;
+  max-width: 1400px;
+  /* Responsive Adjustments */
+}
+#Readings .section-divider {
+  display: block;
+  width: 50%;
+  max-width: 400px;
+  height: auto;
+  margin: 2em auto;
+  filter: drop-shadow(0 0 5px rgba(255, 118, 13, 0.7)); /* Orange glow */
+}
+#Readings header {
+  text-align: center;
+  margin-bottom: 2em;
+}
+#Readings .row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2em;
+  justify-content: center;
+}
+#Readings .row article {
+  flex: 1 1 300px;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+}
+#Readings .row article .article-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+#Readings .row article .image.featured {
+  margin: 0 0 1.5em 0;
+}
+#Readings .row article header {
+  margin: 0 0 1em 0;
+}
+#Readings .row article p {
+  margin: 0;
+}
+@media screen and (max-width: 736px) {
+  #Readings {
+    padding: 1em;
+  }
+  #Readings .section-divider {
+    width: 80%;
+    max-width: 200px;
+    margin: 1.5em auto;
+  }
+  #Readings .row {
+    flex-direction: column;
+    gap: 1.5em;
+  }
+  #Readings .row article {
+    flex: 1 1 100%;
+    max-width: 100%;
   }
 }
 
@@ -2625,6 +2652,21 @@ body.homepage.is-preload #header:after {
   font-size: 3em;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
   margin: 0;
+}
+.carousel h4 {
+  text-align: center;
+  padding: 1em 2em 0 0;
+  font-size: 1.5em;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  margin: 0;
+  line-height: 2em;
+}
+.carousel h4 a {
+  color: #ff760d;
+  transition: color 0.3s ease;
+}
+.carousel h4 a:hover {
+  color: rgba(0, 0, 0, 0.662745098);
 }
 .carousel article {
   position: relative;

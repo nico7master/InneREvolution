@@ -710,21 +710,6 @@
 		}
 	}
 
-/* Wrapper */
-
-	.wrapper {
-		background: #fff;
-		margin: 0 0 2em 0;
-		padding: 6em 0 6em 0;
-
-		&.style1 {
-		}
-
-		&.style2 {
-			padding-top: 0;
-		}
-	}
-
 /* Header */
 
 	#header {
@@ -768,6 +753,7 @@
 			vertical-align: middle;
 			//display: block;
     		margin: 0 auto 1em;
+			filter: drop-shadow(5px 5px 5px rgb(4, 12, 255)); /* Orange glow */
 		}
 
 		h1 {
@@ -821,17 +807,6 @@
 			font-size: 1.25em;
 			padding: 0;
 		}
-
-		//hr {
-		//	top: 1.5em;
-		//	margin-bottom: 3em;
-		//	border-bottom-color: rgba(192, 192, 192, 0.35);
-		//	box-shadow: inset 0 1px 0 0 rgba(192, 192, 192, 0.35);
-
-		//	&:before, &:after {
-		//		background: rgba(192, 192, 192, 0.35);
-		//	}
-		//}
 
 		footer {
 			margin: 1em 0 0 0;
@@ -1321,15 +1296,14 @@
 	}
 	
 	.hatha-yoga-wrapper {
-		background: url('../../images/Ib_secion1bg2.jpg') repeat;
-		background-size: 100% auto; /* Stretch to full width */
-		background-color: #5b5336;
-		padding: 6em 0;
-		position: relative;
-		margin: 0; /* Remove side margins */
-		width: 100vw; /* Full viewport width */
-		left: 50%;
-		transform: translateX(-50%);
+		background: url('../../images/Ib_secion1bg5.jpg') no-repeat center center fixed;
+		background-size: cover; /* Show entire image, adjust to cover if needed */
+  		background-color: #5b5336; /* Fallback color */
+  		padding: 6em 0;
+ 		margin: 0;
+  		width: 100%; /* Simplified full-width */
+  		min-height: 100vh; /* Ensure enough height to see the image */
+  		position: relative;
 	
 		> * {
 			position: relative;
@@ -1339,102 +1313,14 @@
 
 /* Bio Wrapper */
 .bio-wrapper {
-    background: url('../../images/BackgroundBio.jpg') no-repeat center center fixed;
-    background-size: cover;
-    background-color: #5b5336;
-    padding: 6em 0;
-    position: relative;
-    margin: 0;
-    width: 100vw;
-    left: 50%;
-    transform: translateX(-50%);
-
-    &:before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.3)); /* Overlay for readability */
-        z-index: 0;
-    }
-
-    > * {
-        position: relative;
-        z-index: 1;
-    }
-}
-
-/* Bio Wrapper */
-.bio-wrapper {
-    background: url('../../images/BackgroundBio.jpg') no-repeat center center fixed;
-    background-size: cover;
-    background-color: #5b5336;
-    padding: 6em 0;
-    position: relative;
-    margin: 0;
-    width: 100vw;
-    left: 50%;
-    transform: translateX(-50%);
-
-    &:before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.3)); /* Overlay for readability */
-        z-index: 0;
-    }
-
-    > * {
-        position: relative;
-        z-index: 1;
-    }
-}
-
-/* Bio Wrapper */
-.bio-wrapper {
-    background: url('../../images/BackgroundBio.jpg') no-repeat center center fixed;
-    background-size: cover;
-    background-color: #5b5336;
-    padding: 6em 0;
-    position: relative;
-    margin: 0;
-    width: 100vw;
-    left: 50%;
-    transform: translateX(-50%);
-
-    &:before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.3)); /* Overlay for readability */
-        z-index: 0;
-    }
-
-    > * {
-        position: relative;
-        z-index: 1;
-    }
-}
-
-/* Bio Wrapper */
-.bio-wrapper {
-    background: url('../../images/BackgroundBio.jpg') no-repeat center center fixed;
-    background-size: cover;
-    background-color: #5b5336;
-    padding: 6em 0;
-    position: relative;
-    margin: 0;
-    width: 100vw;
-    left: 50%;
-    transform: translateX(-50%);
+    background: url('../../images/wallpaper-411editedLarge.jpeg') no-repeat center center fixed;
+    background-size: cover; /* Show entire image, adjust to cover if needed */
+  	background-color: #5b5336; /* Fallback color */
+  	padding: 6em 0;
+ 	margin: 0;
+  	width: 100%; /* Simplified full-width */
+  	min-height: 100vh; /* Ensure enough height to see the image */
+  	position: relative;
 
     &:before {
         content: '';
@@ -1495,7 +1381,7 @@
                 font-weight: 500;
                 text-align: left;
                 margin: 0 0 0.5em 0;
-                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+                text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5);
             }
 
             p {
@@ -1505,7 +1391,7 @@
                 font-weight: 400;
                 line-height: 1.8em;
                 text-align: left;
-                text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
                 margin-bottom: 1em;
             }
 
@@ -1529,8 +1415,7 @@
 			width: 100%;
 			height: auto;
 			margin: 1em auto;
-			filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.3));
-		}
+			filter: drop-shadow(0 0 5px rgba(255, 118, 13, 0.7)); /* Orange glow */		}
     }
 
     .bio-image {
@@ -1551,6 +1436,18 @@
             filter: drop-shadow(0 0 15px rgba(255, 118, 13, 0.9)); /* Stronger glow on hover */
         }
     }
+
+/* Responsive Adjustments */
+@include breakpoint('<=mobile') {
+    #Readings {
+        .section-divider {
+            width: 80%;
+            max-width: 200px;
+            margin: 1.5em auto;
+			filter: drop-shadow(0 0 5px rgba(255, 118, 13, 0.7)); /* Orange glow */
+        }
+    }
+}
 
     footer {
         text-align: center;
@@ -1601,6 +1498,7 @@
                 .bio-divider {
                     width: 80%;
                     max-width: 150px;
+					filter: drop-shadow(0 0 5px rgba(255, 118, 13, 0.7)); /* Orange glow */
                 }
             }
         }
@@ -1621,6 +1519,131 @@
             .hatha-button {
                 padding: 0.6em 2em;
                 font-size: 1em;
+            }
+        }
+    }
+}
+
+/* Readings Wrapper */
+.readings-wrapper {
+    background: url('../../images/lingabhairavi_chi.png') no-repeat center center fixed;
+    background-size: cover;
+    background-color: #5b5336; /* Fallback color */
+    padding: 6em 0;
+    margin: 0;
+    width: 100%;
+    position: relative;
+
+	h2{
+		font-size: 3em;
+        color: #ff760d;
+		text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
+	}
+
+	h3{
+		font-size: 1.5em;
+        color: #808080;
+		text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
+	}
+
+	h4{
+		font-size: 1.5em;
+        color: #ff760d;
+		text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
+	}
+
+	p{
+		font-size: 1em;
+        color: #e4e4e4;
+		text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
+	}
+
+    &:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.3)); /* Overlay for readability */
+        z-index: 0;
+    }
+
+    > * {
+        position: relative;
+        z-index: 1;
+    }
+}
+
+/* Readings Section */
+#Readings {
+    padding: 0em;
+    margin: 0 auto;
+    max-width: 1400px;
+
+    .section-divider {
+        display: block;
+        width: 50%;
+        max-width: 400px;
+        height: auto;
+        margin: 2em auto;
+        filter: drop-shadow(0 0 5px rgba(255, 118, 13, 0.7)); /* Orange glow */
+    }
+
+    header {
+        text-align: center;
+        margin-bottom: 2em;
+    }
+
+    .row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 2em;
+        justify-content: center;
+
+        article {
+            flex: 1 1 300px;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+
+            .article-content {
+                display: flex;
+                flex-direction: column;
+                flex: 1;
+            }
+
+            .image.featured {
+                margin: 0 0 1.5em 0;
+            }
+
+            header {
+                margin: 0 0 1em 0;
+            }
+
+            p {
+                margin: 0;
+            }
+        }
+    }
+
+    /* Responsive Adjustments */
+    @include breakpoint('<=mobile') {
+        padding: 1em;
+
+        .section-divider {
+            width: 80%;
+            max-width: 200px;
+            margin: 1.5em auto;
+        }
+
+        .row {
+            flex-direction: column;
+            gap: 1.5em;
+
+            article {
+                flex: 1 1 100%;
+                max-width: 100%;
             }
         }
     }
@@ -1703,6 +1726,25 @@
 			font-size: 3em;
 			text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 			margin: 0;
+		}
+
+		h4 {
+			text-align: center;
+			padding: 1em 2em 0 0;
+			font-size: 1.5em;
+			text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+			margin: 0;
+			line-height: 2em;
+
+			a{
+				color: #ff760d;
+				//text-decoration: none;
+				transition: color 0.3s ease;
+
+				&:hover {
+					color: #000000a9;
+				}
+			}
 		}
 
 		article {
