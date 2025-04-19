@@ -2386,7 +2386,7 @@ body.homepage.is-preload #header:after {
   width: 100%;
   height: auto;
   margin: 1em auto;
-  filter: drop-shadow(0 0 5px rgba(255, 118, 13, 0.7)); /* Orange glow */
+  filter: drop-shadow(0 0 5px rgba(238, 238, 238, 0.697));
 }
 #Bio .bio-image {
   flex: 0 0 300px;
@@ -2417,17 +2417,17 @@ body.homepage.is-preload #header:after {
   margin-top: 2em;
 }
 #Bio footer .hatha-button {
-  border: 2px solid #ff760d;
+  border: 2px solid #002093;
   background: transparent;
   padding: 0.6em 2em;
   font-family: "FedraSansPro", sans-serif;
   font-size: 1.1em;
-  color: #ff760d;
+  color: #001d75;
   cursor: pointer;
   transition: background 0.3s ease;
 }
 #Bio footer .hatha-button:hover {
-  background: rgba(255, 118, 13, 0.2);
+  background: rgba(25, 13, 255, 0.2);
 }
 @media screen and (max-width: 736px) {
   #Bio .bio-content {
