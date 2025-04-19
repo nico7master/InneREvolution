@@ -5,7 +5,7 @@
 @import "libs/breakpoints";
 @import "libs/html-grid";
 @import url("https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,300italic,400,400italic,600");
-@import url("fontawesome-all.min.css");
+@import url("..//css/fontawesome-all.min.css");
 @import "fonts";
 
 /*
@@ -1903,6 +1903,10 @@ body.homepage {
   overflow: hidden;
   padding: 2em 0 2em 0;
   margin-bottom: 0;
+  @include breakpoint("<=mobile") {
+	background-repeat: no-repeat !important;
+    background-size: cover !important;
+  }
   .yoga-divider{
 	width: 100%;
     max-width: 500px;
@@ -2397,9 +2401,9 @@ body.homepage {
         color: rgba(255, 255, 255, 0.75);
         text-align: center;
         display: block;
-        font-size: 14px;
-        width: 80px;
-        height: 30px;
+        font-size: 24px;
+        width: 70px;
+        height: 40px;
         line-height: 30px;
         position: absolute;
         left: 50%;
@@ -2407,6 +2411,9 @@ body.homepage {
         background: rgba(132, 128, 136, 0.75);
         border-top: 0;
         border-radius: 0 0 0.35em 0.35em;
+		display: flex;
+		align-items: center;
+        justify-content: center;
       }
     }
   }
