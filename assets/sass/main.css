@@ -1,5 +1,5 @@
 @import url("https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,300italic,400,400italic,600");
-@import url("fontawesome-all.min.css");
+@import url("..//css/fontawesome-all.min.css");
 @font-face {
   font-family: 'FedraSansPro';
   src: url("../webfonts/fedrasanspro-book-webfont.woff2") format("woff2"), url("../webfonts/fedrasanspro-book-webfont.woff") format("woff");
@@ -3343,6 +3343,13 @@ body.homepage.is-preload #header:after {
           transform: translateX(-50%) !important;
 }
 
+@media screen and (max-width: 736px) {
+  .carousel {
+    background-repeat: no-repeat !important;
+    background-size: cover !important;
+  }
+}
+
 .carousel .yoga-divider {
   width: 100%;
   max-width: 500px;
@@ -3798,9 +3805,9 @@ body.homepage.is-preload #header:after {
     color: rgba(255, 255, 255, 0.75);
     text-align: center;
     display: block;
-    font-size: 14px;
-    width: 80px;
-    height: 30px;
+    font-size: 24px;
+    width: 70px;
+    height: 40px;
     line-height: 30px;
     position: absolute;
     left: 50%;
@@ -3808,6 +3815,15 @@ body.homepage.is-preload #header:after {
     background: rgba(132, 128, 136, 0.75);
     border-top: 0;
     border-radius: 0 0 0.35em 0.35em;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+        -ms-flex-align: center;
+            align-items: center;
+    -webkit-box-pack: center;
+        -ms-flex-pack: center;
+            justify-content: center;
   }
   #navPanel {
     -webkit-backface-visibility: hidden;
