@@ -1,5 +1,5 @@
 @import url("https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,300italic,400,400italic,600");
-@import url("fontawesome-all.min.css");
+@import url("..//css/fontawesome-all.min.css");
 @font-face {
   font-family: "FedraSansPro";
   src: url("../webfonts/fedrasanspro-book-webfont.woff2") format("woff2"), url("../webfonts/fedrasanspro-book-webfont.woff") format("woff");
@@ -79,21 +79,91 @@
   font-style: normal;
 }
 /*
-	Helios by HTML5 UP
+	Based on Helios by HTML5 UP
 	html5up.net | @ajlkn
 	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
 */
-html, body, div, span, applet, object,
-iframe, h1, h2, h3, h4, h5, h6, p, blockquote,
-pre, a, abbr, acronym, address, big, cite,
-code, del, dfn, em, img, ins, kbd, q, s, samp,
-small, strike, strong, sub, sup, tt, var, b,
-u, i, center, dl, dt, dd, ol, ul, li, fieldset,
-form, label, legend, table, caption, tbody,
-tfoot, thead, tr, th, td, article, aside,
-canvas, details, embed, figure, figcaption,
-footer, header, hgroup, menu, nav, output, ruby,
-section, summary, time, mark, audio, video {
+html,
+body,
+div,
+span,
+applet,
+object,
+iframe,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+pre,
+a,
+abbr,
+acronym,
+address,
+big,
+cite,
+code,
+del,
+dfn,
+em,
+img,
+ins,
+kbd,
+q,
+s,
+samp,
+small,
+strike,
+strong,
+sub,
+sup,
+tt,
+var,
+b,
+u,
+i,
+center,
+dl,
+dt,
+dd,
+ol,
+ul,
+li,
+fieldset,
+form,
+label,
+legend,
+table,
+caption,
+tbody,
+tfoot,
+thead,
+tr,
+th,
+td,
+article,
+aside,
+canvas,
+details,
+embed,
+figure,
+figcaption,
+footer,
+header,
+hgroup,
+menu,
+nav,
+output,
+ruby,
+section,
+summary,
+time,
+mark,
+audio,
+video {
   margin: 0;
   padding: 0;
   border: 0;
@@ -103,8 +173,17 @@ section, summary, time, mark, audio, video {
   text-shadow: 0.5px 0.5px 1px rgba(0, 0, 0, 0.2);
 }
 
-article, aside, details, figcaption, figure,
-footer, header, hgroup, menu, nav, section {
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+menu,
+nav,
+section {
   display: block;
 }
 
@@ -112,14 +191,18 @@ body {
   line-height: 1;
 }
 
-ol, ul {
+ol,
+ul {
   list-style: none;
 }
 
-blockquote, q {
+blockquote,
+q {
   quotes: none;
 }
-blockquote:before, blockquote:after, q:before, q:after {
+blockquote:before, blockquote:after,
+q:before,
+q:after {
   content: "";
   content: none;
 }
@@ -143,7 +226,9 @@ input::-moz-focus-inner {
   padding: 0;
 }
 
-input, select, textarea {
+input,
+select,
+textarea {
   -moz-appearance: none;
   -webkit-appearance: none;
   appearance: none;
@@ -154,7 +239,9 @@ html {
   box-sizing: border-box;
 }
 
-*, *:before, *:after {
+*,
+*:before,
+*:after {
   box-sizing: inherit;
 }
 
@@ -166,19 +253,28 @@ body {
   font-family: "FedraSansPro", sans-serif;
   font-weight: 400;
 }
-body.is-preload *, body.is-preload *:before, body.is-preload *:after {
+body.is-preload *,
+body.is-preload *:before,
+body.is-preload *:after {
   animation: none !important;
   transition: none !important;
 }
 
-input, textarea, select {
+input,
+textarea,
+select {
   font-size: 15pt;
   line-height: 1.85em;
   font-family: "FedraSansPro", sans-serif;
   font-weight: 300;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   color: #483949;
   line-height: 1.25em;
   font-family: "FedraSerifAPro", serif;
@@ -186,13 +282,23 @@ h1, h2, h3, h4, h5, h6 {
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
+h1 a,
+h2 a,
+h3 a,
+h4 a,
+h5 a,
+h6 a {
   color: inherit;
   text-decoration: none;
   border-bottom-color: transparent;
 }
 
-h1 strong, h2 strong, h3 strong, h4 strong, h5 strong, h6 strong {
+h1 strong,
+h2 strong,
+h3 strong,
+h4 strong,
+h5 strong,
+h6 strong {
   font-weight: 600;
 }
 
@@ -212,12 +318,14 @@ h4 {
   margin: 0 0 0.25em 0;
 }
 
-strong, b {
+strong,
+b {
   font-weight: 400;
   color: #483949;
 }
 
-em, i {
+em,
+i {
   font-style: italic;
 }
 
@@ -252,7 +360,11 @@ blockquote {
   font-weight: 400;
 }
 
-p, ul, ol, dl, table {
+p,
+ul,
+ol,
+dl,
+table {
   margin-bottom: 1em;
 }
 
@@ -1440,17 +1552,24 @@ hr:after {
 }
 
 /* Sections/Article */
-section, article {
+section,
+article {
   margin-bottom: 3em;
 }
-section > :last-child, section:last-child, article > :last-child, article:last-child {
+section > :last-child, section:last-child,
+article > :last-child,
+article:last-child {
   margin-bottom: 0;
 }
-section.special > header, section.special > footer, article.special > header, article.special > footer {
+section.special > header,
+section.special > footer,
+article.special > header,
+article.special > footer {
   text-align: center;
 }
 
-.row > section, .row > article {
+.row > section,
+.row > article {
   margin-bottom: 0;
 }
 
@@ -1625,7 +1744,7 @@ form textarea {
   background: #fafafa;
   width: 100%;
   border-radius: 0.5em;
-  border: solid 1px #E5E5E5;
+  border: solid 1px #e5e5e5;
   padding: 1em;
   transition: background-color 0.35s ease-in-out, border-color 0.35s ease-in-out;
 }
@@ -1727,14 +1846,14 @@ input[type=submit].alt,
 input[type=reset].alt,
 button.alt,
 .button.alt {
-  background: #2B252C;
+  background: #2b252c;
 }
 input[type=button].alt:hover,
 input[type=submit].alt:hover,
 input[type=reset].alt:hover,
 button.alt:hover,
 .button.alt:hover {
-  background: #3B353C;
+  background: #3b353c;
 }
 
 /* Post */
@@ -1794,40 +1913,39 @@ header .icon.circled {
 /* Header */
 #header {
   position: relative;
-  background-image: url("../../images/wallpaper-1981.jpeg");
+  background: url("../../images/wallpaper-1981.jpeg") no-repeat center center fixed;
   background-size: cover;
-  background-position: center center;
-  background-attachment: fixed;
+  background-color: #5b5336; /* Fallback color */
   color: #fff;
   text-align: center;
-  padding: 7.5em 0 2em 0;
+  padding: 2em 0; /* Reduced padding since .inner is fixed */
   cursor: default;
-}
-#header:before {
-  content: "";
-  display: inline-block;
-  vertical-align: middle;
-  height: 100%;
+  overflow: hidden;
+  /* Existing styles for header-icon, h1, h2, h3 remain unchanged */
 }
 #header .inner {
-  position: relative;
+  position: fixed; /* Fix the text content */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* Center horizontally and vertically */
   z-index: 1;
-  margin: 0;
-  display: inline-block;
-  vertical-align: middle;
+  width: 80%; /* Responsive width */
+  max-width: 800px; /* Limit width for larger screens */
+  text-align: center;
+  z-index: 0;
 }
-#header header {
-  display: inline-block;
-}
-#header header > p {
-  font-size: 1.25em;
-  margin: 0;
+@media screen and (max-width: 736px) {
+  #header .inner {
+    width: 90%; /* Slightly wider on mobile */
+    max-width: none; /* Remove max-width for small screens */
+    top: 40%; /* Adjust vertical position for better mobile fit */
+  }
 }
 #header .header-icon {
   width: 36em;
   vertical-align: middle;
   margin: 0 auto 1em;
-  filter: drop-shadow(5px 5px 5px rgb(4, 12, 255)); /* Orange glow */
+  filter: drop-shadow(5px 5px 5px rgb(4, 12, 255));
 }
 #header h1 {
   color: rgba(0, 0, 0, 0);
@@ -1860,30 +1978,15 @@ header .icon.circled {
 #header h3 a:hover {
   color: rgba(0, 0, 0, 0);
 }
-#header .button {
-  display: inline-block;
-  border-radius: 100%;
-  width: 4.5em;
-  height: 4.5em;
-  line-height: 4.5em;
-  text-align: center;
-  font-size: 1.25em;
-  padding: 0;
-}
-#header footer {
-  margin: 1em 0 0 0;
-}
 
+/* Ensure homepage header height remains */
 body.homepage #header {
   height: 100vh;
   min-height: 40em;
 }
-body.homepage #header h1 {
-  font-size: 4em;
-}
 body.homepage #header:after {
   content: "";
-  background: #1C0920;
+  background: #1c0920;
   display: block;
   position: absolute;
   left: 0;
@@ -1946,7 +2049,8 @@ body.homepage.is-preload #header:after {
 #nav > ul > li.active {
   border-color: rgba(192, 192, 192, 0.35);
 }
-#nav > ul > li > a, #nav > ul > li > span {
+#nav > ul > li > a,
+#nav > ul > li > span {
   display: block;
   color: rgb(192, 192, 192);
   text-decoration: none;
@@ -1982,7 +2086,8 @@ body.homepage.is-preload #header:after {
 .dropotron li:hover {
   color: #ef8376;
 }
-.dropotron li a, .dropotron li span {
+.dropotron li a,
+.dropotron li span {
   display: block;
   border: 0;
   padding: 0.5em 0 0.5em 0;
@@ -2007,14 +2112,17 @@ body.homepage.is-preload #header:after {
 
 /* Banner */
 #banner {
-  background: #c2c2c2;
+  align-items: center;
   text-align: center;
+  background: url("../../images/homeCardBg1.png");
+  background-size: 100% auto;
+  background-color: #5b5336;
   padding: 4.5em 0 4.5em 0;
-  margin-bottom: 0;
-  display: flex;
-  align-items: center; /* Vertically aligns items */
-  justify-content: center; /* Centers items horizontally */
-  flex-wrap: wrap; /* Allows wrapping if needed on smaller screens */
+  position: relative;
+  margin: 0;
+  width: 100vw;
+  left: 50%;
+  transform: translateX(-50%);
 }
 #banner h1 {
   font-family: "FedraSerifAPro", serif;
@@ -2067,7 +2175,8 @@ body.homepage.is-preload #header:after {
   #banner .quote-text h2 {
     font-size: 1.75em; /* Adjust text size for mobile */
   }
-  #banner .quote-start, #banner .quote-end {
+  #banner .quote-start,
+  #banner .quote-end {
     margin: 0 0.3em; /* Tighter margins on mobile */
   }
 }
@@ -2234,6 +2343,8 @@ body.homepage.is-preload #header:after {
   }
   #HathaYoga .image-overlay {
     padding: 1em;
+    position: relative;
+    margin-bottom: 0;
   }
   #HathaYoga .image-overlay h2 {
     font-size: 2em;
@@ -2324,6 +2435,11 @@ body.homepage.is-preload #header:after {
   /* Responsive Adjustments */
   /* Responsive Adjustments */
 }
+@media screen and (max-width: 736px) {
+  #Bio {
+    padding: 0em;
+  }
+}
 #Bio header {
   text-align: center;
   margin-bottom: 2em;
@@ -2349,6 +2465,11 @@ body.homepage.is-preload #header:after {
 }
 #Bio .bio-text .bio-section {
   margin-bottom: 2em;
+}
+@media screen and (max-width: 736px) {
+  #Bio .bio-text .bio-section {
+    margin-bottom: 0em;
+  }
 }
 #Bio .bio-text .bio-section h3 {
   color: #ff760d;
@@ -2595,7 +2716,11 @@ body.homepage.is-preload #header:after {
   text-align: center;
   cursor: default;
 }
-#footer h2, #footer h3, #footer h4, #footer h5, #footer h6 {
+#footer h2,
+#footer h3,
+#footer h4,
+#footer h5,
+#footer h6 {
   color: #fff;
   font-family: "FedraSerifAPro", serif;
   font-weight: 500;
@@ -2630,7 +2755,7 @@ body.homepage.is-preload #header:after {
   overflow: hidden;
   padding: 2em 0 2em 0;
   margin-bottom: 0;
-  background: url("../../images/homeCardBg.png") repeat !important;
+  background: url("../../images/homeCardBg1.png") repeat !important;
   background-size: 100% auto !important;
   background-color: #5b5336 !important;
   padding: 4em 0;
@@ -2639,6 +2764,18 @@ body.homepage.is-preload #header:after {
   width: 100vw !important;
   left: 50% !important;
   transform: translateX(-50%) !important;
+}
+@media screen and (max-width: 736px) {
+  .carousel {
+    background-repeat: no-repeat !important;
+    background-size: cover !important;
+  }
+}
+.carousel .yoga-divider {
+  width: 50%;
+  max-width: 200px;
+  margin: auto;
+  display: block;
 }
 .carousel p {
   color: #d3d3d3;
@@ -2653,6 +2790,11 @@ body.homepage.is-preload #header:after {
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
   margin: 0;
 }
+@media screen and (max-width: 736px) {
+  .carousel h2 {
+    font-size: 2em;
+  }
+}
 .carousel h4 {
   text-align: center;
   padding: 1em 2em 0 0;
@@ -2660,6 +2802,11 @@ body.homepage.is-preload #header:after {
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
   margin: 0;
   line-height: 2em;
+}
+@media screen and (max-width: 736px) {
+  .carousel h4 {
+    padding: 1em;
+  }
 }
 .carousel h4 a {
   color: #ff760d;
@@ -2683,7 +2830,8 @@ body.homepage.is-preload #header:after {
   animation: highlightBorder 3.5s ease-in-out forwards;
   pointer-events: none;
 }
-.carousel .forward, .carousel .backward {
+.carousel .forward,
+.carousel .backward {
   position: absolute;
   top: 50%;
   width: 6em;
@@ -2691,7 +2839,8 @@ body.homepage.is-preload #header:after {
   margin-top: -6em;
   cursor: pointer;
 }
-.carousel .forward:before, .carousel .backward:before {
+.carousel .forward:before,
+.carousel .backward:before {
   content: "";
   display: block;
   width: 6em;
@@ -2704,7 +2853,8 @@ body.homepage.is-preload #header:after {
   transition: background-color 0.35s ease-in-out;
   -webkit-backface-visibility: hidden;
 }
-.carousel .forward:after, .carousel .backward:after {
+.carousel .forward:after,
+.carousel .backward:after {
   content: "";
   width: 3em;
   height: 3em;
@@ -2713,7 +2863,8 @@ body.homepage.is-preload #header:after {
   margin: -1.5em 0 0 0;
   background: url("images/arrow.svg") no-repeat center center;
 }
-.carousel .forward:hover:before, .carousel .backward:hover:before {
+.carousel .forward:hover:before,
+.carousel .backward:hover:before {
   background-color: rgba(239, 131, 118, 0.75);
 }
 .carousel .forward {
@@ -2788,7 +2939,10 @@ body.homepage.is-preload #header:after {
 /* Wide */
 @media screen and (max-width: 1680px) {
   /* Basic */
-  body, input, textarea, select {
+  body,
+  input,
+  textarea,
+  select {
     font-size: 14pt;
     line-height: 1.75em;
   }
@@ -2807,7 +2961,10 @@ body.homepage.is-preload #header:after {
 /* Normal */
 @media screen and (max-width: 1280px) {
   /* Basic */
-  body, input, textarea, select {
+  body,
+  input,
+  textarea,
+  select {
     font-size: 12pt;
     line-height: 1.5em;
   }
@@ -2817,9 +2974,6 @@ body.homepage.is-preload #header:after {
     padding-right: 2em;
   }
   /* Header */
-  #header {
-    background-attachment: scroll;
-  }
   #header .inner {
     padding-left: 2em;
     padding-right: 2em;
@@ -2828,6 +2982,7 @@ body.homepage.is-preload #header:after {
   #banner {
     padding-left: 2em;
     padding-right: 2em;
+    position: relative;
   }
   /* Footer */
   #footer {
@@ -2839,7 +2994,10 @@ body.homepage.is-preload #header:after {
 /* Narrower */
 @media screen and (max-width: 840px) {
   /* Basic */
-  body, input, textarea, select {
+  body,
+  input,
+  textarea,
+  select {
     font-size: 13pt;
     line-height: 1.65em;
   }
@@ -2864,16 +3022,21 @@ body.homepage.is-preload #header:after {
   }
 }
 /* Mobile */
-#navPanel, #titleBar {
+#navPanel,
+#titleBar {
   display: none;
 }
 
 @media screen and (max-width: 736px) {
   /* Basic */
-  html, body {
+  html,
+  body {
     overflow-x: hidden;
   }
-  body, input, textarea, select {
+  body,
+  input,
+  textarea,
+  select {
     font-size: 12.5pt;
     line-height: 1.5em;
   }
@@ -2888,13 +3051,16 @@ body.homepage.is-preload #header:after {
     margin-bottom: 6em;
   }
   /* Section/Article */
-  section, article {
+  section,
+  article {
     margin-bottom: 2em;
   }
-  section:last-child, article:last-child {
+  section:last-child,
+  article:last-child {
     margin-bottom: 0;
   }
-  .row > section, .row > article {
+  .row > section,
+  .row > article {
     margin-bottom: 2em;
   }
   header > p {
@@ -3001,9 +3167,9 @@ body.homepage.is-preload #header:after {
     color: rgba(255, 255, 255, 0.75);
     text-align: center;
     display: block;
-    font-size: 14px;
-    width: 80px;
-    height: 30px;
+    font-size: 24px;
+    width: 70px;
+    height: 40px;
     line-height: 30px;
     position: absolute;
     left: 50%;
@@ -3011,6 +3177,9 @@ body.homepage.is-preload #header:after {
     background: rgba(132, 128, 136, 0.75);
     border-top: 0;
     border-radius: 0 0 0.35em 0.35em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   #navPanel {
     backface-visibility: hidden;
@@ -3094,7 +3263,6 @@ body.homepage.is-preload #header:after {
   }
   /* Header */
   #header {
-    background-attachment: scroll;
     padding: 2.5em 0 0 0;
   }
   #header .inner {
@@ -3113,15 +3281,15 @@ body.homepage.is-preload #header:after {
     margin-bottom: 2.5em;
   }
   body.homepage #header {
-    min-height: 0;
+    height: 100vh; /* Taller header for mobile */
+    min-height: 40em; /* Ensure sufficient height */
     padding: 5.5em 0 5em 0;
-    height: auto;
   }
   body.homepage #header:before {
     display: none;
   }
   body.homepage #header h1 {
-    font-size: 2.5em;
+    font-size: 1.8em;
   }
   /* Nav */
   #nav {
@@ -3129,6 +3297,7 @@ body.homepage.is-preload #header:after {
   }
   /* Banner */
   #banner {
+    z-index: 2;
     padding: 3em 2em 3em 2em;
   }
   /* Sidebar */

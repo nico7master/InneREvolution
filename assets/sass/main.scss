@@ -9,7 +9,7 @@
 @import "fonts";
 
 /*
-	Helios by HTML5 UP
+	Based on Helios by HTML5 UP
 	html5up.net | @ajlkn
 	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
 */
@@ -857,55 +857,41 @@ button,
 }
 
 /* Header */
-
 #header {
   position: relative;
-  background-image: url("../../images/wallpaper-1981.jpeg");
+  background: url("../../images/wallpaper-1981.jpeg") no-repeat center center fixed;
   background-size: cover;
-  background-position: center center;
-  background-attachment: fixed;
+  background-color: #5b5336; /* Fallback color */
   color: #fff;
   text-align: center;
-  padding: 7.5em 0 2em 0;
+  padding: 2em 0; /* Reduced padding since .inner is fixed */
   cursor: default;
-
-  &:before {
-    content: "";
-    display: inline-block;
-    vertical-align: middle;
-    height: 100%;
-  }
+  overflow: hidden;
 
   .inner {
-    position: relative;
+    position: fixed; /* Fix the text content */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Center horizontally and vertically */
     z-index: 1;
-    margin: 0;
-    display: inline-block;
-    vertical-align: middle;
+    width: 80%; /* Responsive width */
+    max-width: 800px; /* Limit width for larger screens */
+    text-align: center;
+    z-index: 0;
+
     @include breakpoint("<=mobile") {
-      display: block;
+      width: 90%; /* Slightly wider on mobile */
+      max-width: none; /* Remove max-width for small screens */
+      top: 40%; /* Adjust vertical position for better mobile fit */
     }
   }
 
-  header {
-    display: inline-block;
-    @include breakpoint("<=mobile") {
-      display: block;
-    }
-
-    > p {
-      font-size: 1.25em;
-      margin: 0;
-    }
-  }
-
+  /* Existing styles for header-icon, h1, h2, h3 remain unchanged */
   .header-icon {
     width: 36em;
-    //height: 40px;
     vertical-align: middle;
-    //display: block;
     margin: 0 auto 1em;
-    filter: drop-shadow(5px 5px 5px rgb(4, 12, 255)); /* Orange glow */
+    filter: drop-shadow(5px 5px 5px rgb(4, 12, 255));
   }
 
   h1 {
@@ -913,8 +899,7 @@ button,
     font-size: 3em;
     line-height: 1em;
     font-family: "FedraSerifAPro", serif;
-    font-weight: 700; // Bold for big header
-
+    font-weight: 700;
     -webkit-text-stroke: 2px rgb(100, 121, 255);
     text-shadow: 0 0 16px rgba(0, 34, 255, 0.9);
     letter-spacing: 3px;
@@ -922,11 +907,7 @@ button,
 
   h2 a {
     color: #f4c33000;
-    //font-size: 3em;
-    //line-height: 1em;
-    //font-weight: 700; // Bold for big header
     font-family: "FedraSerifAPro", serif;
-
     -webkit-text-stroke: 1px #ffd761cf;
     text-shadow: 0 0 10px #84691a;
     letter-spacing: 2px;
@@ -938,11 +919,7 @@ button,
 
   h3 a {
     color: #000000b6;
-    //font-size: 3em;
-    //line-height: 1em;
-    //font-weight: 700; // Bold for big header
     font-family: "FedraSerifAPro", serif;
-
     -webkit-text-stroke: 1px #ff6565cf;
     text-shadow: 0 0 6px #84691a;
     letter-spacing: 2px;
@@ -952,31 +929,13 @@ button,
       color: #00000000;
     }
   }
-
-  .button {
-    display: inline-block;
-    border-radius: 100%;
-    width: 4.5em;
-    height: 4.5em;
-    line-height: 4.5em;
-    text-align: center;
-    font-size: 1.25em;
-    padding: 0;
-  }
-
-  footer {
-    margin: 1em 0 0 0;
-  }
 }
 
+/* Ensure homepage header height remains */
 body.homepage {
   #header {
     height: 100vh;
     min-height: 40em;
-
-    h1 {
-      font-size: 4em;
-    }
 
     &:after {
       content: "";
@@ -1001,6 +960,7 @@ body.homepage {
     }
   }
 }
+
 
 /* Nav */
 
@@ -1134,14 +1094,24 @@ body.homepage {
 
 /* Banner */
 #banner {
-  background: #c2c2c2;
+  //padding: 4.5em 0 4.5em 0;
+  //margin-bottom: 0;
+  //display: flex;
+  //justify-content: center; /* Centers items horizontally */
+  //flex-wrap: wrap; /* Allows wrapping if needed on smaller screens */
+  //position: relative;
+
+  align-items: center;
   text-align: center;
+  background: url("../../images/homeCardBg1.png");
+  background-size: 100% auto;
+  background-color: #5b5336;
   padding: 4.5em 0 4.5em 0;
-  margin-bottom: 0;
-  display: flex;
-  align-items: center; /* Vertically aligns items */
-  justify-content: center; /* Centers items horizontally */
-  flex-wrap: wrap; /* Allows wrapping if needed on smaller screens */
+  position: relative;
+  margin: 0;
+  width: 100vw;
+  left: 50%;
+  transform: translateX(-50%);
 
   h1 {
     font-family: "FedraSerifAPro", serif;
@@ -1908,8 +1878,8 @@ body.homepage {
     background-size: cover !important;
   }
   .yoga-divider{
-	width: 100%;
-    max-width: 500px;
+	width: 50%;
+    max-width: 200px;
     margin: auto;
     display: block;
   }
@@ -2076,7 +2046,7 @@ body.homepage {
     }
   }
 
-  background: url("../../images/homeCardBg.png") repeat !important;
+  background: url("../../images/homeCardBg1.png") repeat !important;
   background-size: 100% auto !important;
   background-color: #5b5336 !important;
   padding: 4em 0;
@@ -2159,8 +2129,6 @@ body.homepage {
   /* Header */
 
   #header {
-    background-attachment: scroll;
-
     .inner {
       padding-left: 2em;
       padding-right: 2em;
@@ -2172,6 +2140,7 @@ body.homepage {
   #banner {
     padding-left: 2em;
     padding-right: 2em;
+    position: relative;
   }
 
   /* Footer */
@@ -2521,7 +2490,6 @@ body.homepage {
   /* Header */
 
   #header {
-    background-attachment: scroll;
     padding: 2.5em 0 0 0;
 
     .inner {
@@ -2548,14 +2516,14 @@ body.homepage {
 
   body.homepage {
     #header {
-      min-height: 0;
+      height: 100vh; /* Taller header for mobile */
+      min-height: 40em; /* Ensure sufficient height */
       padding: 5.5em 0 5em 0;
-      height: auto;
-
+  
       &:before {
         display: none;
       }
-
+  
       h1 {
         font-size: 1.8em;
       }
@@ -2571,6 +2539,7 @@ body.homepage {
   /* Banner */
 
   #banner {
+    z-index: 2;
     padding: 3em 2em 3em 2em;
   }
 
