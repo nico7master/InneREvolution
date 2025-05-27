@@ -2787,6 +2787,44 @@ body.homepage.is-preload #header:after {
   }
 }
 
+.calendar-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2em 0;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 1em;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
+  margin: 2em auto;
+  max-width: 900px;
+}
+.calendar-container h2 {
+  margin-bottom: 1.2em;
+  font-size: 2.2em;
+  color: #001d75;
+  text-align: center;
+}
+.calendar-container iframe {
+  border-radius: 12px;
+  border: none;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 800px;
+  min-height: 400px;
+  margin-bottom: 1em;
+  background: #fff;
+}
+
+@media (max-width: 900px) {
+  .calendar-container iframe {
+    max-width: 100vw;
+    width: 98vw;
+    min-height: 350px;
+  }
+  .calendar-container {
+    padding: 1em 0.2em;
+  }
+}
 /* Readings Wrapper */
 .readings-wrapper {
   background: url("../../images/lingabhairavi_chi.png") no-repeat center center fixed;
