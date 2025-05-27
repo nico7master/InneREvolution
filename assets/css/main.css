@@ -2589,6 +2589,148 @@ body.homepage.is-preload #header:after {
   }
 }
 
+/* sadhguru Wrapper */
+.sadhguru-wrapper {
+  background: url("../../images/SadhguruPage1.jpg") no-repeat center center fixed;
+  background-size: cover; /* Show entire image, adjust to cover if needed */
+  background-color: #5b5336; /* Fallback color */
+  padding: 6em 0;
+  margin: 0;
+  width: 100%; /* Simplified full-width */
+  min-height: 100vh; /* Ensure enough height to see the image */
+  position: relative;
+}
+.sadhguru-wrapper > * {
+  position: relative;
+  z-index: 1;
+}
+
+#sadhguru header {
+  text-align: center;
+  margin-bottom: 2em;
+}
+#sadhguru header h2 {
+  color: #ff760d;
+  font-size: 3.5em;
+  font-family: "FedraSerifAPro", serif;
+  font-weight: 700;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.4);
+  margin: 0 0 0.5em 0;
+  letter-spacing: 1px;
+}
+#sadhguru .sadhguru-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  margin-bottom: 1em;
+}
+#sadhguru .sadhguru-divider {
+  display: block;
+  margin-left: 5em;
+  margin-right: auto;
+  width: 50%;
+  height: auto;
+}
+@media screen and (max-width: 736px) {
+  #sadhguru .sadhguru-divider {
+    width: 70%;
+  }
+}
+#sadhguru .sadhguru-section {
+  background: none;
+  box-shadow: none;
+  border-radius: 0;
+  padding: 2em 2.5em;
+  max-width: 1300px;
+  color: rgba(255, 255, 255, 0.7450980392);
+  font-family: "FedraSansPro", sans-serif;
+  font-size: 1.15em;
+  line-height: 1.85em;
+  text-shadow: 1px 1px 6px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  /*&:nth-child(odd) {
+    flex-direction: row;
+    justify-content: flex-start;
+    margin-left: 0;
+    margin-right: auto;
+    text-align: left;
+  }*/
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+  margin-left: auto;
+  margin-right: 10em;
+  text-align: right;
+}
+#sadhguru .sadhguru-section h3 {
+  color: #ffd761;
+  font-size: 2em;
+  font-family: "FedraSerifAPro", serif;
+  font-weight: 600;
+  padding-left: 2em;
+  text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.4);
+  min-width: 180px;
+  flex: 0 0 180px;
+  text-align: left;
+}
+#sadhguru .sadhguru-section p {
+  color: #fff;
+  font-size: 1.1em;
+  font-family: "FedraSansPro", sans-serif;
+  font-weight: 400;
+  line-height: 1.8em;
+  margin-bottom: 0;
+  text-align: left;
+  text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.4);
+  flex: 1 1 auto;
+}
+#sadhguru footer {
+  text-align: center;
+  margin-top: 2em;
+}
+#sadhguru footer .hatha-button {
+  border: 2px solid #ff760d;
+  background: transparent;
+  padding: 0.6em 2em;
+  font-family: "FedraSansPro", sans-serif;
+  font-size: 1.1em;
+  color: #ff760d;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+#sadhguru footer .hatha-button:hover {
+  background: rgba(255, 118, 13, 0.2);
+}
+@media screen and (max-width: 736px) {
+  #sadhguru header h2 {
+    font-size: 2.8em;
+  }
+  #sadhguru .sadhguru-section {
+    flex-direction: column !important;
+    text-align: center !important;
+    padding: 0.5em 0.5em;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+  #sadhguru .sadhguru-section h3 {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    font-size: 2em;
+    min-width: unset;
+    margin-bottom: 0.5em !important;
+    text-align: center !important;
+    width: 100%;
+    flex: none !important;
+    line-height: 1.1em !important;
+  }
+  #sadhguru .sadhguru-section p {
+    font-size: 0.98em;
+    text-align: center !important;
+    margin-top: 0 !important;
+  }
+}
+
 /* Readings Wrapper */
 .readings-wrapper {
   background: url("../../images/lingabhairavi_chi.png") no-repeat center center fixed;
@@ -2761,9 +2903,9 @@ body.homepage.is-preload #header:after {
   padding: 4em 0;
   position: relative;
   margin: 0 !important;
-  width: 100vw !important;
-  left: 50% !important;
-  transform: translateX(-50%) !important;
+  width: 100% !important;
+  left: 0 !important;
+  transform: none !important;
 }
 @media screen and (max-width: 736px) {
   .carousel {
