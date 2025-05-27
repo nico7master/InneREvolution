@@ -148,6 +148,10 @@ section {
   display: block;
 }
 
+html, body {
+  overflow-x: hidden;
+}
+
 body {
   line-height: 1;
 }
@@ -1109,9 +1113,9 @@ body.homepage {
   padding: 4.5em 0 4.5em 0;
   position: relative;
   margin: 0;
-  width: 100vw;
-  left: 50%;
-  transform: translateX(-50%);
+  width: 100% !important;
+  left: 0 !important;
+  transform: none !important;
 
   h1 {
     font-family: "FedraSerifAPro", serif;
@@ -1743,6 +1747,7 @@ body.homepage {
   width: 100%; /* Simplified full-width */
   min-height: 100vh; /* Ensure enough height to see the image */
   position: relative;
+  background-position: 90% center !important; // Move image more to the left
 
   > * {
     position: relative;
@@ -1820,6 +1825,7 @@ body.homepage {
       font-size: 2em;
       font-family: "FedraSerifAPro", serif;
       font-weight: 600;
+      margin: 0 0 0 0;
       padding-left: 2em;
       text-shadow: 2px 2px 6px rgba(0,0,0,0.4);
       min-width: 180px;
@@ -1861,9 +1867,11 @@ body.homepage {
   }
   
   @include breakpoint("<=mobile") {
+
     header h2 {
       font-size: 2.8em;
     }
+
     .sadhguru-section {
       flex-direction: column !important;
       text-align: center !important;
@@ -2067,7 +2075,7 @@ body.homepage {
   position: relative;
   overflow: hidden;
   padding: 6em 0 6em 0;
-  background: #2b252c;
+  background: #2b252c00;
   color: #fff;
   font-family: "FedraSansPro", sans-serif;
   font-weight: 300;
@@ -2087,25 +2095,56 @@ body.homepage {
   h4,
   h5,
   h6 {
-    color: #fff;
+    color: #383838;
     font-family: "FedraSerifAPro", serif;
     font-weight: 500;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
   }
 
   .contact {
     text-align: center;
 
     p {
+      color: #000000;
       text-align: center;
       margin: 0 0 3em 0;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
     }
+
+    ul.icons {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 2em; // space between icons
+      padding: 0;
+      list-style: none;
+    }
+
+    ul.icons li {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+}
+
+  ul.icons li {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .connect-icon {
+    width: 100px;
+    height: 100px;
+    margin: 0; // let gap handle spacing
+    display: block;
   }
 
   .copyright {
     font-family: "FedraSansPro", sans-serif;
     font-weight: 400; // Normal
     text-align: center;
-    color: rgba(128, 128, 128, 0.75);
+    color: rgba(25, 25, 25, 0.75);
     font-size: 0.8em;
     font-family: "FedraSansPro", sans-serif;
     font-weight: 400;
