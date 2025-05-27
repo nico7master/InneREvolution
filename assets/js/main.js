@@ -246,4 +246,26 @@
 
 		});
 
+// Bio image fixed visibility on scroll
+$(window).on('scroll load resize', function() {
+	var $bio = $('#Bio');
+	var $img = $('.bio-image .side-image');
+	if ($bio.length === 0 || $img.length === 0) return;
+	var rect = $bio[0].getBoundingClientRect();
+	var imgHeight = $img.outerHeight() || 0;
+	var imgTop = (window.innerHeight / 2) - (imgHeight / 2); // Where the image top would be
+	var imgBottom = (window.innerHeight / 2) + (imgHeight / 2); // Where the image bottom would be
+  
+	// Only show if the image would be fully within the bio section
+	if (
+	  rect.top < imgTop &&
+	  rect.bottom > imgBottom
+	) {
+	  $img.addClass('visible-in-bio');
+	} else {
+	  $img.removeClass('visible-in-bio');
+	}
+  });
+
 })(jQuery);
+

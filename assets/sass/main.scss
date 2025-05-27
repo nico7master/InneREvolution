@@ -1515,6 +1515,8 @@ body.homepage {
     flex: 1;
     min-width: 50%;
     padding: 1em;
+    margin-right: 320px; // Add space for the fixed image (width + a little gap)
+
 
     .bio-section {
       margin-bottom: 2em;
@@ -1563,28 +1565,82 @@ body.homepage {
       width: 100%;
       height: auto;
       margin: 1em auto;
-      filter: drop-shadow(0 0 5px rgba(238, 238, 238, 0.697));
+      filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.488));
     }
   }
 
-  .bio-image {
-    flex: 0 0 300px;
-    max-width: 100%;
-    text-align: center;
-
-    .side-image {
-      width: 100%;
-      max-width: 300px;
-      height: auto;
-      border-radius: 50%; /* Circular image */
-      filter: drop-shadow(0 0 10px rgba(255, 118, 13, 0.7)); /* Glow shadow */
-      transition: filter 0.3s ease;
+  @media (max-width: 900px) {
+    .bio-image .side-image {
+      display: none;
     }
+    #Bio .bio-text {
+      margin-right: 0;
+    }
+  }
 
-    .side-image:hover {
-      filter: drop-shadow(
-        0 0 15px rgba(255, 118, 13, 0.9)
-      ); /* Stronger glow on hover */
+  .bio-image .side-image {
+    opacity: 0;
+    filter: blur(16px);
+    transition: opacity 0.6s cubic-bezier(0.4,0,0.2,1), filter 0.8s cubic-bezier(0.4,0,0.2,1);
+    pointer-events: none;
+    display: block;
+    position: fixed;
+    top: 50%;
+    right: 5vw;
+    left: auto;
+    transform: translateY(-50%);
+    z-index: 100;
+    width: 300px;
+    max-width: 30vw;
+  }
+  
+  .bio-image .side-image.visible-in-bio {
+    opacity: 1;
+    filter: blur(0);
+    pointer-events: auto;
+  }
+
+  @media (max-width: 900px) {
+    .bio-content {
+      flex-direction: column !important;
+      align-items: center !important;
+      gap: 1.5em !important;
+    }
+    .bio-text {
+      margin: 0 !important;
+      padding: 0 !important;
+      text-align: center !important;
+      width: 100% !important;
+      max-width: 100% !important;
+    }
+    .bio-text .bio-section {
+      text-align: center !important;
+    }
+    .bio-text .bio-section h3,
+    .bio-text .bio-section p {
+      text-align: center !important;
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+    }
+    .bio-image {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
+    .bio-image .side-image {
+      display: block !important;
+      position: static !important;
+      opacity: 1 !important;
+      filter: none !important;
+      pointer-events: auto !important;
+      margin: 2em auto 0 auto !important;
+      width: 60vw !important;
+      max-width: 200px !important;
+      top: auto !important;
+      right: auto !important;
+      left: auto !important;
+      transform: none !important;
+      z-index: 1 !important;
     }
   }
 
