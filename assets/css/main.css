@@ -2515,7 +2515,7 @@ body.homepage.is-preload #header:after {
   margin: 1em auto;
   filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.488));
 }
-@media (max-width: 900px) {
+@media screen and (max-width: 736px) {
   #Bio .bio-image .side-image {
     display: none;
   }
@@ -2543,7 +2543,7 @@ body.homepage.is-preload #header:after {
   filter: blur(0);
   pointer-events: auto;
 }
-@media (max-width: 900px) {
+@media screen and (max-width: 736px) {
   #Bio .bio-content {
     flex-direction: column !important;
     align-items: center !important;
@@ -2822,14 +2822,16 @@ body.homepage.is-preload #header:after {
   background: #fff;
 }
 
-@media (max-width: 900px) {
-  .calendar-container iframe {
-    max-width: 100vw;
-    width: 98vw;
-    min-height: 350px;
-  }
+@media screen and (max-width: 736px) {
   .calendar-container {
+    max-width: 90vw;
+    width: 90%;
     padding: 1em 0.2em;
+  }
+  .calendar-container iframe {
+    max-width: 90vw;
+    width: 90vw;
+    min-height: 350px;
   }
 }
 /* Readings Wrapper */
@@ -3046,6 +3048,8 @@ body.homepage.is-preload #header:after {
   box-shadow: none;
   max-width: 340px;
   text-align: center;
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 #footer .email-copy-box.visible {
   opacity: 1;
@@ -3061,6 +3065,11 @@ body.homepage.is-preload #header:after {
   color: #000;
   letter-spacing: 0.02em;
   font-weight: 200;
+  word-break: break-all;
+  overflow-wrap: anywhere;
+  white-space: normal;
+  display: inline-block;
+  max-width: 100%;
 }
 #footer .copy-again-btn,
 #footer .copy-again-btn:focus,
@@ -3102,6 +3111,21 @@ body.homepage.is-preload #header:after {
 }
 #footer .copy-again-btn.copied {
   color: #ff760d !important;
+}
+@media screen and (max-width: 736px) {
+  #footer #emailToCopy {
+    font-size: 0.9em;
+    word-break: break-all;
+    overflow-wrap: anywhere;
+  }
+  #footer ul.icons .icon {
+    width: 1.8em;
+    height: 1.8em;
+  }
+  #footer ul.icons .connect-icon {
+    width: 3em;
+    height: 3em;
+  }
 }
 
 /* Carousel */

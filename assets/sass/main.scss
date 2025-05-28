@@ -1573,7 +1573,7 @@ body.homepage {
     }
   }
 
-  @media (max-width: 900px) {
+  @include breakpoint("<=mobile") {
     .bio-image .side-image {
       display: none;
     }
@@ -1605,7 +1605,7 @@ body.homepage {
     pointer-events: auto;
   }
 
-  @media (max-width: 900px) {
+  @include breakpoint("<=mobile") {
     .bio-content {
       flex-direction: column !important;
       align-items: center !important;
@@ -1930,14 +1930,16 @@ body.homepage {
   }
 }
 
-@media (max-width: 900px) {
-  .calendar-container iframe {
-    max-width: 100vw;
-    width: 98vw;
-    min-height: 350px;
-  }
+@include breakpoint("<=mobile") {
   .calendar-container {
+    max-width: 90vw;
+    width: 90%;
     padding: 1em 0.2em;
+  }
+  .calendar-container iframe {
+    max-width: 90vw;
+    width: 90vw;
+    min-height: 350px;
   }
 }
 
@@ -2186,6 +2188,8 @@ body.homepage {
     box-shadow: none;
     max-width: 340px;
     text-align: center;
+    word-break: break-word;
+    overflow-wrap: anywhere;
   }
   .email-copy-box.visible {
     opacity: 1;
@@ -2200,6 +2204,11 @@ body.homepage {
     color: #000;
     letter-spacing: 0.02em;
     font-weight: 200;
+    word-break: break-all;
+    overflow-wrap: anywhere;
+    white-space: normal;
+    display: inline-block;
+    max-width: 100%;
   }
 
   .copy-again-btn,
@@ -2244,6 +2253,24 @@ body.homepage {
 
   .copy-again-btn.copied {
     color: #ff760d !important;
+  }
+
+  @include breakpoint("<=mobile") {
+    #emailToCopy {
+      font-size: 0.9em;
+      word-break: break-all;
+      overflow-wrap: anywhere;
+    }
+
+    ul.icons .icon {
+      width: 1.8em;
+      height: 1.8em;
+    }
+
+    ul.icons .connect-icon {
+      width: 3em;
+      height: 3em;
+    }
   }
 }
 
