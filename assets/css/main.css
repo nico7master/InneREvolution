@@ -3033,12 +3033,13 @@ body.homepage.is-preload #header:after {
   color: rgba(212, 212, 212, 0.85);
 }
 #footer .email-copy-box {
-  display: flex;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.5s;
-  flex-direction: column;
-  align-items: center;
   border: none;
   border-radius: 6px;
   padding: 0.7em 1.2em;
@@ -3046,10 +3047,7 @@ body.homepage.is-preload #header:after {
   font-size: 1.1em;
   background: none;
   box-shadow: none;
-  max-width: 340px;
   text-align: center;
-  word-break: break-word;
-  overflow-wrap: anywhere;
 }
 #footer .email-copy-box.visible {
   opacity: 1;
@@ -3065,11 +3063,9 @@ body.homepage.is-preload #header:after {
   color: #000;
   letter-spacing: 0.02em;
   font-weight: 200;
-  word-break: break-all;
-  overflow-wrap: anywhere;
   white-space: normal;
   display: inline-block;
-  max-width: 100%;
+  text-align: center;
 }
 #footer .copy-again-btn,
 #footer .copy-again-btn:focus,
@@ -3117,6 +3113,11 @@ body.homepage.is-preload #header:after {
     font-size: 0.9em;
     word-break: break-all;
     overflow-wrap: anywhere;
+    text-align: center;
+  }
+  #footer .email-copy-box {
+    max-width: 98vw;
+    width: auto;
   }
   #footer ul.icons .icon {
     width: 1.8em;
