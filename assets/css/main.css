@@ -3052,13 +3052,15 @@ body.homepage.is-preload #header:after {
   pointer-events: auto;
 }
 #footer #emailToCopy {
-  font-family: monospace;
+  font-family: "FedraSerifAPro", sans-serif;
   font-size: 1.08em;
   margin-bottom: 0.5em;
   -webkit-user-select: all;
      -moz-user-select: all;
           user-select: all;
   color: #000;
+  letter-spacing: 0.02em;
+  font-weight: 200;
 }
 #footer .copy-again-btn,
 #footer .copy-again-btn:focus,
