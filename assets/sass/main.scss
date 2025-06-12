@@ -8,12 +8,6 @@
 @import url("..//css/fontawesome-all.min.css");
 @import "fonts";
 
-/*
-	Based on Helios by HTML5 UP
-	html5up.net | @ajlkn
-	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
-*/
-
 // Breakpoints.
 
 @include breakpoints(
@@ -867,7 +861,7 @@ button,
   background: url("../../images/wallpaper-1981.jpeg") no-repeat center center
     fixed;
   background-size: cover;
-  background-color: #5b5336; /* Fallback color */
+  background-color: #2d3485; /* Fallback color */
   color: #fff;
   text-align: center;
   padding: 2em 0; /* Reduced padding since .inner is fixed */
@@ -894,14 +888,14 @@ button,
 
   /* Existing styles for header-icon, h1, h2, h3 remain unchanged */
   .header-icon {
-    width: 36em;
+    width: 70%;
     vertical-align: middle;
     margin: 0 auto 1em;
     filter: drop-shadow(5px 5px 5px rgb(4, 12, 255));
   }
 
   h1 {
-    color: #00000000;
+    color: #000000d3;
     font-size: 3em;
     line-height: 1em;
     font-family: "FedraSerifAPro", serif;
@@ -912,10 +906,10 @@ button,
   }
 
   h2 a {
-    color: #f4c33000;
+    color: #000000d6;
     font-family: "FedraSerifAPro", serif;
-    -webkit-text-stroke: 1px #ffd761cf;
-    text-shadow: 0 0 10px #84691a;
+    -webkit-text-stroke: 1px #ffbf50f1;
+    text-shadow: 0 0 6px #fcb242;
     letter-spacing: 2px;
 
     &:hover {
@@ -924,11 +918,13 @@ button,
   }
 
   h3 a {
-    color: #000000b6;
+    font-size: 1.2em;
+    line-height: 2em;
+    color: #000000;
     font-family: "FedraSerifAPro", serif;
-    -webkit-text-stroke: 1px #ff6565cf;
-    text-shadow: 0 0 6px #84691a;
-    letter-spacing: 2px;
+    -webkit-text-stroke: 1px #fc6620cf;
+    text-shadow: 0 0 6px #ff8f07;
+    letter-spacing: 1px;
     word-spacing: 5px;
 
     &:hover {
@@ -2471,6 +2467,42 @@ body.homepage {
     position: relative;
     z-index: 1;
   }
+
+  footer {
+    text-align: center;
+    margin: 2em 0 1em 0;
+
+    .book-now-button {
+      display: inline-block;
+      background: transparent;
+      color: #da782e;
+      border: 2px solid #da782e;
+      border-radius: 0.5em;
+      padding: 0.65em 3em;
+      text-decoration: none;
+      font-family: "FedraSansPro", sans-serif;
+      font-weight: 300;
+      @include vendor(
+        "transition",
+        (
+          "background-color 0.35s ease-in-out",
+          "color 0.35s ease-in-out",
+          "border-color 0.35s ease-in-out"
+        )
+      );
+
+      &:hover {
+        background: rgba(218, 120, 46, 0.1);
+        color: #ef8376;
+        border-color: #ef8376;
+      }
+
+      @include breakpoint("<=mobile") {
+        padding: 0.5em 2em;
+        font-size: 0.9em;
+      }
+    }
+  }
 }
 
 @keyframes highlightBorder {
@@ -2607,8 +2639,19 @@ body.homepage {
   }
 }
 
-/* Mobile */
+#program-calendar {
+  background: url("../../images/homeCardBg1.png") repeat !important;
+  background-size: 100% auto !important;
+  background-color: #5b5336 !important;
+  padding: 4em 0;
+  position: relative;
+  margin: 0 !important;
+  width: 100% !important;
+  left: 0 !important;
+  transform: none !important;
+}
 
+/* Mobile */
 #navPanel,
 #titleBar {
   display: none;

@@ -78,11 +78,6 @@
   font-weight: 400;
   font-style: normal;
 }
-/*
-	Based on Helios by HTML5 UP
-	html5up.net | @ajlkn
-	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
-*/
 html,
 body,
 div,
@@ -1920,7 +1915,7 @@ header .icon.circled {
   position: relative;
   background: url("../../images/wallpaper-1981.jpeg") no-repeat center center fixed;
   background-size: cover;
-  background-color: #5b5336; /* Fallback color */
+  background-color: #2d3485; /* Fallback color */
   color: #fff;
   text-align: center;
   padding: 2em 0; /* Reduced padding since .inner is fixed */
@@ -1947,13 +1942,13 @@ header .icon.circled {
   }
 }
 #header .header-icon {
-  width: 36em;
+  width: 70%;
   vertical-align: middle;
   margin: 0 auto 1em;
   filter: drop-shadow(5px 5px 5px rgb(4, 12, 255));
 }
 #header h1 {
-  color: rgba(0, 0, 0, 0);
+  color: rgba(0, 0, 0, 0.8274509804);
   font-size: 3em;
   line-height: 1em;
   font-family: "FedraSerifAPro", serif;
@@ -1963,21 +1958,23 @@ header .icon.circled {
   letter-spacing: 3px;
 }
 #header h2 a {
-  color: rgba(244, 195, 48, 0);
+  color: rgba(0, 0, 0, 0.8392156863);
   font-family: "FedraSerifAPro", serif;
-  -webkit-text-stroke: 1px rgba(255, 215, 97, 0.8117647059);
-  text-shadow: 0 0 10px #84691a;
+  -webkit-text-stroke: 1px rgba(255, 191, 80, 0.9450980392);
+  text-shadow: 0 0 6px #fcb242;
   letter-spacing: 2px;
 }
 #header h2 a:hover {
   color: rgba(255, 213, 0, 0.337254902);
 }
 #header h3 a {
-  color: rgba(0, 0, 0, 0.7137254902);
+  font-size: 1.2em;
+  line-height: 2em;
+  color: #000000;
   font-family: "FedraSerifAPro", serif;
-  -webkit-text-stroke: 1px rgba(255, 101, 101, 0.8117647059);
-  text-shadow: 0 0 6px #84691a;
-  letter-spacing: 2px;
+  -webkit-text-stroke: 1px rgba(252, 102, 32, 0.8117647059);
+  text-shadow: 0 0 6px #ff8f07;
+  letter-spacing: 1px;
   word-spacing: 5px;
 }
 #header h3 a:hover {
@@ -3301,6 +3298,33 @@ body.homepage.is-preload #header:after {
   position: relative;
   z-index: 1;
 }
+.carousel footer {
+  text-align: center;
+  margin: 2em 0 1em 0;
+}
+.carousel footer .book-now-button {
+  display: inline-block;
+  background: transparent;
+  color: #da782e;
+  border: 2px solid #da782e;
+  border-radius: 0.5em;
+  padding: 0.65em 3em;
+  text-decoration: none;
+  font-family: "FedraSansPro", sans-serif;
+  font-weight: 300;
+  transition: background-color 0.35s ease-in-out, color 0.35s ease-in-out, border-color 0.35s ease-in-out;
+}
+.carousel footer .book-now-button:hover {
+  background: rgba(218, 120, 46, 0.1);
+  color: #ef8376;
+  border-color: #ef8376;
+}
+@media screen and (max-width: 736px) {
+  .carousel footer .book-now-button {
+    padding: 0.5em 2em;
+    font-size: 0.9em;
+  }
+}
 
 @keyframes highlightBorder {
   0% {
@@ -3401,6 +3425,18 @@ body.homepage.is-preload #header:after {
     margin: 0 1em 0 0;
   }
 }
+#program-calendar {
+  background: url("../../images/homeCardBg1.png") repeat !important;
+  background-size: 100% auto !important;
+  background-color: #5b5336 !important;
+  padding: 4em 0;
+  position: relative;
+  margin: 0 !important;
+  width: 100% !important;
+  left: 0 !important;
+  transform: none !important;
+}
+
 /* Mobile */
 #navPanel,
 #titleBar {
