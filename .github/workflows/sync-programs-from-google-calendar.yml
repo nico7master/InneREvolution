@@ -1,0 +1,43 @@
+name: Sync programs from Google Calendar
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 * * * *'
+permissions:
+  contents: write
+
+jobs:
+  sync-programs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Build programs JSON from Google Calendar
+        run: |
+          python scripts/sync_google_calendar.py \
+            --calendar-id "innerevolutionyoga.life@gmail.com" \
+            --calendar-title "InneREvolution Programs" \
+            --calendar-public-url "https://calendar.google.com/calendar/u/0?cid=innerevolutionyoga.life%40gmail.com" \
+            --timezone "Europe/Vienna" \
+            --output "data/programs.json"
+
+      - name: Commit updated programs feed
+        run: |
+          if git diff --quiet -- data/programs.json; then
+            echo "No feed changes detected."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/programs.json
+          git commit -m "chore: sync upcoming programs from Google Calendar"
+          git push

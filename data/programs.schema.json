@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "InneREvolution upcoming programs feed",
+  "type": "object",
+  "required": [
+    "meta",
+    "programs"
+  ],
+  "properties": {
+    "meta": {
+      "type": "object",
+      "required": [
+        "calendarTitle",
+        "calendarUrl",
+        "updatedAt",
+        "source"
+      ],
+      "properties": {
+        "calendarTitle": {
+          "type": "string"
+        },
+        "calendarUrl": {
+          "type": "string",
+          "format": "uri"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "source": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true
+    },
+    "programs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "start",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "start": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "end": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "timezone": {
+            "type": "string"
+          },
+          "allDay": {
+            "type": "boolean"
+          },
+          "location": {
+            "type": "string"
+          },
+          "format": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "registrationUrl": {
+            "type": "string"
+          },
+          "registrationLabel": {
+            "type": "string"
+          },
+          "calendarUrl": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "scheduled",
+              "draft",
+              "cancelled"
+            ]
+          }
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": false
+}

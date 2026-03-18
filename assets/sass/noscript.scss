@@ -1,9 +1,9 @@
-@import 'libs/vars';
-@import 'libs/functions';
-@import 'libs/mixins';
-@import 'libs/vendor';
-@import 'libs/breakpoints';
-@import 'libs/html-grid';
+@use "libs/vars" as *;
+@use "libs/functions" as *;
+@use "libs/mixins" as *;
+@use "libs/vendor" as *;
+@use "libs/breakpoints" as *;
+@use "libs/html-grid" as *;
 
 /*
 	Helios by HTML5 UP

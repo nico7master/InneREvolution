@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <filter id="blur-lg" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="30" />
+    </filter>
+    <filter id="blur-sm" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" />
+    </filter>
+  </defs>
+  <rect width="1600" height="900" fill="transparent"/>
+  <g filter="url(#blur-lg)" opacity="0.52">
+    <ellipse cx="220" cy="150" rx="230" ry="110" fill="#efd6ff"/>
+    <ellipse cx="1320" cy="180" rx="260" ry="120" fill="#f3b8ff"/>
+    <ellipse cx="790" cy="760" rx="420" ry="170" fill="#a86cff"/>
+    <ellipse cx="500" cy="450" rx="220" ry="90" fill="#ffffff" opacity="0.36"/>
+    <ellipse cx="1120" cy="470" rx="250" ry="95" fill="#cf9aff"/>
+  </g>
+  <g filter="url(#blur-sm)" opacity="0.28" stroke-linecap="round" fill="none">
+    <path d="M70 250 C 220 170, 360 320, 520 255 S 850 175, 1030 255 S 1370 335, 1540 250" stroke="#ffe8ff" stroke-width="8"/>
+    <path d="M110 650 C 280 590, 420 740, 620 675 S 980 560, 1170 645 S 1420 735, 1540 665" stroke="#d49fff" stroke-width="7"/>
+    <path d="M180 430 C 320 380, 470 500, 630 448 S 910 350, 1080 430 S 1320 500, 1450 452" stroke="#ffffff" stroke-opacity="0.55" stroke-width="4"/>
+  </g>
+  <g opacity="0.2">
+    <circle cx="180" cy="110" r="7" fill="#ffffff"/>
+    <circle cx="340" cy="220" r="5" fill="#ffe8ff"/>
+    <circle cx="920" cy="130" r="6" fill="#ffffff"/>
+    <circle cx="1260" cy="240" r="5" fill="#ffe8ff"/>
+    <circle cx="1490" cy="170" r="7" fill="#ffffff"/>
+    <circle cx="260" cy="760" r="6" fill="#ffe8ff"/>
+    <circle cx="740" cy="690" r="5" fill="#ffffff"/>
+    <circle cx="1110" cy="780" r="7" fill="#ffe8ff"/>
+    <circle cx="1450" cy="710" r="5" fill="#ffffff"/>
+  </g>
+</svg>

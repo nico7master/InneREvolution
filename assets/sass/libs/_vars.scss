@@ -1,22 +1,217 @@
-// Misc.
-	$misc: (
-		z-index-base:	10000
-	);
+// Colors
+$color-primary-orange: #FF760D;
+$color-secondary-orange: #FF6600;
+$color-accent-orange: #DA782E;
+$color-light-orange: #FFA500;
+$color-white: #FFFFFF;
+$color-off-white: #FAFAFA;
+$color-light-gray: #E5E5E5;
+$color-medium-gray: #D3D3D3;
+$color-dark-gray: #555555;
+$color-darker-gray: #333333;
+$color-darkest-gray: #282828;
+$color-black: #000000;
+$color-primary-brown: #5B5336;
+$color-dark-purple: #483949;
+$color-darker-purple: #2B252C;
+$color-blue-accent: #87CEEB;
+$color-dark-blue: #001D75;
+$color-red-accent: #DF7366;
+$color-yellow-accent: #FFD761;
 
-// Duration.
-	$duration: (
-		navPanel: 0.5s
-	);
+// Spacing
+$spacing-xs: 0.25em;
+$spacing-sm: 0.5em;
+$spacing-md: 1em;
+$spacing-lg: 2em;
+$spacing-xl: 3em;
+$spacing-xxl: 4em;
+$spacing-xxxl: 5em;
+$spacing-xxxxl: 6em;
 
-// Size.
-	$size: (
-		navPanel: 50vh
-	);
+// Sizes
+$size-full: 100%;
+$size-half: 50%;
+$size-quarter: 25%;
+$size-third: 33.3333333333%;
+$size-two-thirds: 66.6666666667%;
+$size-mobile-breakpoint: 736px;
 
-// Font.
-	$font: (
-	);
+// Borders
+$border-none: 0px;
+$border-thin: 1px;
+$border-medium: 2px;
+$border-thick: 4px;
 
-// Palette.
-	$palette: (
-	);
+// Padding
+$padding-sm: 8px;
+$padding-md: 16px;
+$padding-lg: 32px;
+$padding-xl: 48px;
+$padding-xxl: 64px;
+$padding-xxxl: 80px;
+
+// Margins
+$margin-sm: 0.5em;
+$margin-md: 1em;
+$margin-lg: 2em;
+$margin-xl: 3em;
+
+// Gaps
+$gap-sm: 0.5em;
+$gap-md: 1em;
+$gap-lg: 2em;
+$gap-xl: 3em;
+
+// Fonts
+$font-family-primary: 'FedraSansPro', sans-serif;
+$font-family-secondary: 'FedraSerifAPro', serif;
+$font-family-system: 'Source Sans Pro', sans-serif;
+
+// Font sizes
+$font-size-xs: 0.75em;
+$font-size-sm: 0.875em;
+$font-size-md: 1em;
+$font-size-lg: 1.125em;
+$font-size-xl: 1.25em;
+$font-size-xxl: 1.5em;
+$font-size-xxxl: 1.75em;
+$font-size-xxxxl: 2em;
+
+// Font weights
+$font-weight-light: 300;
+$font-weight-regular: 400;
+$font-weight-medium: 600;
+$font-weight-bold: 700;
+
+// Line heights
+$line-height-sm: 1.2;
+$line-height-md: 1.5;
+$line-height-lg: 1.8;
+
+// Transitions
+$transition-fast: 0.2s ease-in-out;
+$transition-medium: 0.3s ease-in-out;
+$transition-slow: 0.5s ease-in-out;
+
+// Shadows
+$shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.1);
+$shadow-md: 0 2px 4px rgba(0, 0, 0, 0.1);
+$shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.1);
+$shadow-xl: 0 8px 16px rgba(0, 0, 0, 0.1);
+
+// Breakpoints
+$breakpoint-mobile: 736px;
+$breakpoint-narrower: 840px;
+$breakpoint-narrow: 960px;
+$breakpoint-normal: 1280px;
+$breakpoint-wide: 1680px;
+
+// Z-index
+$z-index-base: 0;
+$z-index-dropdown: 1000;
+$z-index-modal: 2000;
+$z-index-tooltip: 3000;
+$z-index-max: 9999;
+
+// Durations
+$duration: (
+  navPanel: 0.5s,
+  transition: 0.3s,
+  animation: 0.6s,
+  slow: 1s,
+  fast: 0.2s ease
+);
+
+// Individual duration variables for backward compatibility
+$duration-navPanel: 0.5s;
+$duration-transition: 0.3s;
+$duration-animation: 0.6s;
+$duration-slow: 1s;
+$duration-fast: 0.2s ease;
+
+// Miscellaneous
+$misc: (
+  z-index-base: 1000,
+  border-radius: 4px,
+  shadow-depth: 0 2px 10px rgba(0, 0, 0, 0.1)
+);
+
+// Individual misc variables for backward compatibility
+$misc-z-index-base: 1000;
+$misc-border-radius: 4px;
+$misc-shadow-depth: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+// Sizes
+$size: (
+  navPanel: 275px,
+  header-height: 100px,
+  section-padding: 50px,
+  container-width: 1200px,
+  max-width: 1440px,
+  footer-height: 200px
+);
+
+// Individual size variables for backward compatibility
+$size-navPanel: 275px;
+$size-header-height: 100px;
+$size-section-padding: 50px;
+$size-container-width: 1200px;
+$size-max-width: 1440px;
+$size-footer-height: 200px;
+
+// Fonts
+$font: (
+  primary: 'FedraSansPro, sans-serif',
+  secondary: 'FedraSerifAPro, serif',
+  base-size: 16px,
+  scale: 1.2,
+  weights: (
+    light: 300,
+    regular: 400,
+    medium: 600,
+    bold: 700
+  ),
+  line-height: 1.5
+);
+
+// Individual font variables for backward compatibility
+$font-primary: 'FedraSansPro, sans-serif';
+$font-secondary: 'FedraSerifAPro, serif';
+$font-base-size: 16px;
+$font-scale: 1.2;
+$font-weight-light: 300;
+$font-weight-regular: 400;
+$font-weight-medium: 600;
+$font-weight-bold: 700;
+$font-line-height: 1.5;
+
+// Palette
+$palette: (
+  primary: #FF760D,
+  secondary: #FF6600,
+  accent: #DA782E,
+  dark: #282828,
+  light: #FAFAFA,
+  background: #FFFFFF,
+  text: #333333,
+  text-light: #FFFFFF,
+  success: #28a745,
+  warning: #ffc107,
+  danger: #dc3545,
+  info: #17a2b8
+);
+
+// Individual palette variables for backward compatibility
+$palette-primary: #FF760D;
+$palette-secondary: #FF6600;
+$palette-accent: #DA782E;
+$palette-dark: #282828;
+$palette-light: #FAFAFA;
+$palette-background: #FFFFFF;
+$palette-text: #333333;
+$palette-text-light: #FFFFFF;
+$palette-success: #28a745;
+$palette-warning: #ffc107;
+$palette-danger: #dc3545;
+$palette-info: #17a2b8;
