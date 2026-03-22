@@ -595,7 +595,7 @@ updateActiveDot();
       }
     }
 
-    return dateFormatter.format(startDate) + '<br>' + timeText;
+    return dateFormatter.format(startDate) + ' · ' + timeText;
   }
 
   function buildProgramCard(program, fallbackCalendarUrl) {
@@ -605,48 +605,35 @@ updateActiveDot();
     dateText.innerHTML = formatProgramDate(program);
     var title = createElement('h3', '', program.title || 'Upcoming program');
 
-    cardHeader.appendChild(dateText);
     cardHeader.appendChild(title);
+    cardHeader.appendChild(dateText);
     card.appendChild(cardHeader);
 
-    var metaItems = [];
-    if (program.format) metaItems.push(program.format);
-    if (program.location) metaItems.push(program.location);
+    /* Build meta list with format, language, and location */
+    var metaList = createElement('ul', 'program-card-meta');
+    var hasMeta = false;
 
-    if (metaItems.length) {
-      var metaList = createElement('ul', 'program-card-meta');
+    /* Format bubble */
+    if (program.format) {
+      hasMeta = true;
+      metaList.appendChild(createElement('li', 'program-card-format', program.format));
+    }
 
-      /* Format li with icon (online = globe, in-person = crowd) */
-      if (program.format) {
-        var formatLi = createElement('li', '');
-        var isOnline   = /online|virtual/i.test(program.format);
-        var isInPerson = /in.?person|physical|studio/i.test(program.format);
-        var iconSrc = isOnline   ? 'SVGs/world-wide-web-black-internet-connection-symbol-17711.svg'
-                    : isInPerson ? 'SVGs/black-crowd-or-group-of-people-19859.svg'
-                    : null;
-        if (iconSrc) {
-          var fmtIcon = document.createElement('img');
-          fmtIcon.src = iconSrc;
-          fmtIcon.className = 'program-card-meta-icon';
-          fmtIcon.alt = '';
-          formatLi.appendChild(fmtIcon);
-        }
-        formatLi.appendChild(document.createTextNode(program.format));
-        metaList.appendChild(formatLi);
-      }
+    /* Language bubble */
+    if (program.language) {
+      hasMeta = true;
+      var langLi = createElement('li', 'program-card-lang', program.language.toUpperCase());
+      langLi.setAttribute('data-lang', program.language.toLowerCase());
+      metaList.appendChild(langLi);
+    }
 
-      /* Location li with pin icon */
-      if (program.location) {
-        var locationLi = createElement('li', 'program-card-location');
-        var pinIcon = document.createElement('img');
-        pinIcon.src = 'SVGs/pin-48.svg';
-        pinIcon.className = 'program-card-meta-icon';
-        pinIcon.alt = '';
-        locationLi.appendChild(pinIcon);
-        locationLi.appendChild(document.createTextNode(program.location));
-        metaList.appendChild(locationLi);
-      }
+    /* Location */
+    if (program.location) {
+      hasMeta = true;
+      metaList.appendChild(createElement('li', 'program-card-location', program.location));
+    }
 
+    if (hasMeta) {
       card.appendChild(metaList);
     }
 
@@ -765,14 +752,11 @@ updateActiveDot();
             window._programsSwiper = null;
           }
           window._programsSwiper = new Swiper('.programsSwiper', {
-            slidesPerView: 'auto', /* card width fixed in CSS */
-            spaceBetween: 20,
+            slidesPerView: 'auto',          /* card width fixed in CSS */
+            spaceBetween: 16,               /* breathing room between cards */
             grabCursor: true,
             speed: 400,
-            centerInsufficientSlides: true, /* center cards when they don't fill the row */
-            /* Allow text selection inside cards — Swiper won't intercept events on these */
-            noSwiping: true,
-            noSwipingSelector: '.program-card h3, .program-card-date, .program-card-summary, .program-card-meta, .program-card-location, .program-card-note',
+            centerInsufficientSlides: true, /* center when fewer cards than fill row */
             pagination: { el: '.programs-pagination', clickable: true },
           });
         }, 80);
@@ -924,10 +908,52 @@ updateActiveDot();
 document.addEventListener('DOMContentLoaded', function () {
   new Swiper('.readingsSwiper', {
     slidesPerView: 'auto',      /* card width fixed in CSS */
-    spaceBetween: 30,
+    spaceBetween: 16,           /* breathing room between cards */
     grabCursor: true,
     speed: 400,
     centerInsufficientSlides: true, /* center when fewer cards than fill row */
     pagination: { el: '.readings-pagination', clickable: true },
   });
 });
+
+/* ============================================================
+   NAVBAR v7 — scroll-up show / scroll-down hide
+   .navbar-visible toggled on .navbar-wrapper#navbar
+   ============================================================ */
+(function() {
+  var navbar = document.getElementById('navbar');
+  if (!navbar) return;
+
+  var lastScrollY = window.scrollY;
+  var ticking = false;
+
+  // Visible at page top
+  if (lastScrollY < 60) {
+    navbar.classList.add('navbar-visible');
+  }
+
+  window.addEventListener('scroll', function() {
+    if (!ticking) {
+      window.requestAnimationFrame(function() {
+        var currentScrollY = window.scrollY;
+        var delta = currentScrollY - lastScrollY;
+
+        if (currentScrollY < 60) {
+          // At top of page — always show
+          navbar.classList.add('navbar-visible');
+        } else if (delta < -8) {
+          // Scrolling UP — show
+          navbar.classList.add('navbar-visible');
+        } else if (delta > 8) {
+          // Scrolling DOWN — hide
+          navbar.classList.remove('navbar-visible');
+        }
+
+        lastScrollY = currentScrollY;
+        ticking = false;
+      });
+      ticking = true;
+    }
+  }, { passive: true });
+})();
+/* === END NAVBAR v7 JS === */

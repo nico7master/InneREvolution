@@ -89,6 +89,14 @@
               "draft",
               "cancelled"
             ]
+          },
+          "language": {
+            "type": "string",
+            "enum": [
+              "EN",
+              "DE"
+            ],
+            "description": "Language of the program (EN for English, DE for German)"
           }
         },
         "additionalProperties": true

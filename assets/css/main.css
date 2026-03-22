@@ -8290,8 +8290,8 @@ body.homepage.is-preload #header:after {
   margin-bottom: 1em; /* Space before divider */
 }
 #banner .banner-quote {
-  width: auto;
-  height: 2em; /* Adjusted size for better proportion */
+  width: clamp(1.4rem, 2.2vw, 2.4rem);
+  height: auto; /* Match .quote-mark sizing */
   display: inline-block;
   margin-top: 0; /* Fine-tune vertical position to align with text top */
 }
@@ -8319,7 +8319,8 @@ body.homepage.is-preload #header:after {
     flex-wrap: wrap; /* Allow wrapping if text is too long */
   }
   #banner .banner-quote {
-    height: 0.5em; /* Smaller quotes on mobile */
+    width: clamp(1.8rem, 7vw, 2.7rem); /* Match .quote-mark mobile sizing */
+    height: auto;
     margin-top: 0.15em; /* Adjust for mobile */
   }
   #banner .quote-text h2 {
@@ -18436,8 +18437,8 @@ body.homepage.is-preload #header:after {
 }
 
 #banner .banner-quote {
-  width: auto;
-  height: 2em; /* Adjusted size for better proportion */
+  width: clamp(1.4rem, 2.2vw, 2.4rem);
+  height: auto; /* Match .quote-mark sizing */
   display: inline-block;
   margin-top: 0; /* Fine-tune vertical position to align with text top */
 }
@@ -18471,7 +18472,8 @@ body.homepage.is-preload #header:after {
     flex-wrap: wrap; /* Allow wrapping if text is too long */
   }
   #banner .banner-quote {
-    height: 0.5em; /* Smaller quotes on mobile */
+    width: 1.5rem !important; /* Match .quote-mark mobile sizing */
+    height: auto !important;
     margin-top: 0.15em; /* Adjust for mobile */
   }
   #banner .quote-text h2 {
@@ -20366,7 +20368,7 @@ section#banner .quote-text h2 {
 @media screen and (max-width: 736px) {
   #banner .quote-text h2,
   section#banner .quote-text h2 {
-    font-size: 2.4em !important;
+    font-size: 1.2rem !important; /* reduced for mobile readability */
     line-height: 1.6em !important;
   }
 }
@@ -23958,7 +23960,7 @@ section#banner .quote-text h2 {
 @media screen and (max-width: 736px) {
   #banner .quote-text h2,
   section#banner .quote-text h2 {
-    font-size: 2.4em !important;
+    font-size: 1.2rem !important; /* reduced for mobile readability */
     line-height: 1.6em !important;
   }
 }
@@ -24515,7 +24517,7 @@ section.carousel-shell > .inner,
 
 .swiper-slide p {
   margin: 0;
-  padding: 0 1.45rem 1.42rem;
+  padding: 0; /* removed — was adding extra left/bottom space inside cards */
   color: rgba(235, 226, 213, 0.84);
   font-size: 0.98rem;
   line-height: 1.68;
@@ -25713,167 +25715,106 @@ section#Bio,
   z-index: 1;
 }
 
-#program-calendar .programs-feed-status {
-  color: rgba(249, 235, 255, 0.88);
-}
-
-#program-calendar .program-card {
-  padding: 1.9em;
-  background: linear-gradient(180deg, rgba(83, 42, 127, 0.72), rgba(47, 24, 72, 0.84));
-  border: 1px solid rgba(231, 202, 255, 0.22);
-  box-shadow: 0 18px 40px rgba(8, 3, 20, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.09);
-  backdrop-filter: blur(12px);
-  transition: transform 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease;
-}
-
-#program-calendar .program-card:hover {
-  transform: translateY(-4px);
-  border-color: rgba(255, 226, 249, 0.34);
-  box-shadow: 0 24px 50px rgba(8, 3, 20, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.12);
-}
-
-#program-calendar .program-card h3 {
-  color: #ffd7fb;
-}
-
-#program-calendar .program-card-date {
-  color: #f5c9ff;
-}
-
-#program-calendar .program-card-meta li {
-  background: rgba(255, 255, 255, 0.09);
-  border: 1px solid rgba(231, 202, 255, 0.14);
-  color: #fbeeff;
-}
-
-#program-calendar .program-card-summary {
-  color: rgba(251, 241, 255, 0.92);
-}
-
-#program-calendar .program-inline-link {
-  color: #ffd8fb;
-  border-bottom-color: rgba(255, 216, 251, 0.35);
-}
-
-#program-calendar .program-inline-link:hover {
-  color: #fff1ff;
-  border-bottom-color: rgba(255, 241, 255, 0.68);
-}
-
-#program-calendar .program-card-note {
-  color: #ffe8ff;
-}
-
-@media screen and (max-width: 980px) {
-  #program-calendar .calendar-container {
-    padding: 2.1em 2em;
-  }
-}
-@media screen and (max-width: 736px) {
-  #program-calendar.shared-particles {
-    padding: 3.5em 0 3.25em 0;
-  }
-  #program-calendar .calendar-container {
-    padding: 1.7em 1.35em;
-    border-radius: 1.4em;
-  }
-}
-/* --- End upcoming programs purple section refresh --- */
+/* ─── Programs feed status ─── */
 #program-calendar .programs-feed-status {
   margin: 0 auto 1.75em auto;
   text-align: center;
-  color: #f3e4d0;
+  color: rgba(249, 235, 255, 0.88);
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.35);
 }
 
-#program-calendar .programs-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1.75em;
-}
-
+/* ─── Program Card — base styles ─── */
 #program-calendar .program-card {
   display: flex;
   flex-direction: column;
-  min-height: 100%;
-  padding: 1.75em;
+  font-size: 19px; /* pin to px — breaks em chain from body font-size scaling at breakpoints */
+  padding: 1em 0.8em; /* these em values now always = relative to 19px, not body */
   background: rgba(25, 17, 12, 0.42);
   border: 1px solid rgba(255, 183, 101, 0.26);
   border-radius: 1.25em;
   box-shadow: 0 16px 36px rgba(0, 0, 0, 0.18);
   backdrop-filter: blur(6px);
+  transition: transform 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease;
+}
+
+#program-calendar .program-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 22px 44px rgba(0, 0, 0, 0.24);
 }
 
 #program-calendar .program-card-header {
-  margin-bottom: 1em;
+  margin-bottom: 0.4em;
 }
 
 #program-calendar .program-card h3 {
-  margin: 0;
+  margin: 0 !important; /* override base template h3 margin-top */
   color: #ffb266;
-  font-size: 1.5em;
-  line-height: 1.35;
+  font-size: 1.2em !important; /* lock size — prevent base template h3 breakpoint rules from overriding */
+  line-height: 1.35 !important;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.35);
 }
 
 #program-calendar .program-card-date {
-  margin: 0 0 0.65em 0;
+  margin: 0.15em 0 0 0 !important; /* small gap below date (now sits under title) */
+  padding: 0 !important;
+  line-height: 1.2;
   color: #ffd6a8;
-  font-size: 0.92em;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-size: 0.78em;
+  letter-spacing: 0;
+  text-transform: none;
 }
 
 #program-calendar .program-card-meta {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.65em;
-  margin: 0 0 1.1em 0;
+  gap: 0.45em;
+  margin: 0 0 0.85em 0;
   padding: 0;
   list-style: none;
 }
 
 #program-calendar .program-card-meta li {
-  padding: 0.35em 0.85em;
+  padding: 0.25em 0.65em;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.1);
   color: #f8ead6;
-  font-size: 0.92em;
+  font-size: 0.8em;
   line-height: 1.4;
 }
 
-/* All card text content is selectable */
+/* Disable text selection on program cards */
 #program-calendar .programsSwiper .program-card,
 #program-calendar .programsSwiper .program-card * {
-  -webkit-user-select: text !important;
-  user-select: text !important;
+  -webkit-user-select: none !important;
+  user-select: none !important;
 }
 
-/* Only the location tag gets smaller text */
+/* Location tag slightly smaller */
 #program-calendar .program-card-meta li.program-card-location {
-  font-size: 0.78em;
+  font-size: 0.74em;
   cursor: text;
 }
 
-/* Meta tag icons */
+/* Meta icons */
 #program-calendar .program-card-meta-icon {
   display: inline-block;
   width: 1em;
   height: 1em;
   vertical-align: middle;
-  margin-right: 0.35em;
+  margin-right: 0.3em;
   margin-bottom: 0.1em;
-  filter: invert(1) opacity(0.85); /* black SVG → white on dark card */
+  filter: invert(1) opacity(0.85);
   flex-shrink: 0;
 }
 
 #program-calendar .program-card-summary {
-  flex: 1; /* fills remaining card space */
-  min-height: 0; /* required for overflow-y to work inside flex */
-  overflow-y: auto; /* scroll when text is too long */
-  margin: 0 0 1em 0;
-  padding-right: 0.35em; /* breathing room next to scrollbar */
+  flex: 1; /* fills remaining card height */
+  width: 100% !important; /* prevent align-items:center on showcase from shrinking below card width */
+  min-height: 0;
+  overflow-y: auto;
+  margin: 0; /* no extra margins */
   color: #f5ede3;
+  font-size: 0.9em;
   text-shadow: none;
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 183, 101, 0.35) transparent;
@@ -25893,7 +25834,7 @@ section#Bio,
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.9em;
+  gap: 0.65em;
   margin-top: auto;
 }
 
@@ -25914,34 +25855,9 @@ section#Bio,
 
 #program-calendar .program-card-note {
   color: #ffe6c3;
-  font-size: 0.95em;
+  font-size: 0.87em;
 }
 
-@media screen and (max-width: 980px) {
-  #program-calendar .programs-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-@media screen and (max-width: 736px) {
-  #program-calendar {
-    padding: 3em 0;
-  }
-  #program-calendar .calendar-container {
-    width: calc(100% - 2.5rem);
-    max-width: none;
-    margin: 0 auto 1.5em auto;
-    padding: 1.5em 1.25em;
-  }
-  #program-calendar .programs-feed {
-    padding: 0 1.25em;
-  }
-  #program-calendar .programs-grid {
-    grid-template-columns: 1fr;
-  }
-  #program-calendar .program-card {
-    padding: 1.4em;
-  }
-}
 /* === PROGRAMS SECTION FINAL OVERRIDE START === */
 #program-calendar.programs-showcase {
   position: relative;
@@ -26025,7 +25941,7 @@ section#Bio,
 }
 
 #program-calendar.programs-showcase .program-card {
-  padding: 1.8em;
+  padding: 1em 0.8em; /* matches base card padding */
   background: linear-gradient(180deg, rgba(90, 68, 104, 0.36), rgba(31, 20, 40, 0.6)) !important;
   border: 1px solid rgba(241, 224, 255, 0.14);
   box-shadow: 0 18px 34px rgba(14, 5, 26, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.06);
@@ -26105,8 +26021,6 @@ section#Bio,
 #program-calendar.programs-showcase .program-card-date,
 #program-calendar.programs-showcase .program-card-summary,
 #program-calendar.programs-showcase .program-card-note,
-#program-calendar.programs-showcase .program-card-format,
-#program-calendar.programs-showcase .program-card-location,
 #program-calendar.programs-showcase .program-inline-link,
 #program-calendar.programs-showcase .program-register-button,
 #program-calendar.programs-showcase .program-card p,
@@ -26116,6 +26030,13 @@ section#Bio,
   justify-content: center;
   margin-left: auto;
   margin-right: auto;
+}
+
+/* Format and location are <li> inside flex row — centered by parent justify-content, not auto margins */
+#program-calendar.programs-showcase .program-card-format,
+#program-calendar.programs-showcase .program-card-location {
+  margin-left: 0;
+  margin-right: 0;
 }
 
 #program-calendar.programs-showcase .program-card-meta,
@@ -26165,7 +26086,7 @@ section#Bio,
 .inner-revolution-banner .quote-text h2 {
   margin: 0;
   font-family: "FedraSerifAPro", serif;
-  font-size: clamp(2rem, 4.7vw, 3.25rem);
+  font-size: clamp(1.6rem, 3.5vw, 2.6rem);
   font-weight: 500;
   line-height: 1.2;
   letter-spacing: 0.01em;
@@ -26187,7 +26108,7 @@ section#Bio,
 .inner-revolution-banner .quote-mark,
 .inner-revolution-banner .banner-quote {
   /* covers both class variants used across the 6 banners */
-  width: clamp(2rem, 3vw, 3.2rem);
+  width: clamp(1.4rem, 2.2vw, 2.4rem);
   height: auto;
   display: block;
   flex: 0 0 auto;
@@ -26196,14 +26117,14 @@ section#Bio,
 
 .inner-revolution-banner .banner-divider {
   display: block;
-  width: min(240px, 48vw);
+  width: min(260px, 50vw);
   margin: 1.4rem auto 1rem;
   opacity: 0.95;
 }
 
 .inner-revolution-banner .banner-signature {
   display: block;
-  width: min(210px, 46vw);
+  width: min(220px, 50vw);
   margin: 0 auto;
 }
 
@@ -26300,6 +26221,9 @@ section#Bio,
 .readings-wrapper #Readings .article-content {
   display: flex;
   flex-direction: column;
+  font-size: 17px; /* pin to px — breaks em chain from body font-size scaling at breakpoints */
+  -webkit-user-select: none !important; /* disable text selection */
+  user-select: none !important;
   width: 100%;
   height: 100%;
   overflow: hidden;
@@ -26339,12 +26263,12 @@ section#Bio,
 
 .readings-wrapper #Readings .article-content > header,
 .readings-wrapper #Readings .article-content > p {
-  padding-left: 1.35rem;
-  padding-right: 1.35rem;
+  padding-left: 0.9em; /* em = relative to 17px pin — less wasted side space */
+  padding-right: 0.9em;
 }
 
 .readings-wrapper #Readings .article-content > header {
-  padding-top: 1.35rem;
+  padding-top: 0.9em; /* em = relative to 17px pin */
   text-align: center;
 }
 
@@ -26412,29 +26336,33 @@ section#Bio,
 }
 
 /* Swiper container — full section width, side-padded for breathing room */
+/* ─── Swiper container ─── */
 #program-calendar .programsSwiper {
   width: 100%;
   overflow: hidden;
-  padding: 0 2rem 2.75rem;
+  padding: 0 1rem 2.75rem; /* side room + space for pagination dots */
   box-sizing: border-box;
 }
 
-/* Fixed card size — equal width and height for all cards */
+/* ─── Card size: 290px wide × 560px tall
+       ~3 visible on 1024px, ~4 on 1400px — swipe for more.
+       !important guards prevent base template .swiper-slide { width: 18em }
+       and grid column rules from resizing the card at breakpoints. ─── */
 #program-calendar .programsSwiper .program-card.swiper-slide {
-  width: 340px;
-  height: 750px;
+  width: 290px !important;
+  flex: 0 0 290px !important;
+  min-width: 290px !important;
+  max-width: 290px !important;
+  height: 560px;
   flex-shrink: 0;
 }
 
+/* ─── Mobile: keep same card size, just tighten side padding ─── */
 @media screen and (max-width: 736px) {
   #program-calendar .programsSwiper {
-    padding: 0 1.25rem 2.5rem;
+    padding: 0 0.75rem 2.5rem;
   }
-  /* Near-full width on mobile so one card fills the screen comfortably */
-  #program-calendar .programsSwiper .program-card.swiper-slide {
-    width: calc(100vw - 3.5rem);
-    height: 700px;
-  }
+  /* Card stays 290px × 540px on all screens — no stretching */
 }
 /* Violet-themed pagination dots to match section palette */
 #program-calendar .programs-pagination {
@@ -26828,7 +26756,7 @@ section#banner.footer-banner #footer .contact.contact-professional .contact-intr
 
 section#banner.footer-banner #footer .contact.contact-professional .contact-cards-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 1rem;
   margin-top: 1.6rem;
 }
@@ -27173,7 +27101,7 @@ body #carousel::before {
 
 /* Make Bio section outer container narrower */
 #Bio.container {
-  max-width: 53% !important;
+  max-width: calc(100% - 1.5rem);
   margin-left: auto !important;
   margin-right: auto !important;
 }
@@ -27548,7 +27476,7 @@ body .readings-wrapper #Readings p {
 .readings-wrapper .readingsSwiper {
   width: 100%;
   overflow: hidden;
-  padding: 0 2rem 2.75rem; /* side padding for breathing room + space for pagination dots */
+  padding: 0 0.75rem 2.75rem; /* comfortable side padding */ /* side padding for breathing room + space for pagination dots */
   box-sizing: border-box;
 }
 
@@ -27568,7 +27496,7 @@ body .readings-wrapper #Readings p {
 /* Reset every article — zero grid padding, reset col-4 width, fix to card width */
 .readings-wrapper #Readings .row article.swiper-slide {
   padding: 0 !important; /* kill inherited gutter padding-left */
-  width: 340px !important; /* override col-4's 33.33% */
+  width: 340px !important; /* lock size — override col-4 AND base .swiper-slide { width: 18em } */
   flex: 0 0 340px !important;
   max-width: 340px !important;
   min-width: 340px !important;
@@ -27610,15 +27538,9 @@ body .readings-wrapper #Readings p {
 
 @media screen and (max-width: 736px) {
   .readings-wrapper .readingsSwiper {
-    padding: 0 1rem 2.25rem; /* narrower side padding on mobile */
+    padding: 0 0.75rem 2.25rem; /* narrower side padding on mobile */
   }
-  .readings-wrapper #Readings .row article.swiper-slide {
-    width: calc(100vw - 3rem) !important;
-    flex: 0 0 calc(100vw - 3rem) !important;
-    max-width: calc(100vw - 3rem) !important;
-    min-width: calc(100vw - 3rem) !important;
-    height: 640px !important; /* uniform height on mobile */
-  }
+  /* Card width stays 340px fixed — no vw scaling, same as desktop */
 }
 /* Pagination dots — earth/orange theme */
 .readings-pagination {
@@ -27636,4 +27558,248 @@ body .readings-wrapper #Readings p {
 .readings-pagination .swiper-pagination-bullet-active {
   background: #ffa654;
   transform: scale(1.25);
+}
+
+/* Mobile overrides for inner-revolution-banner quote sections */
+@media screen and (max-width: 736px) {
+  .inner-revolution-banner .quote-container {
+    flex-direction: column !important;
+    align-items: center !important;
+  }
+  .inner-revolution-banner .quote-text h2 {
+    font-size: 1.2rem !important;
+    white-space: normal !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    width: 100% !important;
+  }
+  .inner-revolution-banner .quote-text p {
+    font-size: 1.18rem !important;
+    white-space: normal !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    width: 100% !important;
+  }
+  .inner-revolution-banner .banner-divider,
+  .banner-divider {
+    width: 180px !important;
+    height: auto !important;
+  }
+  .inner-revolution-banner .banner-signature,
+  .banner-signature {
+    width: 160px !important;
+    height: auto !important;
+  }
+  .quote-mark {
+    width: 1.5rem !important;
+    height: auto !important;
+  }
+  .banner-icon {
+    width: 80px !important;
+    height: auto !important;
+  }
+}
+/* ============================================================
+   NAVBAR v7 — fixed floating nav with snake dividers
+   snake-divider-gray2.svg flanking the nav links left/right
+   Show on scroll-up / hide on scroll-down / visible at top
+   ============================================================ */
+.navbar-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  background: transparent;
+  box-shadow: none;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(-100%);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+.navbar-wrapper.navbar-visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+.navbar-wrapper .navbar-inner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.2rem 0;
+  /* snake dividers are placed via #nav::before/::after below */
+}
+.navbar-wrapper {
+  /* Override #nav positioning when inside navbar-wrapper */
+}
+.navbar-wrapper #nav {
+  position: static;
+  padding: 0;
+  overflow: visible;
+  background: transparent;
+  z-index: auto;
+}
+.navbar-wrapper #nav > ul {
+  height: auto;
+  position: relative; /* required so ::before/::after use ul as anchor */
+  /* ul is inline-block (content-sized), so ::before/::after right:100%/left:100%
+     sit exactly next to the nav links — not at screen edges */
+  /* Repurpose old line decorators as snake SVG dividers */
+}
+.navbar-wrapper #nav > ul::before, .navbar-wrapper #nav > ul::after {
+  content: "";
+  position: absolute; /* needed for right:100% / left:100% to work */
+  top: 50%;
+  display: block;
+  width: 220px;
+  height: 22px;
+  background: url("../../SVGs/snake-divider-gray2.svg") no-repeat center center;
+  background-size: 220px 22px;
+  opacity: 0.45;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  border: none; /* remove old border-top / border-bottom lines */
+  margin: 0; /* remove old margin-top offsets */
+}
+.navbar-wrapper #nav > ul::before {
+  right: 100%; /* just left of the nav links */
+  left: auto;
+  margin-right: 12px;
+  transform: translateY(-50%);
+}
+.navbar-wrapper #nav > ul::after {
+  left: 100%; /* just right of the nav links */
+  right: auto;
+  margin-left: 12px;
+  transform: translateY(-50%) scaleX(-1);
+}
+.navbar-wrapper #nav > ul > li {
+  margin: 0 0.15rem;
+  padding: 0.5rem 0.85rem;
+}
+.navbar-wrapper #nav > ul > li > a,
+.navbar-wrapper #nav > ul > li > span {
+  font-family: "GrandifloraOne", serif;
+  font-weight: 700;
+  font-size: 1.2rem; /* 1.5x of original 0.88rem */
+  color: #ffffff;
+  letter-spacing: 0.04em;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9), 0 2px 12px rgba(0, 0, 0, 0.7);
+  transition: color 0.25s ease, text-shadow 0.25s ease;
+}
+.navbar-wrapper #nav > ul > li > a:hover,
+.navbar-wrapper #nav > ul > li > span:hover {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+/* ── Minimal text-only dropotron dropdowns ── */
+body .dropotron {
+  background: transparent !important; /* no box */
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 0.6rem 0 !important;
+  min-width: 160px;
+  overflow: visible !important;
+  margin-top: 0.5rem !important; /* gap below nav trigger text */
+  text-align: left !important; /* align text to left of trigger */
+}
+body .dropotron::before {
+  display: none !important; /* no caret arrow */
+}
+body .dropotron li {
+  border-top: none !important; /* remove default borders */
+  margin: 0 !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  overflow: visible !important;
+  /* Line divider between items — skip first */
+}
+body .dropotron li + li {
+  border-top: 1px solid rgba(255, 255, 255, 0.18) !important;
+}
+body .dropotron li a,
+body .dropotron li span {
+  display: block !important;
+  padding: 0.6rem 1.2rem !important;
+  font-family: "GrandifloraOne", serif !important; /* same as nav links */
+  font-size: 1rem !important;
+  font-weight: 700 !important;
+  font-style: normal !important; /* prevent italic on any child elements */
+  color: #ffffff !important;
+  text-decoration: none !important;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  /* Heavy shadow so text is legible over any background */
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95), 0 2px 10px rgba(0, 0, 0, 0.85), 0 4px 20px rgba(0, 0, 0, 0.7) !important;
+  transition: color 0.2s ease, text-shadow 0.2s ease !important;
+}
+body .dropotron li a::before,
+body .dropotron li span::before {
+  display: none !important;
+}
+body .dropotron li a:hover,
+body .dropotron li span:hover {
+  color: rgba(255, 255, 255, 0.75) !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95), 0 2px 10px rgba(0, 0, 0, 0.85), 0 4px 20px rgba(0, 0, 0, 0.7) !important;
+  background: transparent !important;
+  transform: none !important;
+}
+body .dropotron.level-0::before {
+  display: none !important;
+}
+body .dropotron {
+  /* Center level-0 dropdown horizontally under its trigger text */
+}
+body .dropotron.level-0 {
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  text-align: center !important;
+}
+
+/* Hide desktop navbar on mobile — navPanel hamburger takes over */
+@media screen and (max-width: 980px) {
+  .navbar-wrapper {
+    display: none !important;
+  }
+}
+/* === END NAVBAR v7 === */
+/* === HERO DAY WIND: FIXED PATH ON MOBILE (NO RESCALING) === */
+/* On mobile the particle path keeps its full desktop dimensions.          */
+/* It overflows off-screen instead of being squished to fit the viewport.  */
+/* The parent clips cleanly — no horizontal scrollbar created.             */
+@media (max-width: 980px) {
+  /* Clip overflowing particles at the hero boundary */
+  body.homepage #header .hero-day-particles {
+    overflow: hidden !important;
+  }
+  /* Lock the wind-trail container to the desktop design size */
+  /* so preserveAspectRatio="none" scales the path identically to desktop */
+  body.homepage #header .hero-day-particles .cyan-wind-trail,
+  body.homepage #header .hero-day-particles .cyan-wind-trail.cwt1 {
+    width: 1440px !important;
+    height: 900px !important;
+  }
+}
+/* === HERO DAY WIND: CENTER FIXED PATH ON MOBILE === */
+/* The 1440px container is centered so the path extends equally off both sides */
+@media (max-width: 980px) {
+  body.homepage #header .hero-day-particles .cyan-wind-trail,
+  body.homepage #header .hero-day-particles .cyan-wind-trail.cwt1 {
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+  }
+}
+/* === HERO WORDMARK: BIGGER TEXT ON MOBILE === */
+@media (max-width: 640px) {
+  .hero-wordmark-title {
+    font-size: 2rem !important;
+  }
+  .hero-wordmark-subtitle {
+    font-size: 0.95rem !important;
+  }
 }

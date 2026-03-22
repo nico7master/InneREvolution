@@ -148,6 +148,16 @@ def build_calendar_url(calendar_id: str) -> str:
     return f'https://calendar.google.com/calendar/u/0?cid={encoded_id}'
 
 
+def extract_language(title: str, description: str) -> str:
+    """Extract language from title or description. Defaults to 'DE'."""
+    text = f"{title} {description}".upper()
+    if 'EN' in text or 'ENGLISH' in text:
+        return 'EN'
+    if 'DE' in text or 'GERMAN' in text or 'DEUTSCH' in text:
+        return 'DE'
+    return 'DE'  # Default to German
+
+
 def parse_events(ics_text: str, default_timezone: str, fallback_calendar_url: str) -> list[dict]:
     events = []
     current = None
@@ -179,6 +189,7 @@ def parse_events(ics_text: str, default_timezone: str, fallback_calendar_url: st
                     'format': extract_format(description),
                     'summary': extract_summary(description),
                     'registrationUrl': extract_registration_url(description),
+                    'language': extract_language(current.get('SUMMARY', ''), description),
                     'calendarUrl': current.get('URL', fallback_calendar_url),
                     'status': current.get('STATUS', 'scheduled').lower()
                 }

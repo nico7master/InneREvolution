@@ -18,7 +18,8 @@
       "summary": "Bring the joy of yoga into your daily life! Learn & practice simple but powerful yogic processes to boost your health & immunity.",
       "registrationUrl": "https://forms.gle/CE69x9GFGR25S4hN8",
       "calendarUrl": "https://calendar.google.com/calendar/u/0?cid=innerevolutionyoga.life%40gmail.com",
-      "status": "confirmed"
+      "status": "confirmed",
+      "language": "DE"
     },
     {
       "id": "2h7m64kc9urg82i1gb0lofbi5n",
@@ -32,7 +33,8 @@
       "summary": "This program offers a simple yet powerful set of 10 practices that activate the joints, muscles and energy system, bringing ease to the whole system.",
       "registrationUrl": "https://forms.gle/CE69x9GFGR25S4hN8",
       "calendarUrl": "https://calendar.google.com/calendar/u/0?cid=innerevolutionyoga.life%40gmail.com",
-      "status": "confirmed"
+      "status": "confirmed",
+      "language": "DE"
     },
     {
       "id": "2at6ahtbje8icke33mobt459bu",
@@ -41,12 +43,13 @@
       "end": "2026-05-12T16:30:00+00:00",
       "timezone": "UTC",
       "allDay": false,
-      "location": "Hotel & Café SIMON, Jormannsdorfer-Straße 15, 7431 Bad Tatzmannsdorf, Austria",
+      "location": "Hotel & Caf\u00e9 SIMON, Jormannsdorfer-Stra\u00dfe 15, 7431 Bad Tatzmannsdorf, Austria",
       "format": "In person",
-      "summary": "“Surya” means “sun,” and “kriya” means “inner energy process.” Surya Kriya activates the solar plexus to raise the samat prana, or solar heat, in the system.",
+      "summary": "\u201cSurya\u201d means \u201csun,\u201d and \u201ckriya\u201d means \u201cinner energy process.\u201d Surya Kriya activates the solar plexus to raise the samat prana, or solar heat, in the system.",
       "registrationUrl": "https://forms.gle/CE69x9GFGR25S4hN8",
       "calendarUrl": "https://calendar.google.com/calendar/u/0?cid=innerevolutionyoga.life%40gmail.com",
-      "status": "confirmed"
+      "status": "confirmed",
+      "language": "DE"
     },
     {
       "id": "7c00iljm86p3d0cj0fi47gnvmt",
@@ -55,12 +58,13 @@
       "end": "2026-05-13T19:00:00+02:00",
       "timezone": "Europe/Vienna",
       "allDay": false,
-      "location": "Hotel & Café SIMON, Jormannsdorfer-Straße 15, 7431 Bad Tatzmannsdorf, Austria",
+      "location": "Hotel & Caf\u00e9 SIMON, Jormannsdorfer-Stra\u00dfe 15, 7431 Bad Tatzmannsdorf, Austria",
       "format": "In person",
       "summary": "Mantras are one of the most misunderstood aspects of Yoga. Sadhguru explains how a mantra is not just a sound that you utter but something that you strive to become.",
       "registrationUrl": "https://forms.gle/CE69x9GFGR25S4hN8",
       "calendarUrl": "https://calendar.google.com/calendar/u/0?cid=innerevolutionyoga.life%40gmail.com",
-      "status": "confirmed"
+      "status": "confirmed",
+      "language": "DE"
     }
   ]
 }
