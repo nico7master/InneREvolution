@@ -4,6 +4,7 @@ on:
   workflow_dispatch:
   schedule:
     - cron: '0 * * * *'
+
 permissions:
   contents: write
 
@@ -29,13 +30,20 @@ jobs:
             --timezone "Europe/Vienna" \
             --output "data/programs.json"
 
-      - name: Commit updated programs feed
+      - name: Check for changes
+        id: check
         run: |
           if git diff --quiet -- data/programs.json; then
-            echo "No feed changes detected."
-            exit 0
+            echo "changed=false" >> $GITHUB_OUTPUT
+            echo "No changes detected — skipping deploy."
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "Changes detected — will commit and deploy."
           fi
 
+      - name: Commit updated programs feed
+        if: steps.check.outputs.changed == 'true'
+        run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/programs.json
