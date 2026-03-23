@@ -957,3 +957,32 @@ document.addEventListener('DOMContentLoaded', function () {
   }, { passive: true });
 })();
 /* === END NAVBAR v7 JS === */
+
+
+// =============================================
+// HERO PARTICLES: Pause when scrolled out of view
+// Handles both SVG SMIL (desktop) + CSS wind-track
+// =============================================
+(function() {
+    var header = document.querySelector('#header') || document.querySelector('header');
+    var svg = document.querySelector('.cyan-wind-trail svg');
+    var windTrack = document.querySelector('.wind-track');
+
+    if (!header) return;
+
+    var observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+            if (entry.isIntersecting) {
+                // Hero in view — resume
+                if (svg) svg.unpauseAnimations();
+                if (windTrack) windTrack.classList.remove('paused');
+            } else {
+                // Hero out of view — pause
+                if (svg) svg.pauseAnimations();
+                if (windTrack) windTrack.classList.add('paused');
+            }
+        });
+    }, { threshold: 0.15 });
+
+    observer.observe(header);
+})();

@@ -12,7 +12,7 @@
     />
     <link rel="preload" href="assets/webfonts/GrandifloraOne-Regular.ttf" as="font" type="font/ttf" crossorigin>
     <link rel="preload" href="assets/webfonts/DeliusSwashCaps-Regular.ttf" as="font" type="font/ttf" crossorigin>
-    <link rel="stylesheet" href="../assets/css/main.css?v=20260322153551" />
+    <link rel="stylesheet" href="../assets/css/main.css?v=20260322155830" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     
     <link rel="preload" href="images/wallpaper-1981.jpeg" as="image" />
@@ -324,7 +324,6 @@
       <div class="navbar-inner">
         <nav id="nav">
           <ul>
-            <li><a href="#header">Startseite</a></li>
             <li>
               <span>Yoga</span>
               <ul>
@@ -341,6 +340,7 @@
                 <li><a href="#Readings"><i>Mehr...</i></a></li>
               </ul>
             </li>
+            <li><a href="#Readings">Lesetipps</a></li>
             <li><a href="#footer">Kontakt</a></li>
             <li class="lang-switch"><a href="#" onclick="i18n.switchTo('en'); return false;">EN</a></li>
           </ul>
@@ -353,11 +353,14 @@
         <header>
         
 <div class="quote-container">
-            <img
+            <picture>
+              <source srcset="../images/quoteStart.webp" type="image/webp">
+              <img
               src="../images/quoteStart.png"
               alt="quote start"
               class="banner-quote quote-start"
-            />
+             loading="lazy" decoding="async"/>
+            </picture>
             <div class="quote-text">
               <h2>
                 Yoga ist eine Technologie.<br />
@@ -365,22 +368,31 @@
                 egal woher du kommst oder woran du glaubst.
               </h2>
             </div>
-            <img
+            <picture>
+              <source srcset="../images/quoteEnd.webp" type="image/webp">
+              <img
               src="../images/quoteEnd.png"
               alt="quote end"
               class="banner-quote quote-end"
-            />
+             loading="lazy" decoding="async"/>
+            </picture>
         </div>
-          <img
+          <picture>
+              <source srcset="../images/1733553363-hytt-flower-red.webp" type="image/webp">
+              <img
             src="../images/1733553363-hytt-flower-red.png"
             alt="quote divider"
             class="banner-divider"
-          /><br />
-          <img
+           loading="lazy" decoding="async"/>
+            </picture><br />
+          <picture>
+              <source srcset="../images/sadhguru-sign.webp" type="image/webp">
+              <img
             src="../images/sadhguru-sign.png"
             alt="Sadhguru"
             class="banner-signature"
-          />
+           loading="lazy" decoding="async"/>
+            </picture>
       </header>
 </section>
 
@@ -388,11 +400,14 @@
       <div class="wrapper style2 hatha-yoga-wrapper shared-particles" data-theme="earth">
         <article id="HathaYoga" class="container special">
           <div class="image-header-wrapper">
-            <img
+            <picture>
+              <source srcset="../images/Yoga/HathaYoga.webp" type="image/webp">
+              <img
               src="../images/Yoga/HathaYoga.jpg"
               alt="Hatha Yoga"
               class="featured-image"
             />
+            </picture>
             <header class="image-overlay">
               <h2>Hatha Yoga</h2>
               <p>
@@ -411,11 +426,14 @@
                 </p>
               </div>
               <div class="hatha-icon-container">
-                <img
+                <picture>
+              <source srcset="../images/lb_sun.webp" type="image/webp">
+              <img
                   src="../images/lb_sun.png"
                   alt="sun"
                   class="hatha-icon hatha-sun"
-                />
+                 loading="lazy" decoding="async"/>
+            </picture>
                 <span class="hatha-caption">Sonne / „Ha" bedeutet Sonne</span>
               </div>
             </div>
@@ -427,11 +445,14 @@
                 </p>
               </div>
               <div class="hatha-icon-container">
-                <img
+                <picture>
+              <source srcset="../images/lb_moonblue.webp" type="image/webp">
+              <img
                   src="../images/lb_moonblue.png"
                   alt="moon"
                   class="hatha-icon hatha-moon"
-                />
+                 loading="lazy" decoding="async"/>
+            </picture>
                 <span class="hatha-caption">Mond / „Tha" bedeutet Mond</span>
               </div>
             </div>
@@ -453,33 +474,45 @@
         <header>
         
 <div class="quote-container">
-            <img
+            <picture>
+              <source srcset="../images/quoteStart.webp" type="image/webp">
+              <img
               src="../images/quoteStart.png"
               alt="quote start"
               class="banner-quote quote-start"
-            />
+             loading="lazy" decoding="async"/>
+            </picture>
             <div class="quote-text">
               <h2>
                 Wenn du bewusst verschiedene Haltungen einnimmst,<br />
                 kannst du dein Bewusstsein erweitern.
               </h2>
             </div>
-            <img
+            <picture>
+              <source srcset="../images/quoteEnd.webp" type="image/webp">
+              <img
               src="../images/quoteEnd.png"
               alt="quote end"
               class="banner-quote quote-end"
-            />
+             loading="lazy" decoding="async"/>
+            </picture>
           </div>
-          <img
+          <picture>
+              <source srcset="../images/1733553363-hytt-flower-red.webp" type="image/webp">
+              <img
             src="../images/1733553363-hytt-flower-red.png"
             alt="quote divider"
             class="banner-divider"
-          /><br />
-          <img
+           loading="lazy" decoding="async"/>
+            </picture><br />
+          <picture>
+              <source srcset="../images/sadhguru-sign.webp" type="image/webp">
+              <img
             src="../images/sadhguru-sign.png"
             alt="Sadhguru"
             class="banner-signature"
-          />
+           loading="lazy" decoding="async"/>
+            </picture>
       </header>
 </section>
 
@@ -499,7 +532,10 @@
             <!-- 1. Upa Yoga -->
             <article class="swiper-slide" id="upa-yoga">
               <a href="https://isha.sadhguru.org/yoga/yoga-programs/upa-yoga/" class="image featured" target="_blank" rel="noopener"
-                ><img src="../images/Yoga/UpaYoga.jpg" alt="Upa Yoga" /></a>
+                ><picture>
+              <source srcset="../images/Yoga/UpaYoga.webp" type="image/webp">
+              <img src="../images/Yoga/UpaYoga.jpg" alt="Upa Yoga"  loading="lazy" decoding="async"/>
+            </picture></a>
               <header><h3><a href="https://isha.sadhguru.org/yoga/yoga-programs/upa-yoga/" target="_blank" rel="noopener">Upa Yoga</a></h3></header>
               <p>Upa-Yoga schmiert die Gelenke, lockert die Muskeln und aktiviert deine Energiezentren. Du wirst dich wacher und aufmerksamer fühlen.</p>
             </article>
@@ -507,7 +543,10 @@
             <!-- 2. Surya Shakti -->
             <article class="swiper-slide" id="surya-shakti">
               <a href="https://isha.sadhguru.org/yoga/yoga-programs/surya-shakti/" class="image featured" target="_blank" rel="noopener"
-                ><img src="../images/Yoga/SuryaShakti.jpg" alt="Surya Shakti" /></a>
+                ><picture>
+              <source srcset="../images/Yoga/SuryaShakti.webp" type="image/webp">
+              <img src="../images/Yoga/SuryaShakti.jpg" alt="Surya Shakti"  loading="lazy" decoding="async"/>
+            </picture></a>
               <header><h3><a href="https://isha.sadhguru.org/yoga/yoga-programs/surya-shakti/" target="_blank" rel="noopener">Surya Shakti</a></h3></header>
               <p>Surya Shakti ist eine Variante von Surya Kriya, legt aber mehr Fokus auf körperliche Fitness und Geschwindigkeit. Durch diesen Prozess wird eine enorme Menge an Energie erzeugt.</p>
             </article>
@@ -515,7 +554,10 @@
             <!-- 3. Surya Kriya -->
             <article class="swiper-slide" id="surya-kriya">
               <a href="https://isha.sadhguru.org/yoga/yoga-programs/surya-kriya/" class="image featured" target="_blank" rel="noopener"
-                ><img src="../images/Yoga/SuryaKriya3.jpg" alt="Surya Kriya" /></a>
+                ><picture>
+              <source srcset="../images/Yoga/SuryaKriya3.webp" type="image/webp">
+              <img src="../images/Yoga/SuryaKriya3.jpg" alt="Surya Kriya"  loading="lazy" decoding="async"/>
+            </picture></a>
               <header><h3><a href="https://isha.sadhguru.org/yoga/yoga-programs/surya-kriya/" target="_blank" rel="noopener">Surya Kriya</a></h3></header>
               <p>Surya Kriya ist ein kraftvoller Prozess zur Aktivierung der Sonnenenergie in dir. Er aktiviert das Sonnengeflecht, um die Samat Prana, auch Sonnenwärme genannt, im System zu steigern.</p>
             </article>
@@ -523,7 +565,10 @@
             <!-- 4. Yogasanas -->
             <article class="swiper-slide" id="yogasanas">
               <a href="https://isha.sadhguru.org/yoga/yoga-programs/yoga-asanas/" class="image featured" target="_blank" rel="noopener"
-                ><img src="../images/Yoga/Yogasanas.png" alt="Yogasanas" /></a>
+                ><picture>
+              <source srcset="../images/Yoga/Yogasanas.webp" type="image/webp">
+              <img src="../images/Yoga/Yogasanas.png" alt="Yogasanas"  loading="lazy" decoding="async"/>
+            </picture></a>
               <header><h3><a href="https://isha.sadhguru.org/yoga/yoga-programs/yoga-asanas/" target="_blank" rel="noopener">Yogasanas</a></h3></header>
               <p>Wenn du bewusst eine Asana hältst, kann sie verändern, wie du denkst, fühlst und das Leben erlebst. Das ist es, was Hatha Yoga bewirken kann.</p>
             </article>
@@ -531,7 +576,10 @@
             <!-- 5. Angamardana -->
             <article class="swiper-slide" id="angamardana">
               <a href="https://isha.sadhguru.org/yoga/yoga-programs/angamardana/" class="image featured" target="_blank" rel="noopener"
-                ><img src="../images/Yoga/Angamardana.jpg" alt="Angamardana" /></a>
+                ><picture>
+              <source srcset="../images/Yoga/Angamardana.webp" type="image/webp">
+              <img src="../images/Yoga/Angamardana.jpg" alt="Angamardana"  loading="lazy" decoding="async"/>
+            </picture></a>
               <header><h3><a href="https://isha.sadhguru.org/yoga/yoga-programs/angamardana/" target="_blank" rel="noopener">Angamardana</a></h3></header>
               <p>Angamardana ist ein kraftvolles System, um den menschlichen Körper und Geist zu höchster Gesundheit und Wohlbefinden zu bringen — und vor allem, um zu einem vollständigen Menschen zu entfalten.</p>
             </article>
@@ -539,7 +587,10 @@
             <!-- 6. Bhuta Shuddhi -->
             <article class="swiper-slide" id="bhuta-shuddhi">
               <a href="https://isha.sadhguru.org/yoga/yoga-programs/bhuta-shuddhi/" class="image featured" target="_blank" rel="noopener"
-                ><img src="../images/Yoga/BhutaShuddhi.png" alt="Bhuta Shuddhi" /></a>
+                ><picture>
+              <source srcset="../images/Yoga/BhutaShuddhi.webp" type="image/webp">
+              <img src="../images/Yoga/BhutaShuddhi.png" alt="Bhuta Shuddhi"  loading="lazy" decoding="async"/>
+            </picture></a>
               <header><h3><a href="https://isha.sadhguru.org/yoga/yoga-programs/bhuta-shuddhi/" target="_blank" rel="noopener">Bhuta Shuddhi</a></h3></header>
               <p>Erde, Wasser, Wind, Feuer und Raum. Das Wohlbefinden von Körper und Geist kann durch die Reinigung dieser fünf Elemente im menschlichen System hergestellt werden.</p>
             </article>
@@ -564,33 +615,45 @@
         <header>
         
 <div class="quote-container">
-            <img
+            <picture>
+              <source srcset="../images/quoteStart.webp" type="image/webp">
+              <img
               src="../images/quoteStart.png"
               alt="quote start"
               class="banner-quote quote-start"
-            />
+             loading="lazy" decoding="async"/>
+            </picture>
             <div class="quote-text">
               <h2>
                 Harmonie in der Welt wird es erst geben, wenn der Mensch wirklich in sich selbst harmonisch ist. <br />
                 Nur wenn das Individuum bereit ist, sich zu verändern, kann es eine echte Revolution geben.
               </h2>
             </div>
-            <img
+            <picture>
+              <source srcset="../images/quoteEnd.webp" type="image/webp">
+              <img
               src="../images/quoteEnd.png"
               alt="quote end"
               class="banner-quote quote-end"
-            />
+             loading="lazy" decoding="async"/>
+            </picture>
           </div>
-          <img
+          <picture>
+              <source srcset="../images/1733553363-hytt-flower-red.webp" type="image/webp">
+              <img
             src="../images/1733553363-hytt-flower-red.png"
             alt="quote divider"
             class="banner-divider"
-          /><br />
-          <img
+           loading="lazy" decoding="async"/>
+            </picture><br />
+          <picture>
+              <source srcset="../images/sadhguru-sign.webp" type="image/webp">
+              <img
             src="../images/sadhguru-sign.png"
             alt="Sadhguru"
             class="banner-signature"
-          />
+           loading="lazy" decoding="async"/>
+            </picture>
       </header>
 </section>
 
@@ -637,11 +700,14 @@
 
               <aside class="bio-portrait">
                 <div class="bio-portrait-frame">
-                  <img
+                  <picture>
+              <source srcset="../images/NicoSchlagerYoga.webp" type="image/webp">
+              <img
                     src="../images/NicoSchlagerYoga.png"
                     alt="Nico Schlager practicing yoga"
                     class="side-image"
-                  />
+                   loading="lazy" decoding="async"/>
+            </picture>
                 </div>
               </aside>
             </div>
@@ -658,11 +724,14 @@
         <header>
         
 <div class="quote-container">
-            <img
+            <picture>
+              <source srcset="../images/quoteStart.webp" type="image/webp">
+              <img
               src="../images/quoteStart.png"
               alt="quote start"
               class="banner-quote quote-start"
-            />
+             loading="lazy" decoding="async"/>
+            </picture>
             <div class="quote-text">
               <h2>
                 Dieses Leben ist für mich ein Bestreben, Menschen zu helfen <br />
@@ -670,22 +739,31 @@
                 Mögest du die Seligkeit des Göttlichen kennenlernen.
               </h2>
             </div>
-            <img
+            <picture>
+              <source srcset="../images/quoteEnd.webp" type="image/webp">
+              <img
               src="../images/quoteEnd.png"
               alt="quote end"
               class="banner-quote quote-end"
-            />
+             loading="lazy" decoding="async"/>
+            </picture>
         </div>
-          <img
+          <picture>
+              <source srcset="../images/1733553363-hytt-flower-red.webp" type="image/webp">
+              <img
             src="../images/1733553363-hytt-flower-red.png"
             alt="quote divider"
             class="banner-divider"
-          /><br />
-          <img
+           loading="lazy" decoding="async"/>
+            </picture><br />
+          <picture>
+              <source srcset="../images/sadhguru-sign.webp" type="image/webp">
+              <img
             src="../images/sadhguru-sign.png"
             alt="Sadhguru"
             class="banner-signature"
-          />
+           loading="lazy" decoding="async"/>
+            </picture>
       </header>
 </section>
 
@@ -703,10 +781,13 @@
           <div class="sadhguru-layout">
             <div class="sadhguru-hero">
               <figure class="sadhguru-visual">
-                <img
+                <picture>
+              <source srcset="../images/meditating-sadhguru-header-s9gmt8qk5d8ar5uj-950969017.webp" type="image/webp">
+              <img
                   src="../images/meditating-sadhguru-header-s9gmt8qk5d8ar5uj-950969017.jpg"
                   alt="Sadhguru"
-                />
+                 loading="lazy" decoding="async"/>
+            </picture>
               </figure>
             </div>
             <div class="sadhguru-content">
@@ -775,11 +856,14 @@
         <header>
         
 <div class="quote-container">
-            <img
+            <picture>
+              <source srcset="../images/quoteStart.webp" type="image/webp">
+              <img
               src="../images/quoteStart.png"
               alt="quote start"
               class="banner-quote quote-start"
-            />
+             loading="lazy" decoding="async"/>
+            </picture>
             <div class="quote-text">
               <h2>
                 Wenn du den ersten Schritt getan hast, ist die halbe Reise geschafft. <br />
@@ -787,22 +871,31 @@
                 du kannst deine Reise nur von dem Platz aus beginnen, auf dem du gerade sitzt
               </h2>
             </div>
-            <img
+            <picture>
+              <source srcset="../images/quoteEnd.webp" type="image/webp">
+              <img
               src="../images/quoteEnd.png"
               alt="quote end"
               class="banner-quote quote-end"
-            />
+             loading="lazy" decoding="async"/>
+            </picture>
           </div>
-          <img
+          <picture>
+              <source srcset="../images/1733553363-hytt-flower-red.webp" type="image/webp">
+              <img
             src="../images/1733553363-hytt-flower-red.png"
             alt="quote divider"
             class="banner-divider"
-          /><br />
-          <img
+           loading="lazy" decoding="async"/>
+            </picture><br />
+          <picture>
+              <source srcset="../images/sadhguru-sign.webp" type="image/webp">
+              <img
             src="../images/sadhguru-sign.png"
             alt="Sadhguru"
             class="banner-signature"
-          />
+           loading="lazy" decoding="async"/>
+            </picture>
       </header>
 </section>
 
@@ -834,14 +927,26 @@
       <!-- Zitat Banner unter Kommende Programme -->
       <section id="banner" class="inner-revolution-banner programs-bottom-quote">
         <div class="quote-container">
-          <img src="../images/quoteStart.png" alt="Opening quote mark" class="quote-mark quote-start" />
+          <picture>
+              <source srcset="../images/quoteStart.webp" type="image/webp">
+              <img src="../images/quoteStart.png" alt="Opening quote mark" class="quote-mark quote-start"  loading="lazy" decoding="async"/>
+            </picture>
           <div class="quote-text">
             <h2>Dieser Durst zu wissen wurde nicht von dir erschaffen;<br />es ist einfach das Leben, das nach sich selbst sehnt, und das Leben wird sich nicht zufriedengeben, solange es seine ultimative Natur nicht kennt.</h2>
           </div>
-          <img src="../images/quoteEnd.png" alt="Closing quote mark" class="quote-mark quote-end" />
+          <picture>
+              <source srcset="../images/quoteEnd.webp" type="image/webp">
+              <img src="../images/quoteEnd.png" alt="Closing quote mark" class="quote-mark quote-end"  loading="lazy" decoding="async"/>
+            </picture>
         </div>
-        <img src="images/1733553363-hytt-flower-red.png" alt="Decorative divider" class="banner-divider" />
-        <img src="images/sadhguru-sign.png" alt="Sadhguru signature" class="banner-signature" />
+        <picture>
+              <source srcset="../images/1733553363-hytt-flower-red.webp" type="image/webp">
+              <img src="../images/1733553363-hytt-flower-red.png" alt="Decorative divider" class="banner-divider"  loading="lazy" decoding="async"/>
+            </picture>
+        <picture>
+              <source srcset="../images/sadhguru-sign.webp" type="image/webp">
+              <img src="../images/sadhguru-sign.png" alt="Sadhguru signature" class="banner-signature"  loading="lazy" decoding="async"/>
+            </picture>
 </section>
 
       <!-- Interessante Lektuere -->
@@ -865,10 +970,13 @@
                 rel="noopener"
                 class="article-content article-card-link"
               >
-                <span class="image featured"><img
+                <span class="image featured"><picture>
+              <source srcset="../images/Yoga/SuryaKriya2.webp" type="image/webp">
+              <img
                     src="../images/Yoga/SuryaKriya2.jpg"
                     alt="Hatha Yoga Ausbildung"
-                /></span>
+                 loading="lazy" decoding="async"/>
+            </picture></span>
                 <header>
                   <h4>Hatha Yoga Lehrer Ausbildung</h4>
                 </header>
@@ -886,10 +994,13 @@
                 rel="noopener"
                 class="article-content article-card-link"
               >
-                <span class="image featured"><img
+                <span class="image featured"><picture>
+              <source srcset="../images/InnerEngineering.webp" type="image/webp">
+              <img
                     src="../images/InnerEngineering.jpg"
                     alt="Innere Technologie"
-                /></span>
+                 loading="lazy" decoding="async"/>
+            </picture></span>
                 <header>
                   <h4>Innere Technologie</h4>
                 </header>
@@ -905,8 +1016,11 @@
                 rel="noopener"
                 class="article-content article-card-link"
               >
-                <span class="image featured"><img src="../images/ConciousPlanet.jpg" alt="Conscious Planet"
-                /></span>
+                <span class="image featured"><picture>
+              <source srcset="../images/ConciousPlanet.webp" type="image/webp">
+              <img src="../images/ConciousPlanet.jpg" alt="Conscious Planet"
+                 loading="lazy" decoding="async"/>
+            </picture></span>
                 <header>
                   <h4>Conscious Planet</h4>
                 </header>

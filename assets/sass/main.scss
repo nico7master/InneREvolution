@@ -22100,3 +22100,11 @@ body .dropotron {
     font-size: 0.95rem !important;
   }
 }
+
+
+/* Hide heavy SVG particles on mobile — revisit later */
+@media (max-width: 980px) {
+    .cyan-wind-trail {
+        display: none !important;
+    }
+}
