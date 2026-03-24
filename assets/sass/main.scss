@@ -22104,9 +22104,15 @@ body .dropotron {
 
 /* Hide heavy SVG particles on mobile — revisit later */
 @media (max-width: 980px) {
-    .cyan-wind-trail {
-        display: none !important;
-    }
+  body.homepage #header .hero-day-particles .cyan-wind-trail,
+  body.homepage #header .hero-day-particles .cyan-wind-trail.cwt1,
+  body.homepage #header .hero-day-particles .cyan-wind-trail.cwt2,
+  body.homepage #header .hero-day-particles .cyan-wind-trail.cwt3 {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
 }
 
 /* Performance: disable background-attachment:fixed on mobile (causes full repaints on scroll) */
