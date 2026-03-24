@@ -1034,6 +1034,8 @@ document.addEventListener('DOMContentLoaded', function () {
         c.style.display    = 'none';
         c.style.visibility = 'hidden';
       });
+      /* Switch fixed backgrounds to scroll — prevents full repaints on low-end devices */
+      document.body.classList.add('low-fps');
       cancelAnimationFrame(rafId);
     }
 

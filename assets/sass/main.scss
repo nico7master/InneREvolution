@@ -22224,3 +22224,32 @@ html.stars-active .shooting-star {
   }
 }
 /* === END MOBILE HERO-WRAPPER HEIGHT FIX === */
+
+
+/* === LOW-FPS BACKGROUND FIX === */
+/* JS fpsGuard adds body.low-fps when FPS drops below 30 — switch all fixed
+   backgrounds to scroll to stop full-page repaints on every scroll frame */
+body.low-fps {
+  .bio-wrapper,
+  .wrapper.style2.bio-wrapper,
+  .bio-wrapper::before,
+  .wrapper.style2.bio-wrapper::before,
+  .hatha-yoga-wrapper,
+  .hatha-yoga-wrapper::before,
+  .readings-wrapper,
+  .readings-wrapper::before,
+  .sadhguru-wrapper,
+  .sadhguru-wrapper::before,
+  .footer-banner,
+  .footer-banner::before,
+  #program-calendar,
+  #program-calendar::before,
+  #Bio,
+  #Bio::before,
+  section,
+  section::before,
+  section::after {
+    background-attachment: scroll !important;
+  }
+}
+/* === END LOW-FPS BACKGROUND FIX === */
