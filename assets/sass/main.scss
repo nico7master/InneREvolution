@@ -208,7 +208,7 @@ html {
   box-sizing: inherit;
 }
 body {
-  background: #5b5336;
+  background: #080818; /* Near-black: hides hero edge on mobile */
   color: #5b5b5b;
   font-size: 15pt;
   line-height: 1.85em;
@@ -2984,9 +2984,9 @@ body.homepage {
 
   body.homepage {
     #header {
-      height: 100vh; /* Taller header for mobile */
-      min-height: 40em; /* Ensure sufficient height */
-      padding: $spacing-xxxl 0 $spacing-xxxl 0;
+      height: 72vh; /* Reduced for mobile — less scrolling to content */
+      min-height: 20em; /* Enough for hero content */
+      padding: $spacing-md 0 $spacing-md 0; /* Removed excessive top/bottom padding */
 
       &:before {
         display: none;
