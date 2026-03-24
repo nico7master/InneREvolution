@@ -22214,3 +22214,13 @@ html.stars-active .shooting-star {
 #header.hero-paused .hero-day-particles .dust {
   animation-play-state: paused !important;
 }
+
+
+/* === MOBILE HERO-WRAPPER HEIGHT FIX === */
+/* Reduce 200vh scroll spacer on mobile — banner appears after ~2 swipes instead of 5 */
+@media (max-width: 980px) {
+  html body.homepage .hero-wrapper {
+    height: 120vh !important;
+  }
+}
+/* === END MOBILE HERO-WRAPPER HEIGHT FIX === */
