@@ -2984,7 +2984,7 @@ body.homepage {
 
   body.homepage {
     #header {
-      height: 70vh; /* Reduced hero height on mobile for less scrolling */
+      height: 100vh; /* Taller header for mobile */
       min-height: 40em; /* Ensure sufficient height */
       padding: $spacing-xxxl 0 $spacing-xxxl 0;
 
@@ -22213,12 +22213,4 @@ html.stars-active .shooting-star {
 #header.hero-paused .hero-day-particles,
 #header.hero-paused .hero-day-particles .dust {
   animation-play-state: paused !important;
-}
-
-/* Mobile: shorter hero so quote section is reached faster */
-@media (max-width: 980px) {
-  body.homepage #header {
-    height: 70vh !important;
-    min-height: 30em !important;
-  }
 }
