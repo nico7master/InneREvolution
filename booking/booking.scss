@@ -1,0 +1,584 @@
+// booking/booking.scss
+// Compiled to booking/booking.css via GitHub Actions and local npm run build:booking
+// Never edit booking.css directly — edit this file.
+
+@use "../assets/sass/libs/vars" as *;
+@use "../assets/sass/libs/breakpoints" as *;
+
+// ─── Breakpoints (matches main site) ────────────────────────────────────────
+@include breakpoints((
+  wide:     (1281px, 1680px),
+  normal:   (961px,  1280px),
+  narrow:   (841px,  960px),
+  narrower: (737px,  840px),
+  mobile:   (null,   736px),
+));
+
+// ─── Fonts ───────────────────────────────────────────────────────────────────
+@font-face {
+  font-family: 'FedraSansPro';
+  src: url('../assets/webfonts/fedrasanspro-book-webfont.woff2') format('woff2'),
+       url('../assets/webfonts/fedrasanspro-book-webfont.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'FedraSansPro';
+  src: url('../assets/webfonts/fedrasanspro-light-webfont.woff2') format('woff2'),
+       url('../assets/webfonts/fedrasanspro-light-webfont.woff') format('woff');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+// ─── Reset & Base ─────────────────────────────────────────────────────────────
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { font-size: 16px; scroll-behavior: smooth; }
+
+body.booking-page {
+  font-family: $font-family-primary;
+  font-weight: $font-weight-regular;
+  line-height: $line-height-md;
+  color: $color-darker-gray;
+  background-color: $color-off-white;
+  min-height: 100vh;
+}
+
+a {
+  color: $color-primary-orange;
+  text-decoration: none;
+  transition: color $transition-fast;
+  &:hover { color: $color-secondary-orange; }
+}
+
+// ─── Header ───────────────────────────────────────────────────────────────────
+.booking-header {
+  background: $color-darkest-gray;
+  color: $color-white;
+  text-align: center;
+  padding: $padding-xl $padding-lg $padding-lg;
+  position: relative;
+
+  h1 {
+    font-family: $font-family-secondary;
+    font-size: $font-size-xxxxl * 1.4;  // ~2.8rem
+    font-weight: $font-weight-light;
+    letter-spacing: 0.05em;
+    color: $color-white;
+    margin-bottom: $spacing-sm;
+  }
+
+  .booking-tagline {
+    font-size: $font-size-lg;
+    color: rgba($color-white, 0.65);
+    font-weight: $font-weight-light;
+  }
+}
+
+// Back link top-left of header
+.booking-back-link {
+  position: absolute;
+  top: $padding-md;
+  left: $padding-md;
+  color: rgba($color-white, 0.6);
+  font-size: $font-size-sm;
+  transition: color $transition-fast;
+  &:hover { color: $color-white; }
+
+  @include breakpoint('<=mobile') {
+    position: static;
+    display: block;
+    margin-bottom: $spacing-md;
+    text-align: left;
+  }
+}
+
+// ─── Main container ───────────────────────────────────────────────────────────
+.booking-main {
+  max-width: $size-container-width;
+  margin: 0 auto;
+  padding: $padding-xl $padding-lg;
+
+  @include breakpoint('<=mobile') {
+    padding: $padding-lg $padding-md;
+  }
+}
+
+// ─── Loading State ────────────────────────────────────────────────────────────
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $gap-md;
+  padding: $padding-xxl 0;
+  color: $color-dark-gray;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid $color-light-gray;
+  border-top-color: $color-primary-orange;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+// ─── Empty State ──────────────────────────────────────────────────────────────
+.empty-state {
+  text-align: center;
+  padding: $padding-xxl 0;
+  color: $color-dark-gray;
+  font-size: $font-size-lg;
+}
+
+// ─── Programs Grid ────────────────────────────────────────────────────────────
+.programs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: $gap-xl;
+
+  @include breakpoint('<=mobile') {
+    grid-template-columns: 1fr;
+    gap: $gap-lg;
+  }
+}
+
+// ─── Program Card ─────────────────────────────────────────────────────────────
+.program-card {
+  background: $color-white;
+  border-radius: 8px;
+  box-shadow: $shadow-lg;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform $transition-medium, box-shadow $transition-medium;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: $shadow-xl;
+  }
+
+  // Full / sold-out state
+  &.full {
+    opacity: 0.75;
+    &:hover { transform: none; box-shadow: $shadow-lg; }
+  }
+}
+
+.program-card-header {
+  background: $color-darkest-gray;
+  color: $color-white;
+  padding: $padding-lg;
+  position: relative;
+}
+
+.program-card-title {
+  font-family: $font-family-secondary;
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-regular;
+  margin-bottom: $spacing-xs;
+}
+
+.program-card-dates {
+  font-size: $font-size-sm;
+  color: rgba($color-white, 0.65);
+}
+
+// "Full" badge overlay
+.badge-full {
+  position: absolute;
+  top: $padding-md;
+  right: $padding-md;
+  background: $color-red-accent;
+  color: $color-white;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-bold;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+
+.program-card-body {
+  padding: $padding-lg;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: $gap-md;
+}
+
+.program-card-description {
+  font-size: $font-size-md;
+  color: $color-dark-gray;
+  line-height: $line-height-lg;
+}
+
+// Schedule (sessions list)
+.program-schedule {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: $gap-sm;
+
+  li {
+    font-size: $font-size-sm;
+    color: $color-dark-gray;
+    display: flex;
+    align-items: baseline;
+    gap: $gap-sm;
+
+    &::before {
+      content: '\25CB'; // hollow circle bullet
+      color: $color-primary-orange;
+      font-size: $font-size-xs;
+      flex-shrink: 0;
+    }
+  }
+}
+
+.program-card-footer {
+  padding: $padding-md $padding-lg $padding-lg;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $gap-md;
+  border-top: $border-thin solid $color-light-gray;
+}
+
+.program-card-price {
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-bold;
+  color: $color-darkest-gray;
+}
+
+.spots-available {
+  font-size: $font-size-sm;
+  color: $palette-success;
+  font-weight: $font-weight-medium;
+}
+
+.spots-full {
+  font-size: $font-size-sm;
+  color: $color-red-accent;
+  font-weight: $font-weight-medium;
+}
+
+// Register button on card
+.btn-register {
+  background: $color-primary-orange;
+  color: $color-white;
+  border: none;
+  border-radius: 4px;
+  padding: $padding-sm $padding-lg;
+  font-family: $font-family-primary;
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+  cursor: pointer;
+  transition: background $transition-fast, transform $transition-fast;
+  white-space: nowrap;
+
+  &:hover:not(:disabled) {
+    background: $color-secondary-orange;
+    transform: translateY(-1px);
+  }
+
+  &:disabled {
+    background: $color-medium-gray;
+    cursor: not-allowed;
+    transform: none;
+  }
+}
+
+// ─── Modal Overlay ────────────────────────────────────────────────────────────
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba($color-black, 0.65);
+  z-index: $z-index-modal;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $padding-md;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity $transition-medium;
+
+  &.is-open {
+    opacity: 1;
+    pointer-events: all;
+  }
+}
+
+.modal {
+  background: $color-white;
+  border-radius: 8px;
+  box-shadow: 0 20px 60px rgba($color-black, 0.3);
+  width: 100%;
+  max-width: 560px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: $padding-xl;
+  position: relative;
+  transform: translateY(16px);
+  transition: transform $transition-medium;
+
+  .modal-overlay.is-open & {
+    transform: translateY(0);
+  }
+
+  h2 {
+    font-family: $font-family-secondary;
+    font-size: $font-size-xxxl;
+    font-weight: $font-weight-regular;
+    margin-bottom: $spacing-lg;
+    color: $color-darkest-gray;
+    padding-right: $padding-xl; // space for close button
+  }
+
+  @include breakpoint('<=mobile') {
+    padding: $padding-lg $padding-md;
+    max-height: 100vh;
+    border-radius: 0;
+  }
+}
+
+.modal-close {
+  position: absolute;
+  top: $padding-md;
+  right: $padding-md;
+  background: none;
+  border: none;
+  font-size: 1.75rem;
+  color: $color-dark-gray;
+  cursor: pointer;
+  line-height: 1;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: background $transition-fast, color $transition-fast;
+
+  &:hover {
+    background: $color-light-gray;
+    color: $color-darkest-gray;
+  }
+}
+
+// ─── Form ─────────────────────────────────────────────────────────────────────
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: $spacing-lg;
+
+  label,
+  .group-label {
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    color: $color-darker-gray;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="number"],
+  textarea {
+    width: 100%;
+    border: $border-thin solid $color-medium-gray;
+    border-radius: 4px;
+    padding: $padding-sm $padding-md;
+    font-family: $font-family-primary;
+    font-size: $font-size-md;
+    color: $color-darker-gray;
+    background: $color-white;
+    transition: border-color $transition-fast, box-shadow $transition-fast;
+
+    &:focus {
+      outline: none;
+      border-color: $color-primary-orange;
+      box-shadow: 0 0 0 3px rgba($color-primary-orange, 0.15);
+    }
+
+    &::placeholder { color: $color-medium-gray; }
+  }
+
+  textarea { resize: vertical; min-height: 80px; }
+}
+
+.required { color: $color-red-accent; }
+
+// Discount code row
+.discount-row {
+  .discount-input-wrap {
+    display: flex;
+    gap: $gap-sm;
+    align-items: center;
+
+    input { flex: 1; }
+  }
+}
+
+.discount-status {
+  font-size: $font-size-lg;
+  flex-shrink: 0;
+  width: 24px;
+  text-align: center;
+}
+
+.discount-result {
+  font-size: $font-size-sm;
+  min-height: 1.4em;
+
+  &.is-valid   { color: $palette-success; }
+  &.is-invalid { color: $color-red-accent; }
+}
+
+// Price display
+.price-display {
+  flex-direction: row;
+  align-items: center;
+  gap: $gap-md;
+  padding: $padding-sm $padding-md;
+  background: $color-off-white;
+  border-radius: 4px;
+  border: $border-thin solid $color-light-gray;
+
+  .price-label {
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: $color-dark-gray;
+  }
+
+  .price-value {
+    font-size: $font-size-xxl;
+    font-weight: $font-weight-bold;
+    color: $color-darkest-gray;
+    margin-left: auto;
+  }
+
+  .price-original {
+    font-size: $font-size-sm;
+    color: $color-dark-gray;
+    text-decoration: line-through;
+  }
+
+  .price-savings {
+    font-size: $font-size-sm;
+    color: $palette-success;
+    font-weight: $font-weight-medium;
+  }
+}
+
+// Radio group
+.radio-group {
+  display: flex;
+  gap: $gap-lg;
+  flex-wrap: wrap;
+}
+
+.radio-label {
+  display: flex;
+  align-items: center;
+  gap: $gap-sm;
+  font-size: $font-size-md;
+  cursor: pointer;
+
+  input[type="radio"] {
+    width: 18px;
+    height: 18px;
+    accent-color: $color-primary-orange;
+    cursor: pointer;
+  }
+}
+
+// Friends section (conditional)
+.friends-section {
+  background: $color-off-white;
+  border-left: 3px solid $color-primary-orange;
+  border-radius: 0 4px 4px 0;
+  padding: $padding-md;
+  margin-bottom: $spacing-lg;
+
+  .form-group:last-child { margin-bottom: 0; }
+}
+
+// Submit button
+.btn-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $gap-sm;
+  width: 100%;
+  background: $color-primary-orange;
+  color: $color-white;
+  border: none;
+  border-radius: 4px;
+  padding: $padding-md $padding-lg;
+  font-family: $font-family-primary;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-medium;
+  cursor: pointer;
+  transition: background $transition-fast, transform $transition-fast;
+  margin-top: $spacing-md;
+
+  &:hover:not(:disabled) {
+    background: $color-secondary-orange;
+    transform: translateY(-1px);
+  }
+
+  &:disabled {
+    background: $color-medium-gray;
+    cursor: not-allowed;
+    transform: none;
+  }
+}
+
+// Button loading spinner
+.btn-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba($color-white, 0.4);
+  border-top-color: $color-white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  flex-shrink: 0;
+}
+
+// ─── Success Message ──────────────────────────────────────────────────────────
+.success-message {
+  text-align: center;
+  padding: $padding-xl $padding-lg;
+
+  h3 {
+    font-family: $font-family-secondary;
+    font-size: $font-size-xxl;
+    margin-bottom: $spacing-md;
+    color: $color-darkest-gray;
+  }
+
+  p { color: $color-dark-gray; line-height: $line-height-lg; }
+}
+
+.success-icon {
+  width: 64px;
+  height: 64px;
+  background: $palette-success;
+  color: $color-white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  margin: 0 auto $spacing-lg;
+}

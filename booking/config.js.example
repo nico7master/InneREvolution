@@ -1,0 +1,10 @@
+// config.js.example
+// Copy to config.js and fill in your values for LOCAL development.
+// config.js is gitignored — never commit it.
+// In production this file is generated automatically by GitHub Actions.
+
+const CONFIG = {
+  SHEET_ID:        "your-google-sheet-id",
+  SHEETS_API_KEY:  "your-restricted-api-key",
+  APPS_SCRIPT_URL: "https://script.google.com/macros/s/YOUR_ID/exec"
+};

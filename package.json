@@ -1,5 +1,12 @@
 {
   "dependencies": {
     "sass": "^1.98.0"
+  },
+  "scripts": {
+    "build:css": "sass assets/sass/main.scss assets/css/main.css --style compressed --no-source-map",
+    "build:booking": "sass booking/booking.scss booking/booking.css --style compressed --no-source-map",
+    "build": "npm run build:css && npm run build:booking",
+    "watch:css": "sass --watch assets/sass/main.scss assets/css/main.css",
+    "watch:booking": "sass --watch booking/booking.scss booking/booking.css"
   }
 }

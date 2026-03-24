@@ -1,0 +1,74 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  # Also re-deploy when the calendar sync updates programs.json
+  workflow_run:
+    workflows: ["Sync programs from Google Calendar"]
+    types: [completed]
+    branches: [main]
+
+# Only one deploy at a time; queue rather than cancel.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # !! Secrets are injected here — config.js is NEVER committed to git
+      - name: Generate booking/config.js from secrets
+        env:
+          SHEET_ID:        ${{ secrets.SHEET_ID }}
+          SHEETS_API_KEY:  ${{ secrets.SHEETS_API_KEY }}
+          APPS_SCRIPT_URL: ${{ secrets.APPS_SCRIPT_URL }}
+        run: |
+          cat > booking/config.js << EOF
+          // Auto-generated at deploy time by GitHub Actions.
+          // DO NOT COMMIT — contains sensitive API keys.
+          const CONFIG = {
+            SHEET_ID:        "${SHEET_ID}",
+            SHEETS_API_KEY:  "${SHEETS_API_KEY}",
+            APPS_SCRIPT_URL: "${APPS_SCRIPT_URL}"
+          };
+          EOF
+
+      - name: Compile main SCSS
+        run: npm run build:css
+
+      - name: Compile booking SCSS
+        run: npm run build:booking
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Deploy the entire repo root (excluding .git etc.)
+          path: .
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

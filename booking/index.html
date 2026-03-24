@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <title>Book Your Spot — InneREvolution Yoga</title>
+    <link rel="stylesheet" href="booking.css" />
+    <link rel="icon" type="image/png" href="../images/favicon/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="../images/favicon/favicon.svg" />
+    <link rel="shortcut icon" href="../images/favicon/favicon.ico" />
+  </head>
+  <body class="booking-page">
+
+    <!-- Header -->
+    <header class="booking-header">
+      <a href="../" class="booking-back-link">&#8592; Back to site</a>
+      <h1>Yoga Programs</h1>
+      <p class="booking-tagline">Book your spot and begin your journey</p>
+    </header>
+
+    <main class="booking-main">
+      <section id="programs-section" class="programs-section">
+
+        <!-- Loading placeholder -->
+        <div id="programs-loading" class="loading-state">
+          <div class="loading-spinner"></div>
+          <p>Loading programs&#8230;</p>
+        </div>
+
+        <!-- Populated by JS -->
+        <div id="programs-grid" class="programs-grid" style="display:none;"></div>
+
+        <!-- Empty state -->
+        <div id="programs-empty" class="empty-state" style="display:none;">
+          <p>No programs are currently available. Check back soon!</p>
+        </div>
+
+      </section>
+    </main>
+
+    <!-- Registration Modal -->
+    <div id="modal-overlay" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <div class="modal">
+
+        <button class="modal-close" id="modal-close" aria-label="Close">&times;</button>
+        <h2 id="modal-title">Register</h2>
+
+        <form id="booking-form" novalidate>
+
+          <!-- Hidden: populated by openModal() -->
+          <input type="hidden" id="field-program-id"    name="programId" />
+          <input type="hidden" id="field-program-name"  name="programName" />
+          <input type="hidden" id="field-program-price" name="programPrice" />
+
+          <div class="form-group">
+            <label for="field-name">Full Name <span class="required">*</span></label>
+            <input type="text" id="field-name" name="name" required autocomplete="name" placeholder="Jane Doe" />
+          </div>
+
+          <div class="form-group">
+            <label for="field-email">Email <span class="required">*</span></label>
+            <input type="email" id="field-email" name="email" required autocomplete="email" placeholder="jane@example.com" />
+          </div>
+
+          <div class="form-group">
+            <label for="field-phone">Phone</label>
+            <input type="tel" id="field-phone" name="phone" autocomplete="tel" placeholder="+43 &#8230;" />
+          </div>
+
+          <!-- Discount code with live validation -->
+          <div class="form-group discount-row">
+            <label for="field-discount">Discount Code</label>
+            <div class="discount-input-wrap">
+              <input type="text" id="field-discount" name="discountCode" autocomplete="off" placeholder="e.g. FRIEND10" />
+              <span id="discount-status" class="discount-status" aria-live="polite"></span>
+            </div>
+            <div id="discount-result" class="discount-result" aria-live="polite"></div>
+          </div>
+
+          <!-- Live price display -->
+          <div class="form-group price-display">
+            <span class="price-label">Total:</span>
+            <span id="price-value" class="price-value">&#8364;0.00</span>
+          </div>
+
+          <!-- Invited by friend radio -->
+          <div class="form-group">
+            <span class="group-label">Were you invited by a friend?</span>
+            <div class="radio-group">
+              <label class="radio-label">
+                <input type="radio" name="invitedByFriend" value="no" checked onchange="toggleFriends(false)" />
+                No
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="invitedByFriend" value="yes" onchange="toggleFriends(true)" />
+                Yes
+              </label>
+            </div>
+          </div>
+
+          <!-- Friends section (shown conditionally) -->
+          <div id="friends-section" class="friends-section" style="display:none;">
+            <div class="form-group">
+              <label for="field-friends-count">How many friends are joining?</label>
+              <input type="number" id="field-friends-count" name="friendsCount" min="1" max="10" placeholder="1" />
+            </div>
+            <div class="form-group">
+              <label for="field-friends-names">Friends&#8217; names</label>
+              <textarea id="field-friends-names" name="friendsNames" rows="2" placeholder="One name per line"></textarea>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="field-comments">Comments / Questions</label>
+            <textarea id="field-comments" name="comments" rows="3" placeholder="Anything you&#8217;d like us to know&#8230;"></textarea>
+          </div>
+
+          <button type="submit" id="submit-btn" class="btn-primary">
+            <span id="submit-label">Request Spot &amp; Pay</span>
+            <span id="submit-spinner" class="btn-spinner" style="display:none;"></span>
+          </button>
+
+        </form>
+
+        <!-- Shown after successful submission -->
+        <div id="form-success" class="success-message" style="display:none;">
+          <div class="success-icon">&#10003;</div>
+          <h3>You&#8217;re registered!</h3>
+          <p id="success-detail">Check your email for the payment link and confirmation details.</p>
+        </div>
+
+      </div><!-- /.modal -->
+    </div><!-- /#modal-overlay -->
+
+    <!-- Config: gitignored locally, generated by GitHub Actions in production -->
+    <script src="config.js"></script>
+    <!-- Booking logic -->
+    <script src="booking.js"></script>
+
+  </body>
+</html>

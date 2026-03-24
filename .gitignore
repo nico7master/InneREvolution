@@ -47,3 +47,6 @@ build/
 # Temporary files
 *.tmp
 *.temp
+
+# Booking page — secrets injected at deploy time, never commit
+booking/config.js
