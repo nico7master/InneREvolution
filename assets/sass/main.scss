@@ -22108,3 +22108,28 @@ body .dropotron {
         display: none !important;
     }
 }
+
+/* Performance: disable background-attachment:fixed on mobile (causes full repaints on scroll) */
+@media screen and (max-width: 980px) {
+  .bio-wrapper,
+  .wrapper.style2.bio-wrapper,
+  .bio-wrapper::before,
+  .wrapper.style2.bio-wrapper::before,
+  .hatha-yoga-wrapper,
+  .hatha-yoga-wrapper::before,
+  .readings-wrapper,
+  .readings-wrapper::before,
+  .sadhguru-wrapper,
+  .sadhguru-wrapper::before,
+  .footer-banner,
+  .footer-banner::before,
+  #program-calendar,
+  #program-calendar::before,
+  #Bio,
+  #Bio::before,
+  body.homepage section,
+  body.homepage section::before,
+  body.homepage section::after {
+    background-attachment: scroll !important;
+  }
+}
