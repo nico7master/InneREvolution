@@ -5,6 +5,12 @@ on:
   schedule:
     - cron: '0 * * * *'
 
+# Prevent calendar sync from racing with Pages deployment.
+# cancel-in-progress: false = queue behind running deploy, never cancel it.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
 permissions:
   contents: write
 
