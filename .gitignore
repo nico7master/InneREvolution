@@ -50,3 +50,7 @@ build/
 
 # Booking page — secrets injected at deploy time, never commit
 booking/config.js
+*.bak
+*.broken
+*.revert_mistake
+assets/css/test.*
