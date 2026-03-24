@@ -987,19 +987,28 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (!header) return;
 
+    window._heroVisible = true; // shared flag for bloomLoop in index.html
+
     var observer = new IntersectionObserver(function(entries) {
         entries.forEach(function(entry) {
             if (entry.isIntersecting) {
-                // Hero in view — resume
+                // Hero in view — resume everything
+                window._heroVisible = true;
                 if (svg) svg.unpauseAnimations();
                 if (windTrack) windTrack.classList.remove('paused');
+                if (header) header.classList.remove('hero-paused'); // resume dust motes via CSS
             } else {
-                // Hero out of view — pause
+                // Hero out of view — pause everything
+                window._heroVisible = false;
                 if (svg) svg.pauseAnimations();
                 if (windTrack) windTrack.classList.add('paused');
+                if (header) header.classList.add('hero-paused'); // pause dust motes via CSS
             }
         });
-    }, { threshold: 0.15 
+    }, { threshold: 0.15 });
+
+    observer.observe(header);
+
   /* ---- Rolling FPS watcher ----------------------------------------
    * Starts after 3s warmup (hero particles settled).
    * Samples FPS every 2 seconds. If 2 consecutive samples are below
@@ -1058,7 +1067,4 @@ document.addEventListener('DOMContentLoaded', function () {
       }, WARMUP_MS);
     }
   })();
-});
-
-    observer.observe(header);
 })();

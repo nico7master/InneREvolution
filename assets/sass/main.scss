@@ -22148,3 +22148,69 @@ body .dropotron {
     visibility: hidden !important;
   }
 }
+
+/* === STAR ANIMATION: dawn-aware ===
+ * Stars keep their animation defined at all times but are PAUSED by default.
+ * JS toggles html.stars-active to switch play-state to running.
+ * Using animation-play-state:paused (not animation:none) so stars
+ * freeze in place — no jump back to initial rotation position.
+ */
+
+/* Default: stars paused in place on all devices */
+body.homepage #header .stars-deep,
+body.homepage .stars-deep,
+body.homepage #header .stars-mid,
+body.homepage .stars-mid,
+body.homepage #header .stars-fore,
+body.homepage .stars-fore {
+  animation-play-state: paused !important;
+}
+
+body.homepage #header .stars-deep::before,
+body.homepage .stars-deep::before,
+body.homepage #header .stars-mid::before,
+body.homepage .stars-mid::before,
+body.homepage #header .stars-fore::before,
+body.homepage .stars-fore::before,
+body.homepage #header .stars-fore::after,
+body.homepage .stars-fore::after {
+  animation-play-state: paused !important;
+}
+
+.shooting-star {
+  display: none !important;
+}
+
+/* Resume when JS sets html.stars-active (night mode, hero visible) */
+html.stars-active body.homepage #header .stars-deep,
+html.stars-active body.homepage .stars-deep,
+html.stars-active body.homepage #header .stars-mid,
+html.stars-active body.homepage .stars-mid,
+html.stars-active body.homepage #header .stars-fore,
+html.stars-active body.homepage .stars-fore {
+  animation-play-state: running !important;
+}
+
+html.stars-active body.homepage #header .stars-deep::before,
+html.stars-active body.homepage .stars-deep::before,
+html.stars-active body.homepage #header .stars-mid::before,
+html.stars-active body.homepage .stars-mid::before,
+html.stars-active body.homepage #header .stars-fore::before,
+html.stars-active body.homepage .stars-fore::before,
+html.stars-active body.homepage #header .stars-fore::after,
+html.stars-active body.homepage .stars-fore::after {
+  animation-play-state: running !important;
+}
+
+html.stars-active .shooting-star {
+  display: block !important;
+}
+
+/* === DUST MOTES + SACRED GEO: pause when hero scrolled out of view ===
+ * JS adds .hero-paused to #header via IntersectionObserver.
+ * animation-play-state:paused freezes in place — no snap/jump.
+ */
+#header.hero-paused .hero-day-particles,
+#header.hero-paused .hero-day-particles .dust {
+  animation-play-state: paused !important;
+}
