@@ -1215,7 +1215,8 @@
     const heroH = window.innerHeight;
     const scrollY = window.scrollY;
     // Full transition happens over one viewport height of scroll
-    const dawn = Math.min(1, Math.max(0, scrollY / (heroH * 0.65))); // day arrives at 65% scroll
+    const scrollFactor = window.innerWidth <= 980 ? 0.40 : 0.65; // mobile: day at 40%, desktop: 65%
+    const dawn = Math.min(1, Math.max(0, scrollY / (heroH * scrollFactor)));
     html.style.setProperty('--dawn', dawn.toFixed(4));
     // Stars animate only during night (dawn < 0.1) — saves GPU on all devices
     if (dawn < 0.1) {
