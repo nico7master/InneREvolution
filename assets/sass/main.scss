@@ -22139,3 +22139,12 @@ body .dropotron {
     background-attachment: scroll !important;
   }
 }
+
+/* Hide section particle canvases on mobile — matches other mobile breakpoints */
+/* Uses 2-class selector to beat .shared-particles .shared-particle-canvas specificity */
+@media (max-width: 980px) {
+  .shared-particles .shared-particle-canvas {
+    display: none !important;
+    visibility: hidden !important;
+  }
+}

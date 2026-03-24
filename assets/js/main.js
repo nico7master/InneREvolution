@@ -421,6 +421,9 @@ updateActiveDot();
 
     var dpr = 1, width = 1, height = 1;
     var particles = [], raf = 0, running = false, last = 0;
+    var sectionOffset = 0;
+    function updateSectionOffset() { sectionOffset = wrapper.getBoundingClientRect().top; }
+    window.addEventListener('scroll', updateSectionOffset, { passive: true });
 
     function rand(min, max) { return Math.random() * (max - min) + min; }
 
@@ -428,7 +431,7 @@ updateActiveDot();
       var mobile = width <= 736;
       var area = Math.max(1, width * height);
       var scaled = Math.round(area / (mobile ? 50000 : 34000));
-      return Math.max(mobile ? 20 : 36, Math.min(mobile ? 32 : 56, scaled));
+      return Math.max(mobile ? 10 : 36, Math.min(mobile ? 18 : 56, scaled)); /* mobile: max 18 */
     }
 
     function makeParticle(initial) {
@@ -472,8 +475,13 @@ updateActiveDot();
     function step(now) {
       if (!running) return;
       if (!last) last = now;
+      /* 30fps cap on mobile — halves GPU load */
+      var mobile = width <= 736;
+      if (mobile && now - last < 33) { raf = window.requestAnimationFrame(step); return; }
       var dt = Math.min(32, now - last); last = now;
       ctx.clearRect(0, 0, width, height);
+      ctx.save();
+      ctx.translate(0, -sectionOffset);
       for (var i = 0; i < particles.length; i++) {
         var p = particles[i];
         p.y -= p.rise * (dt / 1000);
@@ -493,6 +501,7 @@ updateActiveDot();
         ctx.arc(x, y, p.radius, 0, Math.PI * 2);
         ctx.fill();
       }
+      ctx.restore();
       raf = window.requestAnimationFrame(step);
     }
 
@@ -501,6 +510,7 @@ updateActiveDot();
       /* Ensure canvas has real dimensions before starting */
       var sz = getSize(wrapper);
       if (sz.w !== width || sz.h !== height || !particles.length) applySize(sz.w, sz.h);
+      updateSectionOffset();
       running = true; last = 0;
       raf = window.requestAnimationFrame(step);
     }
@@ -525,7 +535,7 @@ updateActiveDot();
 
     /* Re-measure on resize */
     window.addEventListener('resize', function () {
-      if (running) resize();
+      if (running) { resize(); updateSectionOffset(); }
     }, { passive: true });
 
     /* Ensure proper dimensions after full page load */
@@ -537,6 +547,13 @@ updateActiveDot();
   }
 
   function initSharedParticles() {
+    /* Skip entirely on mobile — too heavy for small screens */
+    if (window.innerWidth <= 980) return;
+    /* Skip if FPS watcher detected low performance */
+    if (window._particlesDisabled) return;
+    var prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var slowConn = navigator.connection && (navigator.connection.saveData || /2g/.test(navigator.connection.effectiveType));
+    if (prefersReduced || slowConn) return; /* skip particles on reduced-motion / slow connections */
     var wrappers = document.querySelectorAll('.shared-particles');
     for (var i = 0; i < wrappers.length; i++) {
       initSectionCanvas(wrappers[i]);
@@ -982,7 +999,66 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (windTrack) windTrack.classList.add('paused');
             }
         });
-    }, { threshold: 0.15 });
+    }, { threshold: 0.15 
+  /* ---- Rolling FPS watcher ----------------------------------------
+   * Starts after 3s warmup (hero particles settled).
+   * Samples FPS every 2 seconds. If 2 consecutive samples are below
+   * THRESHOLD, all section particle canvases are removed and flagged
+   * so new ones are never created.
+   * Does NOT affect hero particles.
+   * ----------------------------------------------------------------- */
+  (function fpsGuard() {
+    var THRESHOLD      = 30;    /* fps floor */
+    var SAMPLE_MS      = 2000;  /* measure window per sample */
+    var WARMUP_MS      = 3000;  /* wait before first sample */
+    var BAD_SAMPLES    = 2;     /* consecutive bad samples before disabling */
+    var badCount       = 0;
+    var frameCount     = 0;
+    var sampleStart    = null;
+    var rafId          = null;
+
+    function disableParticles() {
+      window._particlesDisabled = true;
+      /* Remove any already-running canvases */
+      var canvases = document.querySelectorAll('.shared-particles .shared-particle-canvas');
+      canvases.forEach(function(c) {
+        c.style.display    = 'none';
+        c.style.visibility = 'hidden';
+      });
+      cancelAnimationFrame(rafId);
+    }
+
+    function tick(now) {
+      if (!sampleStart) sampleStart = now;
+      frameCount++;
+      var elapsed = now - sampleStart;
+
+      if (elapsed >= SAMPLE_MS) {
+        var fps = (frameCount / elapsed) * 1000;
+        if (fps < THRESHOLD) {
+          badCount++;
+          if (badCount >= BAD_SAMPLES) {
+            disableParticles();
+            return; /* stop RAF loop */
+          }
+        } else {
+          badCount = 0; /* reset on good sample */
+        }
+        frameCount  = 0;
+        sampleStart = now;
+      }
+
+      rafId = requestAnimationFrame(tick);
+    }
+
+    /* Only run on non-mobile (mobile already hides canvases via CSS) */
+    if (window.innerWidth > 980) {
+      setTimeout(function() {
+        rafId = requestAnimationFrame(tick);
+      }, WARMUP_MS);
+    }
+  })();
+});
 
     observer.observe(header);
 })();
