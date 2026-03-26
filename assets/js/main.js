@@ -33,6 +33,8 @@ window.setTimeout(function() {
 $body.removeClass('is-preload');
 }, 100);
 });
+// Safety fallback: remove preload after 2.5s even if external resources hang
+window.setTimeout(function() { $body.removeClass('is-preload'); }, 2500);
 
 // Dropdowns.
 $('#nav > ul').dropotron({
@@ -568,7 +570,7 @@ updateActiveDot();
 })();
 /* --- End per-section particle canvases --- */
 
-/* --- Upcoming programs feed --- */
+/* --- Upcoming programs feed (Google Sheets) --- */
 (function () {
   function createElement(tagName, className, text) {
     var element = document.createElement(tagName);
@@ -577,211 +579,274 @@ updateActiveDot();
     return element;
   }
 
-  function formatProgramDate(program) {
-    if (!program || !program.start) return 'Date coming soon';
-
-    var startDate = new Date(program.start);
-    if (isNaN(startDate.getTime())) return 'Date coming soon';
-
-    var timeZone = program.timezone || undefined;
-    var dateFormatter = new Intl.DateTimeFormat('en-GB', {
-      weekday: 'short',
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric',
-      timeZone: timeZone
-    });
-
-    if (program.allDay) {
-      return dateFormatter.format(startDate);
-    }
-
-    var timeFormatter = new Intl.DateTimeFormat('en-GB', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
-      timeZone: timeZone
-    });
-
-    var timeText = timeFormatter.format(startDate);
-
-    if (program.end) {
-      var endDate = new Date(program.end);
-      if (!isNaN(endDate.getTime())) {
-        timeText += ' – ' + timeFormatter.format(endDate);
-      }
-    }
-
-    return dateFormatter.format(startDate) + ' · ' + timeText;
+  /* Google Sheets serial date → "YYYY-MM-DD" */
+  function serialToISO(serial) {
+    if (!serial && serial !== 0) return '';
+    if (typeof serial === 'string') return serial.substring(0, 10);
+    var d = new Date(Math.round((serial - 25569) * 86400 * 1000));
+    return d.toISOString().split('T')[0];
   }
 
-  function buildProgramCard(program, fallbackCalendarUrl) {
-    var card = createElement('article', 'program-card swiper-slide'); /* swiper-slide enables Swiper drag-scroll */
-    var cardHeader = createElement('div', 'program-card-header');
+  /* Google Sheets serial time fraction → "HH:MM" */
+  function serialToTime(frac) {
+    if (!frac && frac !== 0) return '';
+    if (typeof frac === 'string') return frac.substring(0, 5);
+    var totalMins = Math.round(frac * 24 * 60);
+    var h = Math.floor(totalMins / 60);
+    var m = totalMins % 60;
+    return String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0');
+  }
+
+  function formatDate(raw) {
+    if (!raw) return '';
+    var d = new Date(raw.indexOf('T') !== -1 ? raw : raw + 'T00:00:00');
+    if (isNaN(d.getTime())) return '';
+    return d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+  }
+
+  function fetchSheet(range) {
+    var url = 'https://sheets.googleapis.com/v4/spreadsheets/' + CONFIG.SHEET_ID +
+              '/values/' + encodeURIComponent(range) +
+              '?key=' + CONFIG.SHEETS_API_KEY +
+              '&valueRenderOption=UNFORMATTED_VALUE&dateTimeRenderOption=SERIAL_NUMBER';
+    // 5-second timeout — prevents infinite spinner when API key blocks localhost
+    var controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+    var timer = controller ? setTimeout(function () { controller.abort(); }, 5000) : null;
+    var opts = controller ? { signal: controller.signal } : {};
+    return fetch(url, opts).then(function (res) {
+      if (timer) clearTimeout(timer);
+      if (!res.ok) throw new Error('Sheets API ' + res.status + ' — check API key referrer restrictions');
+      return res.json();
+    }).then(function (data) { return data.values || []; })
+    .catch(function (err) {
+      if (timer) clearTimeout(timer);
+      throw err; // re-throw so Promise.all catch handles it
+    });
+  }
+
+  function buildProgramCard(program, sessions) {
+    var isFull   = program.spotsLeft <= 0;
+    var card     = createElement('article', 'program-card swiper-slide' + (isFull ? ' is-full' : ''));
+    var header   = createElement('div', 'program-card-header');
+    var title    = createElement('h3', '', program.name || 'Upcoming program');
     var dateText = createElement('p', 'program-card-date');
-    dateText.innerHTML = formatProgramDate(program);
-    var title = createElement('h3', '', program.title || 'Upcoming program');
+    dateText.textContent = program.startDate
+      ? formatDate(program.startDate) + (program.endDate && program.endDate !== program.startDate ? ' \u2013 ' + formatDate(program.endDate) : '')
+      : 'Date coming soon';
+    header.appendChild(title);
+    header.appendChild(dateText);
+    card.appendChild(header);
 
-    cardHeader.appendChild(title);
-    cardHeader.appendChild(dateText);
-    card.appendChild(cardHeader);
-
-    /* Build meta list with format, language, and location */
+    /* Meta bubbles: format / language / level / location */
     var metaList = createElement('ul', 'program-card-meta');
-    var hasMeta = false;
-
-    /* Format bubble */
-    if (program.format) {
-      hasMeta = true;
-      metaList.appendChild(createElement('li', 'program-card-format', program.format));
-    }
-
-    /* Language bubble */
+    var hasMeta  = false;
+    if (program.format)   { hasMeta = true; metaList.appendChild(createElement('li', 'program-card-format', program.format)); }
     if (program.language) {
       hasMeta = true;
       var langLi = createElement('li', 'program-card-lang', program.language.toUpperCase());
       langLi.setAttribute('data-lang', program.language.toLowerCase());
       metaList.appendChild(langLi);
     }
+    if (program.location) { hasMeta = true; metaList.appendChild(createElement('li', 'program-card-location', program.location)); }
+    if (hasMeta) card.appendChild(metaList);
 
-    /* Location */
-    if (program.location) {
-      hasMeta = true;
-      metaList.appendChild(createElement('li', 'program-card-location', program.location));
+    /* Description */
+    if (program.description) card.appendChild(createElement('p', 'program-card-summary', program.description));
+
+    /* Session schedule (first 3 sessions) */
+    var progSessions = sessions.filter(function (s) { return s.programId === program.id; }).slice(0, 3);
+    if (progSessions.length > 0) {
+      var ul = createElement('ul', 'program-card-schedule');
+      progSessions.forEach(function (s) {
+        ul.appendChild(createElement('li', '', formatDate(s.date) + ' \u00b7 ' + s.timeStart + '\u2013' + s.timeEnd));
+      });
+      card.appendChild(ul);
     }
 
-    if (hasMeta) {
-      card.appendChild(metaList);
-    }
-
-    if (program.summary) {
-      card.appendChild(createElement('p', 'program-card-summary', program.summary));
-    }
-
+    /* Footer: price + spots + CTA */
     var footer = createElement('div', 'program-card-actions');
+    footer.appendChild(createElement('span', 'program-card-price', '\u20ac' + Number(program.price).toFixed(2)));
+    footer.appendChild(createElement('span', isFull ? 'program-card-note' : 'program-card-note',
+      isFull ? 'Sold out' : program.spotsLeft + ' spot' + (program.spotsLeft === 1 ? '' : 's') + ' left'));
 
-    if (program.registrationUrl) {
-      var registerButton = createElement('a', 'button hatha-button program-register-button', program.registrationLabel || 'Register');
-      registerButton.href = program.registrationUrl;
-      registerButton.target = '_blank';
-      registerButton.rel = 'noopener';
-      footer.appendChild(registerButton);
+    var btn = document.createElement('a');
+    btn.className = 'button hatha-button program-register-button';
+    if (isFull) {
+      btn.textContent       = 'Sold Out';
+      btn.setAttribute('aria-disabled', 'true');
+      btn.style.opacity     = '0.55';
+      btn.style.pointerEvents = 'none';
     } else {
-      footer.appendChild(createElement('span', 'program-card-note', 'Add your Google Form link to open registration.'));
+      btn.textContent = 'Book Now';
+      btn.href        = '/booking/?program=' + encodeURIComponent(program.id);
     }
-
-    var calendarUrl = program.calendarUrl || fallbackCalendarUrl;
-    if (calendarUrl) {
-      var calendarLink = createElement('a', 'program-inline-link', 'Open in Calendar');
-      calendarLink.href = calendarUrl;
-      calendarLink.target = '_blank';
-      calendarLink.rel = 'noopener';
-      footer.appendChild(calendarLink);
-    }
-
+    footer.appendChild(btn);
     card.appendChild(footer);
     return card;
+  }
+
+  function refreshParticles() {
+    function emit() { try { window.dispatchEvent(new Event('resize')); } catch (e) {} }
+    if (window.requestAnimationFrame) {
+      window.requestAnimationFrame(function () { emit(); setTimeout(emit, 160); setTimeout(emit, 420); });
+    } else { emit(); setTimeout(emit, 160); setTimeout(emit, 420); }
   }
 
   function initProgramsFeed() {
     var feed = document.querySelector('[data-programs-feed]');
     if (!feed) return;
-
     var status = feed.querySelector('[data-programs-status]');
-    var list = feed.querySelector('[data-programs-list]');
-    var calendarLink = document.querySelector('[data-programs-calendar-link]');
-    var feedUrl = feed.getAttribute('data-programs-feed');
+    var list   = feed.querySelector('[data-programs-list]');
+    if (!status || !list) return;
 
-    if (!feedUrl || !status || !list) return;
+    /* Graceful fallback: CONFIG not available — load static programs.json */
+    if (typeof CONFIG === 'undefined' || !CONFIG.SHEET_ID || !CONFIG.SHEETS_API_KEY) {
+      var feedUrl = feed.getAttribute('data-programs-feed');
+      if (!feedUrl) { status.textContent = 'Programs coming soon.'; return; }
+      fetch(feedUrl, { cache: 'no-store' })
+        .then(function (r) { if (!r.ok) throw new Error(); return r.json(); })
+        .then(function (payload) {
+          var programs = (payload.programs || []).filter(function (p) {
+            return p && p.start && (p.status || '').toLowerCase() !== 'cancelled';
+          });
+          status.textContent = programs.length ? '' : 'No programs listed yet.';
+          programs.slice(0, 6).forEach(function (p) {
+            /* Build full card from calendar JSON format */
+            var card = createElement('article', 'program-card swiper-slide');
 
-    function refreshProgramsParticles() {
-      function emitResize() {
-        try {
-          window.dispatchEvent(new Event('resize'));
-        } catch (error) {
-          var resizeEvent = document.createEvent('Event');
-          resizeEvent.initEvent('resize', true, true);
-          window.dispatchEvent(resizeEvent);
-        }
-      }
+            /* Header: title + date */
+            var header = createElement('div', 'program-card-header');
+            header.appendChild(createElement('h3', '', p.title || 'Upcoming program'));
+            var dateEl = createElement('p', 'program-card-date');
+            if (p.start) {
+              var startD = new Date(p.start);
+              var dateStr = startD.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+              if (p.end) {
+                var endD = new Date(p.end);
+                var startDay = startD.toDateString();
+                var endDay = endD.toDateString();
+                if (startDay !== endDay) {
+                  dateStr += ' – ' + endD.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+                }
+              }
+              dateEl.textContent = dateStr;
+            } else {
+              dateEl.textContent = 'Date coming soon';
+            }
+            header.appendChild(dateEl);
+            card.appendChild(header);
 
-      if (window.requestAnimationFrame) {
-        window.requestAnimationFrame(function () {
-          emitResize();
-          setTimeout(emitResize, 160);
-          setTimeout(emitResize, 420);
-        });
+            /* Meta bubbles: format / language / location */
+            var metaList = createElement('ul', 'program-card-meta');
+            var hasMeta = false;
+            if (p.format)   { hasMeta = true; metaList.appendChild(createElement('li', 'program-card-format', p.format)); }
+            if (p.language) {
+              hasMeta = true;
+              var langLi = createElement('li', 'program-card-lang', p.language.toUpperCase());
+              langLi.setAttribute('data-lang', p.language.toLowerCase());
+              metaList.appendChild(langLi);
+            }
+            if (p.location) { hasMeta = true; metaList.appendChild(createElement('li', 'program-card-location', p.location)); }
+            if (hasMeta) card.appendChild(metaList);
+
+            /* Description / summary */
+            if (p.summary) card.appendChild(createElement('p', 'program-card-summary', p.summary));
+
+            /* Footer: Book Now button */
+            var footer = createElement('div', 'program-card-actions');
+            var btn = document.createElement('a');
+            btn.className = 'button hatha-button program-register-button';
+            btn.textContent = 'Book Now';
+            btn.href = p.registrationUrl || '/booking/';
+            btn.target = '_blank';
+            btn.rel = 'noopener';
+            footer.appendChild(btn);
+            card.appendChild(footer);
+
+            list.appendChild(card);
+          });
+          refreshParticles();
+          setTimeout(function () {
+            if (window._programsSwiper) { window._programsSwiper.destroy(true, true); window._programsSwiper = null; }
+            window._programsSwiper = new Swiper('.programsSwiper', {
+              slidesPerView: 'auto',
+              spaceBetween: 16,
+              grabCursor: true,
+              speed: 400,
+              centerInsufficientSlides: true,
+              pagination: { el: '.programs-pagination', clickable: true },
+            });
+          }, 80);
+        })
+        .catch(function () { status.textContent = 'Programs will appear here soon.'; refreshParticles(); });
+      return;
+    }
+
+    /* Main path: read from Google Sheets */
+    Promise.all([
+      fetchSheet('Programs!A2:O'),
+      fetchSheet('Sessions!A2:G')
+    ]).then(function (results) {
+      var progRows = results[0];
+      var sessRows = results[1];
+
+      var programs = progRows.map(function (r) {
+        return {
+          id:          (r[0]  || '').toString().trim(),
+          name:        r[1]  || '',
+          price:       parseFloat(r[2]) || 0,
+          spotsTotal:  parseInt(r[3])   || 0,
+          spotsLeft:   parseInt(r[4])   || 0,
+          active:      ['TRUE','YES','1'].indexOf((r[5]  || '').toString().toUpperCase().trim()) !== -1,
+          startDate:   serialToISO(r[6]  || ''),
+          endDate:     serialToISO(r[7]  || ''),
+          description: r[9]  || '',
+          location:    r[10] || '',
+          language:    r[11] || '',
+          format:      r[13] || '',  // col N (Level removed)
+        };
+      }).filter(function (p) { return p.active && p.id; }).slice(0, 6);
+
+      var sessions = sessRows.map(function (r) {
+        return {
+          programId: (r[0] || '').toString().trim(),
+          sessionNum: parseInt(r[1]) || 0,
+          date:      serialToISO(r[2] || ''),
+          timeStart: serialToTime(r[3] || ''),
+          timeEnd:   serialToTime(r[4] || ''),
+          notes:     r[5] || '',
+        };
+      });
+
+      list.innerHTML = '';
+
+      if (!programs.length) {
+        status.textContent = 'No programs are currently available. Check back soon!';
+        refreshParticles();
         return;
       }
 
-      emitResize();
-      setTimeout(emitResize, 160);
-      setTimeout(emitResize, 420);
-    }
+      status.textContent = '';
+      programs.forEach(function (p) { list.appendChild(buildProgramCard(p, sessions)); });
+      refreshParticles();
 
-    fetch(feedUrl, { cache: 'no-store' })
-      .then(function (response) {
-        if (!response.ok) throw new Error('Unable to load programs feed.');
-        return response.json();
-      })
-      .then(function (payload) {
-        var programs = Array.isArray(payload.programs) ? payload.programs.slice() : [];
-        var meta = payload.meta || {};
-        var fallbackCalendarUrl = meta.calendarUrl || (calendarLink ? calendarLink.href : '');
-        var now = Date.now();
-
-        if (calendarLink && meta.calendarUrl) {
-          calendarLink.href = meta.calendarUrl;
-        }
-
-        programs = programs.filter(function (program) {
-          if (!program || !program.start) return false;
-          if ((program.status || '').toLowerCase() === 'cancelled') return false;
-
-          var compareDate = new Date(program.end || program.start);
-          if (isNaN(compareDate.getTime())) return false;
-
-          return compareDate.getTime() >= now - 3600000;
-        }).sort(function (left, right) {
-          return new Date(left.start).getTime() - new Date(right.start).getTime();
-        }).slice(0, 6);
-
-        list.innerHTML = '';
-
-        if (!programs.length) {
-          status.textContent = 'No programs are listed yet. Add a test event in data/programs.json or let the Google Calendar sync populate this section.';
-          refreshProgramsParticles();
-          return;
-        }
-
-        status.textContent = '';
-
-        programs.forEach(function (program) {
-          list.appendChild(buildProgramCard(program, fallbackCalendarUrl));
+      setTimeout(function () {
+        if (window._programsSwiper) { window._programsSwiper.destroy(true, true); window._programsSwiper = null; }
+        window._programsSwiper = new Swiper('.programsSwiper', {
+          slidesPerView: 'auto',
+          spaceBetween: 16,
+          grabCursor: true,
+          speed: 400,
+          centerInsufficientSlides: true,
+          pagination: { el: '.programs-pagination', clickable: true },
         });
+      }, 80);
 
-        refreshProgramsParticles();
-
-        /* Initialise (or re-initialise) the Swiper for the programs feed */
-        setTimeout(function () {
-          if (window._programsSwiper) {
-            window._programsSwiper.destroy(true, true);
-            window._programsSwiper = null;
-          }
-          window._programsSwiper = new Swiper('.programsSwiper', {
-            slidesPerView: 'auto',          /* card width fixed in CSS */
-            spaceBetween: 16,               /* breathing room between cards */
-            grabCursor: true,
-            speed: 400,
-            centerInsufficientSlides: true, /* center when fewer cards than fill row */
-            pagination: { el: '.programs-pagination', clickable: true },
-          });
-        }, 80);
-      })
-      .catch(function () {
-        status.textContent = 'Programs will appear here soon. If you are previewing locally, open the site through a local server or GitHub Pages so the JSON feed can load.';
-        refreshProgramsParticles();
-      });
+    }).catch(function (err) {
+      console.error('[Programs feed] Sheets error:', err);
+      status.textContent = 'Programs will appear here soon.';
+      refreshParticles();
+    });
   }
 
   if (document.readyState === 'loading') {

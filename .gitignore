@@ -54,3 +54,9 @@ booking/config.js
 *.broken
 *.revert_mistake
 assets/css/test.*
+
+# Apps Script — Script ID, credentials and clasp tokens
+docs/.clasp.json
+
+# Backup files — never commit
+.tmp/
