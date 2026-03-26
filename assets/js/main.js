@@ -643,7 +643,7 @@ updateActiveDot();
     if (program.format)   { hasMeta = true; metaList.appendChild(createElement('li', 'program-card-format', program.format)); }
     if (program.language) {
       hasMeta = true;
-      var langLi = createElement('li', 'program-card-lang', program.language.toUpperCase());
+      var langLi = createElement('li', 'program-card-lang', program.language);
       langLi.setAttribute('data-lang', program.language.toLowerCase());
       metaList.appendChild(langLi);
     }
@@ -655,7 +655,6 @@ updateActiveDot();
 
     /* Footer: price + spots + CTA */
     var footer = createElement('div', 'program-card-actions');
-    if (program.price > 0) { footer.appendChild(createElement('span', 'program-card-price', '\u20ac' + Number(program.price).toFixed(2))); }
     footer.appendChild(createElement('span', isFull ? 'program-card-note' : 'program-card-note',
       isFull ? 'Sold out' : program.spotsLeft + ' spot' + (program.spotsLeft === 1 ? '' : 's') + ' left'));
 
@@ -732,7 +731,7 @@ updateActiveDot();
             if (p.format)   { hasMeta = true; metaList.appendChild(createElement('li', 'program-card-format', p.format)); }
             if (p.language) {
               hasMeta = true;
-              var langLi = createElement('li', 'program-card-lang', p.language.toUpperCase());
+              var langLi = createElement('li', 'program-card-lang', p.language);
               langLi.setAttribute('data-lang', p.language.toLowerCase());
               metaList.appendChild(langLi);
             }
