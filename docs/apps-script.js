@@ -55,7 +55,12 @@ function onOpen() {
 }
 
 // ─── 2. WEB APP ───────────────────────────────────────────────────────────────
-function doGet() {
+function doGet(e) {
+  var params = (e && e.parameter) ? e.parameter : {};
+  if (params.action === 'fixLanguage' && params.secret === 'ir2026fix') {
+    fixLanguageValues();
+    return ContentService.createTextOutput('Language values updated.');
+  }
   return ContentService.createTextOutput('InneREvolution Booking API — OK');
 }
 
