@@ -915,3 +915,35 @@ function buildDateTime(base, timeVal) {
   d.setHours(Math.floor(mins / 60), mins % 60, 0, 0);
   return d;
 }
+
+/**
+ * ONE-TIME MIGRATION: replace any 'German' / 'GERMAN' language values
+ * in the Programs sheet with 'Deutsch'.
+ * Run once manually from the Apps Script editor after deploying.
+ */
+function fixLanguageValues() {
+  var ss   = SpreadsheetApp.getActiveSpreadsheet();
+  var prog = ss.getSheetByName('Programs');
+  if (!prog) { Logger.log('Programs sheet not found'); return; }
+  var lastRow = prog.getLastRow();
+  if (lastRow < 2) { Logger.log('No data rows'); return; }
+  // Language is column 12 (index 11, column L)
+  var range  = prog.getRange(2, 12, lastRow - 1, 1);
+  var values = range.getValues();
+  var count  = 0;
+  for (var i = 0; i < values.length; i++) {
+    var v = String(values[i][0]).trim();
+    if (v.toUpperCase() === 'GERMAN') {
+      values[i][0] = 'Deutsch';
+      count++;
+    } else if (v.toLowerCase() === 'english / german' || v.toUpperCase() === 'ENGLISH / GERMAN') {
+      values[i][0] = 'English / Deutsch';
+      count++;
+    }
+  }
+  range.setValues(values);
+  // Re-apply data validations to update dropdown
+  applyDataValidations(ss);
+  Logger.log('fixLanguageValues: updated ' + count + ' cell(s).');
+  SpreadsheetApp.getUi().alert('Done! Updated ' + count + ' language cell(s) to Deutsch.');
+}
