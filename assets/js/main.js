@@ -653,19 +653,9 @@ updateActiveDot();
     /* Description */
     if (program.description) card.appendChild(createElement('p', 'program-card-summary', program.description));
 
-    /* Session schedule (first 3 sessions) */
-    var progSessions = sessions.filter(function (s) { return s.programId === program.id; }).slice(0, 3);
-    if (progSessions.length > 0) {
-      var ul = createElement('ul', 'program-card-schedule');
-      progSessions.forEach(function (s) {
-        ul.appendChild(createElement('li', '', formatDate(s.date) + ' \u00b7 ' + s.timeStart + '\u2013' + s.timeEnd));
-      });
-      card.appendChild(ul);
-    }
-
     /* Footer: price + spots + CTA */
     var footer = createElement('div', 'program-card-actions');
-    footer.appendChild(createElement('span', 'program-card-price', '\u20ac' + Number(program.price).toFixed(2)));
+    if (program.price > 0) { footer.appendChild(createElement('span', 'program-card-price', '\u20ac' + Number(program.price).toFixed(2))); }
     footer.appendChild(createElement('span', isFull ? 'program-card-note' : 'program-card-note',
       isFull ? 'Sold out' : program.spotsLeft + ' spot' + (program.spotsLeft === 1 ? '' : 's') + ' left'));
 
