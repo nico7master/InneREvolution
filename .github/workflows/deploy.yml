@@ -4,11 +4,6 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
-  # Also re-deploy when the calendar sync updates programs.json
-  workflow_run:
-    workflows: ["Sync programs from Google Calendar"]
-    types: [completed]
-    branches: [main]
 
 # Only one deploy at a time; queue rather than cancel.
 concurrency:
@@ -56,6 +51,9 @@ jobs:
             APPS_SCRIPT_URL: "${APPS_SCRIPT_URL}"
           };
           EOF
+
+      - name: Ensure config.js is included in deploy artifact
+        run: sed -i '/booking\/config.js/d' .gitignore
 
       - name: Compile main SCSS
         run: npm run build:css
