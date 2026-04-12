@@ -578,22 +578,27 @@ async function handleSubmit(event) {
   };
 
   try {
-    // Apps Script Web Apps require no-cors for cross-origin POST from browsers.
-    // The POST body IS processed server-side, but the response is opaque (unreadable).
-    // This is the standard and reliable approach for Google Apps Script.
-    await fetch(CONFIG.APPS_SCRIPT_URL, {
+    // POST to Apps Script — use redirect:follow to get the actual JSON response.
+    // No Content-Type header → text/plain → 'simple request' → no CORS preflight.
+    // Apps Script 302-redirects to googleusercontent.com which returns JSON with CORS headers.
+    const response = await fetch(CONFIG.APPS_SCRIPT_URL, {
       method: 'POST',
-      mode:   'no-cors',
-      body:   JSON.stringify(payload),
+      redirect: 'follow',
+      body: JSON.stringify(payload),
     });
+    const result = await response.json();
 
-    // POST was sent successfully (no-cors never throws on successful network request).
-    // The booking is processed server-side by Apps Script.
-    // Show success state
-    document.getElementById('booking-form').style.display = 'none';
-    document.getElementById('form-success').style.display  = '';
-    const msg = bs('successFallback')(email);
-    document.getElementById('success-detail').textContent = msg;
+    if (result.success) {
+      // Show success state
+      document.getElementById('booking-form').style.display = 'none';
+      document.getElementById('form-success').style.display  = '';
+      const msg = result.paymentUrl
+        ? bs('successPayLink')(email)
+        : bs('successFallback')(email);
+      document.getElementById('success-detail').textContent = msg;
+    } else {
+      throw new Error(result.error || 'Booking failed. Please try again.');
+    }
 
 
   } catch (err) {
