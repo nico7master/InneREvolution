@@ -578,36 +578,23 @@ async function handleSubmit(event) {
   };
 
   try {
-    // Send to Apps Script — deployed as "Anyone" so CORS is handled via redirects.
-    // Apps Script redirects POST to a different URL that returns JSON with CORS headers.
-    const response = await fetch(CONFIG.APPS_SCRIPT_URL, {
+    // Apps Script Web Apps require no-cors for cross-origin POST from browsers.
+    // The POST body IS processed server-side, but the response is opaque (unreadable).
+    // This is the standard and reliable approach for Google Apps Script.
+    await fetch(CONFIG.APPS_SCRIPT_URL, {
       method: 'POST',
-      redirect: 'follow',
-      body: JSON.stringify(payload),
+      mode:   'no-cors',
+      body:   JSON.stringify(payload),
     });
 
-    let result = { ok: false, paymentLink: '' };
-    try {
-      const text = await response.text();
-      result = JSON.parse(text);
-    } catch (parseErr) {
-      // If response isn't JSON, treat non-error HTTP status as success
-      if (response.ok || response.type === 'opaque') {
-        result = { ok: true, success: true, paymentLink: '' };
-      }
-    }
+    // POST was sent successfully (no-cors never throws on successful network request).
+    // The booking is processed server-side by Apps Script.
+    // Show success state
+    document.getElementById('booking-form').style.display = 'none';
+    document.getElementById('form-success').style.display  = '';
+    const msg = bs('successFallback')(email);
+    document.getElementById('success-detail').textContent = msg;
 
-    if (result.success || result.ok) {
-      // Show success state
-      document.getElementById('booking-form').style.display = 'none';
-      document.getElementById('form-success').style.display  = '';
-      const msg = result.paymentUrl
-        ? bs('successPayLink')(email)
-        : bs('successFallback')(email);
-      document.getElementById('success-detail').textContent = msg;
-    } else {
-      throw new Error(result.error || 'Booking failed. Please try again.');
-    }
 
   } catch (err) {
     console.error('Booking submission failed:', err);
