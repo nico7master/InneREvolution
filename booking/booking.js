@@ -4,49 +4,191 @@
 
 'use strict';
 
+// ─── Booking i18n ─────────────────────────────────────────────────────────────
+var BOOKING_STRINGS = {
+  en: {
+    toSite:             '\u2190 To Website',
+    heroTitle:          'Yoga Programs',
+    heroTagline:        'Classical Hatha Yoga \u2014 Begin your journey',
+    loading:            'Loading programs\u2026',
+    reserveNote:        'Reserve your spot \u2014 we\u2019ll send you a secure payment link to confirm',
+    noPrograms:         'No programs are currently available.',
+    checkBack:          'Check back soon or ',
+    returnSiteLink:     'return to the site',
+    soldOutSpots:       'Sold out',
+    spotsLeft:          function(n) { return n + ' spot' + (n === 1 ? '' : 's') + ' left'; },
+    fullBadge:          'Full',
+    soldOutBtn:         'Sold Out',
+    registerBtn:        'Register',
+    modalTitle:         'Register',
+    labelName:          'Full Name',
+    labelEmail:         'Email',
+    labelPhone:         'Phone',
+    discountToggle:     'Have a discount code?',
+    labelDiscount:      'Discount Code',
+    labelTotal:         'Total',
+    friendsQuestion:    'Are you bringing friends?',
+    friendsHint:        '(10% off per friend joining)',
+    radioNo:            'No',
+    radioYes:           'Yes',
+    labelFriendCount:   'How many friends are joining with you?',
+    labelFriendNames:   'Friends\u2019 names',
+    friendsPlaceholder: 'One name per line (so we can match their registration)',
+    labelComments:      'Comments / Questions',
+    commentsPlaceholder:'Anything you\u2019d like us to know\u2026',
+    submitBtn:          'Request Spot \u0026 Pay',
+    successTitle:       'You\u2019re Registered!',
+    successDefault:     'Check your email for the payment link and confirmation details.',
+    returnSiteBtn:      '\u2190 Return to site',
+    pctOff:             function(d, p) { return d + ' (' + p + '% off)'; },
+    friendsJoining:     function(n, p) { return n + ' friend' + (n > 1 ? 's' : '') + ' joining (' + p + '% off)'; },
+    youSave:            function(a) { return ' \u2014 you save \u20ac' + a; },
+    codeInvalid:        'Code not recognised.',
+    friendsHintText:    function(n, p) { return '\u2714 ' + n + ' friend' + (n > 1 ? 's' : '') + ' joining \u2192 ' + p + '% friends discount auto-applied!'; },
+    alertNoConfig:      'Booking system is not configured yet (missing Apps Script URL). Please contact us directly to register.',
+    alertFillIn:        'Please fill in your name and email.',
+    alertError:         'Booking error: ',
+    alertConsole:       '\n\nOpen F12 console for full details.',
+    successPayLink:     function(e) { return 'Check your inbox at ' + e + ' \u2014 a secure payment link is on its way to confirm your spot.'; },
+    successFallback:    function(e) { return 'Check your inbox at ' + e + ' for your payment link and confirmation.'; },
+    dateLocale:         'en-GB',
+  },
+  de: {
+    toSite:             '\u2190 Zur Website',
+    heroTitle:          'Yoga Programme',
+    heroTagline:        'Klassisches Hatha Yoga \u2014 Beginne deine Reise',
+    loading:            'Lade Programme\u2026',
+    reserveNote:        'Reserviere deinen Platz \u2014 wir senden dir einen sicheren Zahlungslink zur Best\u00e4tigung',
+    noPrograms:         'Derzeit sind keine Programme verf\u00fcgbar.',
+    checkBack:          'Schau bald wieder vorbei oder ',
+    returnSiteLink:     'kehre zur Website zur\u00fcck',
+    soldOutSpots:       'Ausverkauft',
+    spotsLeft:          function(n) { return n + ' Platz' + (n === 1 ? '' : '\u00e4tze') + ' verf\u00fcgbar'; },
+    fullBadge:          'Voll',
+    soldOutBtn:         'Ausverkauft',
+    registerBtn:        'Anmelden',
+    modalTitle:         'Anmelden',
+    labelName:          'Vollst\u00e4ndiger Name',
+    labelEmail:         'E-Mail',
+    labelPhone:         'Telefon',
+    discountToggle:     'Hast du einen Rabattcode?',
+    labelDiscount:      'Rabattcode',
+    labelTotal:         'Gesamt',
+    friendsQuestion:    'Bringst du Freunde mit?',
+    friendsHint:        '(10% Rabatt pro mitgebrachtem Freund)',
+    radioNo:            'Nein',
+    radioYes:           'Ja',
+    labelFriendCount:   'Wie viele Freunde machen mit?',
+    labelFriendNames:   'Namen der Freunde',
+    friendsPlaceholder: 'Ein Name pro Zeile (damit wir die Anmeldungen zuordnen k\u00f6nnen)',
+    labelComments:      'Kommentare / Fragen',
+    commentsPlaceholder:'Was sollen wir wissen\u2026',
+    submitBtn:          'Platz reservieren \u0026 bezahlen',
+    successTitle:       'Du bist angemeldet!',
+    successDefault:     'Pr\u00fcfe deine E-Mails f\u00fcr den Zahlungslink und die Best\u00e4tigungsdetails.',
+    returnSiteBtn:      '\u2190 Zur\u00fcck zur Website',
+    pctOff:             function(d, p) { return d + ' (' + p + '% Rabatt)'; },
+    friendsJoining:     function(n, p) { return n + ' Freund' + (n > 1 ? 'e' : '') + ' dabei (' + p + '% Rabatt)'; },
+    youSave:            function(a) { return ' \u2014 du sparst \u20ac' + a; },
+    codeInvalid:        'Code nicht erkannt.',
+    friendsHintText:    function(n, p) { return '\u2714 ' + n + ' Freund' + (n > 1 ? 'e' : '') + ' dabei \u2192 ' + p + '% Freundesrabatt automatisch angewandt!'; },
+    alertNoConfig:      'Das Buchungssystem ist noch nicht konfiguriert. Bitte kontaktiere uns direkt zur Anmeldung.',
+    alertFillIn:        'Bitte gib deinen Namen und deine E-Mail-Adresse ein.',
+    alertError:         'Buchungsfehler: ',
+    alertConsole:       '\n\n\u00d6ffne die F12-Konsole f\u00fcr Details.',
+    successPayLink:     function(e) { return 'Schau in dein Postfach (' + e + ') \u2014 ein sicherer Zahlungslink ist unterwegs, um deinen Platz zu best\u00e4tigen.'; },
+    successFallback:    function(e) { return 'Schau in dein Postfach (' + e + ') f\u00fcr deinen Zahlungslink und deine Best\u00e4tigung.'; },
+    dateLocale:         'de-AT',
+  }
+};
+
+/* Detect language: ?lang= URL param → localStorage key 'innerevolution_lang' → default EN */
+(function () {
+  var params = new URLSearchParams(window.location.search);
+  var urlLang = params.get('lang');
+  if (urlLang === 'de' || urlLang === 'en') localStorage.setItem('innerevolution_lang', urlLang);
+  var stored = localStorage.getItem('innerevolution_lang');
+  window._bookingLang = (stored === 'de') ? 'de' : 'en';
+})();
+
+/* Shorthand getter — bs('key') returns string or function */
+function bs(key) { return BOOKING_STRINGS[window._bookingLang || 'en'][key]; }
+// ─── End Booking i18n ─────────────────────────────────────────────────────────
+
 // ─── State ────────────────────────────────────────────────────────────────────
 let programs       = [];
 let sessions       = [];
 let discountCodes  = [];
 let activeDiscount = { pct: 0, code: '', description: '' };
+let friendsDiscount = { pct: 0, count: 0 }; // auto-discount: 10% × friends count
 
 // ─── Sheets API helper ────────────────────────────────────────────────────────
 async function fetchSheet(range) {
-  const url = `https://sheets.googleapis.com/v4/spreadsheets/${CONFIG.SHEET_ID}/values/${encodeURIComponent(range)}?key=${CONFIG.SHEETS_API_KEY}`;
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${CONFIG.SHEET_ID}/values/${encodeURIComponent(range)}?key=${CONFIG.SHEETS_API_KEY}&valueRenderOption=UNFORMATTED_VALUE&dateTimeRenderOption=SERIAL_NUMBER`;
   const res = await fetch(url);
   if (!res.ok) throw new Error(`Sheets API error ${res.status} for range: ${range}`);
   const data = await res.json();
   return data.values || [];
 }
 
+// ─── Serial number converters (Google Sheets stores dates/times as numbers) ───
+function serialToISO(serial) {
+  if (!serial && serial !== 0) return '';
+  if (typeof serial === 'string' && serial.includes('-')) return serial; // already ISO
+  // Google Sheets epoch: Dec 30, 1899
+  const d = new Date(Math.round((serial - 25569) * 86400 * 1000)); // convert to Unix ms
+  return d.toISOString().split('T')[0]; // "YYYY-MM-DD"
+}
+
+function serialToTime(frac) {
+  if (!frac && frac !== 0) return '';
+  if (typeof frac === 'string') return frac.substring(0, 5); // already "HH:MM"
+  const totalMins = Math.round(frac * 24 * 60);
+  const h = Math.floor(totalMins / 60);
+  const m = totalMins % 60;
+  return String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0');
+}
+
+
 // ─── Data fetchers ────────────────────────────────────────────────────────────
 async function fetchPrograms() {
-  // Columns: A=ProgramID, B=Name, C=Price, D=SpotsTotal, E=SpotsLeft,
-  //          F=Active, G=StartDate, H=EndDate, I=StripePaymentLink
-  const rows = await fetchSheet('Programs!A2:I');
+  // Website display sheet: A=ProgramID, B=Name, C=Price, D=SpotsTotal, E=SpotsLeft,
+  //   F=Active, G=StartDate, H=Sessions, I=Std/Sess, J=TotalHours,
+  //   K=Description, L=Location, M=Language
+  // Row 1=title, Row 2=header(emoji), Row 3+=data
+  const rows = await fetchSheet('Programs!A3:M');
   programs = rows.map(r => ({
-    id:               r[0] || '',
+    id:               (r[0] || '').toString().trim(),
     name:             r[1] || '',
     price:            parseFloat(r[2]) || 0,
     spotsTotal:       parseInt(r[3]) || 0,
     spotsLeft:        parseInt(r[4]) || 0,
-    active:           (r[5] || '').toString().toUpperCase() === 'TRUE' || r[5] === '1',
-    startDate:        r[6] || '',
-    endDate:          r[7] || '',
-    stripePaymentLink: r[8] || '',
+    active:           ['TRUE','YES','1'].includes((r[5] || '').toString().toUpperCase().trim()),
+    startDate:        serialToISO(r[6] || ''),
+    endDate:          '',
+    sessionCount:     parseInt(r[7]) || 0,
+    hoursPerSession:  parseFloat(r[8]) || 0,
+    totalHours:       parseFloat(r[9]) || 0,
+    stripePaymentLink: '',
+    description:      r[10] || '',
+    location:         r[11] || '',
+    language:         r[12] || '',
+    image:            '',
+    format:           '',
   }));
 }
 
 async function fetchSessions() {
-  // Columns: A=ProgramID, B=SessionNum, C=Date(ISO), D=TimeStart, E=TimeEnd, F=Notes
+  // Website display sheet: A=ProgramID, B=ProgramName, C=SessionNum,
+  //                       D=Date, E=TimeStart, F=TimeEnd
   const rows = await fetchSheet('Sessions!A2:F');
   sessions = rows.map(r => ({
-    programId:  r[0] || '',
-    sessionNum: parseInt(r[1]) || 0,
-    date:       r[2] || '',
-    timeStart:  r[3] || '',
-    timeEnd:    r[4] || '',
-    notes:      r[5] || '',
+    programId:  (r[0] || '').toString().trim(),
+    sessionNum: parseInt(r[2]) || 0,  // col C (skip B=ProgramName)
+    date:       serialToISO(r[3] || ''),
+    timeStart:  serialToTime(r[4] || ''),
+    timeEnd:    serialToTime(r[5] || ''),
+    notes:      '',
   }));
 }
 
@@ -63,10 +205,10 @@ async function fetchDiscountCodes() {
 // ─── Date/time formatting ─────────────────────────────────────────────────────
 function formatDate(raw) {
   // Input: ISO date string e.g. "2026-05-02" or "2026-05-02T18:00:00"
-  // Output: "Sat 02 May"
+  // Output: locale-formatted short date
   if (!raw) return '';
   const d = new Date(raw.includes('T') ? raw : raw + 'T00:00:00');
-  return d.toLocaleDateString('en-GB', { weekday: 'short', day: '2-digit', month: 'short' });
+  return d.toLocaleDateString(bs('dateLocale'), { weekday: 'short', day: '2-digit', month: 'short' });
 }
 
 function formatTime(raw) {
@@ -94,23 +236,47 @@ function renderPrograms() {
 }
 
 function buildCard(p) {
-  const isFull      = p.spotsLeft <= 0;
+  const isFull       = p.spotsLeft <= 0;
   const cardSessions = sessions.filter(s => s.programId === p.id);
 
   const spotsHtml = isFull
-    ? `<span class="spots-full">Sold out</span>`
-    : `<span class="spots-available">${p.spotsLeft} spot${p.spotsLeft === 1 ? '' : 's'} left</span>`;
+    ? `<span class="spots-full">${bs('soldOutSpots')}</span>`
+    : `<span class="spots-available">${bs('spotsLeft')(p.spotsLeft)}</span>`;
 
-  const badgeHtml = isFull ? `<span class="badge-full">Full</span>` : '';
+  const badgeHtml = isFull ? `<span class="badge-full">${bs('fullBadge')}</span>` : '';
 
   const dateRange = p.startDate
     ? `${formatDate(p.startDate)}${p.endDate && p.endDate !== p.startDate ? ' &ndash; ' + formatDate(p.endDate) : ''}`
     : '';
 
+  const descHtml = p.description
+    ? `<p class="program-card-description">${p.description}</p>`
+    : '';
+
+  const infoHtml = [
+    p.sessionCount ? `${p.sessionCount} session${p.sessionCount !== 1 ? 's' : ''}` : '',
+    p.totalHours   ? `${p.totalHours} hrs` : ''
+  ].filter(Boolean).map(v => `<span class="program-card-badge program-card-info">${v}</span>`).join('');
+
+  const metaHtml = [p.format, p.language, p.location].filter(Boolean)
+    .map(v => `<span class="program-card-badge">${v}</span>`).join('');
+
+  // Group sessions by date for compact display
+  const sessionsByDate = {};
+  cardSessions.forEach(s => {
+    const dateKey = formatDate(s.date);
+    if (!sessionsByDate[dateKey]) sessionsByDate[dateKey] = [];
+    sessionsByDate[dateKey].push({
+      time: `${formatTime(s.timeStart)}\u2013${formatTime(s.timeEnd)}`,
+      notes: s.notes
+    });
+  });
+
   const scheduleHtml = cardSessions.length > 0
-    ? `<ul class="program-schedule">${cardSessions.map(s =>
-        `<li>${formatDate(s.date)} &bull; ${formatTime(s.timeStart)}&ndash;${formatTime(s.timeEnd)}${s.notes ? ' <em>(' + s.notes + ')</em>' : ''}</li>`
-      ).join('')}</ul>`
+    ? `<div class="program-schedule">${Object.entries(sessionsByDate).map(([date, sesList]) => {
+        const times = sesList.map(s => s.notes ? `${s.time} (${s.notes})` : s.time).join(', ');
+        return `<div class="schedule-row"><span class="schedule-date">${date}</span> <span class="schedule-times">${times}</span></div>`;
+      }).join('')}</div>`
     : '';
 
   return `
@@ -121,6 +287,8 @@ function buildCard(p) {
         ${dateRange ? `<p class="program-card-dates">${dateRange}</p>` : ''}
       </div>
       <div class="program-card-body">
+        ${metaHtml || infoHtml ? `<div class="program-card-badges">${infoHtml}${metaHtml}</div>` : ''}
+        ${descHtml}
         ${scheduleHtml}
       </div>
       <div class="program-card-footer">
@@ -131,12 +299,61 @@ function buildCard(p) {
             class="btn-register"
             onclick="openModal('${p.id}')"
             ${isFull ? 'disabled aria-disabled="true"' : ''}>
-            ${isFull ? 'Sold Out' : 'Register'}
+            ${isFull ? bs('soldOutBtn') : bs('registerBtn')}
           </button>
         </div>
       </div>
     </article>`;
 }
+
+// ─── Apply static page translations to DOM ───────────────────────────────────
+function applyStaticTranslations() {
+  var el;
+  /* Set html lang attribute */
+  document.documentElement.lang = window._bookingLang || 'en';
+  /* Header */
+  el = document.querySelector('.booking-tosite-btn');              if (el) el.textContent = bs('toSite');
+  el = document.querySelector('.booking-hero-title');              if (el) el.textContent = bs('heroTitle');
+  el = document.querySelector('.booking-hero-tagline');            if (el) el.textContent = bs('heroTagline');
+  /* Loading / states */
+  el = document.querySelector('#programs-loading p');              if (el) el.textContent = bs('loading');
+  el = document.querySelector('.programs-reserve-note');           if (el) el.textContent = bs('reserveNote');
+  el = document.querySelector('#programs-empty p:first-of-type');  if (el) el.textContent = bs('noPrograms');
+  el = document.querySelector('#programs-empty .empty-subtext');
+  if (el) el.innerHTML = bs('checkBack') + '<a href="../">' + bs('returnSiteLink') + '</a>.';
+  /* Modal title */
+  el = document.getElementById('modal-title');                     if (el) el.textContent = bs('modalTitle');
+  /* Form labels — preserve child spans where needed */
+  el = document.querySelector('label[for="field-name"]');
+  if (el) el.innerHTML = bs('labelName') + ' <span class="required">*</span>';
+  el = document.querySelector('label[for="field-email"]');
+  if (el) el.innerHTML = bs('labelEmail') + ' <span class="required">*</span>';
+  el = document.querySelector('label[for="field-phone"]');         if (el) el.textContent = bs('labelPhone');
+  el = document.getElementById('discount-toggle-btn');             if (el) el.textContent = bs('discountToggle');
+  el = document.querySelector('label[for="field-discount"]');      if (el) el.textContent = bs('labelDiscount');
+  el = document.querySelector('.price-label');                     if (el) el.textContent = bs('labelTotal');
+  el = document.querySelector('.group-label');
+  if (el) el.innerHTML = bs('friendsQuestion') + ' <small class="field-hint">' + bs('friendsHint') + '</small>';
+  /* Radio label text nodes */
+  var radioNo  = document.querySelector('input[name="bringingFriends"][value="no"]');
+  var radioYes = document.querySelector('input[name="bringingFriends"][value="yes"]');
+  if (radioNo  && radioNo.parentElement)  radioNo.parentElement.childNodes.forEach(function(n)  { if (n.nodeType === 3 && n.textContent.trim()) n.textContent = ' ' + bs('radioNo') + ' '; });
+  if (radioYes && radioYes.parentElement) radioYes.parentElement.childNodes.forEach(function(n) { if (n.nodeType === 3 && n.textContent.trim()) n.textContent = ' ' + bs('radioYes') + ' '; });
+  /* Friends section */
+  el = document.querySelector('label[for="field-friends-count"]'); if (el) el.textContent = bs('labelFriendCount');
+  el = document.querySelector('label[for="field-friends-names"]'); if (el) el.textContent = bs('labelFriendNames');
+  el = document.getElementById('field-friends-names');             if (el) el.placeholder = bs('friendsPlaceholder');
+  /* Comments */
+  el = document.querySelector('label[for="field-comments"]');      if (el) el.textContent = bs('labelComments');
+  el = document.getElementById('field-comments');                  if (el) el.placeholder = bs('commentsPlaceholder');
+  /* Submit button */
+  el = document.getElementById('submit-label');                    if (el) el.textContent = bs('submitBtn');
+  /* Success state */
+  el = document.querySelector('#form-success h3');                 if (el) el.textContent = bs('successTitle');
+  el = document.getElementById('success-detail');                  if (el) el.textContent = bs('successDefault');
+  el = document.querySelector('.btn-back-site');                   if (el) el.textContent = bs('returnSiteBtn');
+}
+// ─── End static translations ──────────────────────────────────────────────────
 
 // ─── Modal ────────────────────────────────────────────────────────────────────
 function openModal(programId) {
@@ -157,15 +374,22 @@ function openModal(programId) {
   document.getElementById('submit-spinner').style.display   = 'none';
 
   // Reset discount state
-  activeDiscount = { pct: 0, code: '', description: '' };
+  activeDiscount  = { pct: 0, code: '', description: '' };
+  friendsDiscount = { pct: 0, count: 0 };
 
   // Populate hidden fields
   document.getElementById('field-program-id').value    = program.id;
   document.getElementById('field-program-name').value  = program.name;
   document.getElementById('field-program-price').value = program.price;
 
-  // Set modal title
-  document.getElementById('modal-title').textContent = `Register: ${program.name}`;
+  // Set modal title and program name
+  document.getElementById('modal-title').textContent = bs('modalTitle');
+  const progNameEl = document.getElementById('modal-program-name');
+  if (progNameEl) progNameEl.textContent = program.name;
+
+  // Re-apply submit label (may have been reset by form.reset())
+  const submitLabel = document.getElementById('submit-label');
+  if (submitLabel) submitLabel.textContent = bs('submitBtn');
 
   // Set initial price
   updatePriceDisplay(program.price);
@@ -186,16 +410,31 @@ function closeModal() {
 // ─── Price display ────────────────────────────────────────────────────────────
 function updatePriceDisplay(basePrice) {
   const priceEl    = document.getElementById('price-value');
+  const originalEl = document.getElementById('price-original');
   const resultEl   = document.getElementById('discount-result');
 
-  if (activeDiscount.pct > 0) {
-    const discounted = basePrice * (1 - activeDiscount.pct / 100);
+  // Total discount = manual code + friends discount (capped at 50%)
+  const totalPct = Math.min(50, activeDiscount.pct + friendsDiscount.pct);
+
+  if (totalPct > 0) {
+    const discounted = basePrice * (1 - totalPct / 100);
     const savings    = basePrice - discounted;
     priceEl.textContent = `\u20AC${discounted.toFixed(2)}`;
+    // Show original price struck-through
+    if (originalEl) { originalEl.textContent = `\u20AC${basePrice.toFixed(2)}`; originalEl.style.display = ''; }
     resultEl.className  = 'discount-result is-valid';
-    resultEl.innerHTML  = `${activeDiscount.description} &mdash; you save &euro;${savings.toFixed(2)}`;
+    const parts = [];
+    if (activeDiscount.pct > 0)  parts.push(bs('pctOff')(activeDiscount.description, activeDiscount.pct));
+    if (friendsDiscount.pct > 0) parts.push(bs('friendsJoining')(friendsDiscount.count, friendsDiscount.pct));
+    resultEl.innerHTML = parts.join(' + ') + bs('youSave')(savings.toFixed(2));
   } else {
     priceEl.textContent = `\u20AC${basePrice.toFixed(2)}`;
+    // Hide original price
+    if (originalEl) { originalEl.textContent = ''; originalEl.style.display = 'none'; }
+    if (!activeDiscount.code) {
+      resultEl.className   = 'discount-result';
+      resultEl.textContent = '';
+    }
   }
 }
 
@@ -211,8 +450,8 @@ function onDiscountInput() {
 }
 
 function validateDiscountCode(value) {
-  const statusEl = document.getElementById('discount-status');
-  const resultEl = document.getElementById('discount-result');
+  const statusEl  = document.getElementById('discount-status');
+  const resultEl  = document.getElementById('discount-result');
   const basePrice = parseFloat(document.getElementById('field-program-price').value) || 0;
 
   if (!value) {
@@ -233,7 +472,7 @@ function validateDiscountCode(value) {
     activeDiscount = { pct: 0, code: '', description: '' };
     statusEl.textContent = '\u274c';
     resultEl.className   = 'discount-result is-invalid';
-    resultEl.textContent = 'Code not recognised.';
+    resultEl.textContent = bs('codeInvalid');
     updatePriceDisplay(basePrice);
   }
 }
@@ -241,11 +480,60 @@ function validateDiscountCode(value) {
 // ─── Friends toggle ───────────────────────────────────────────────────────────
 function toggleFriends(show) {
   document.getElementById('friends-section').style.display = show ? '' : 'none';
+  if (!show) {
+    // Reset friends discount when hiding section
+    friendsDiscount = { pct: 0, count: 0 };
+    const hint = document.getElementById('friends-discount-hint');
+    if (hint) hint.style.display = 'none';
+    const basePrice = parseFloat(document.getElementById('field-program-price').value) || 0;
+    updatePriceDisplay(basePrice);
+  }
+}
+
+// Toggle discount code field visibility
+function toggleDiscountField() {
+  const container = document.getElementById('discount-field-container');
+  const btn       = document.getElementById('discount-toggle-btn');
+  if (container.style.display === 'none') {
+    container.style.display    = 'flex';
+    container.style.flexDirection = 'column';
+    btn.style.display          = 'none';
+    // Focus the input after a short delay for animation
+    setTimeout(() => { document.getElementById('field-discount').focus(); }, 100);
+  }
+}
+
+// ─── Friends count change — auto-apply 10% per friend ────────────────────────
+function onFriendsCountChange() {
+  const count     = parseInt(document.getElementById('field-friends-count').value) || 0;
+  const basePrice = parseFloat(document.getElementById('field-program-price').value) || 0;
+  const hint      = document.getElementById('friends-discount-hint');
+
+  if (count > 0) {
+    const pct       = count * 10; // 10% per friend
+    const cappedPct = Math.min(50, pct);
+    friendsDiscount = { pct: cappedPct, count: count };
+    if (hint) {
+      hint.textContent = bs('friendsHintText')(count, cappedPct);
+      hint.style.display = '';
+    }
+  } else {
+    friendsDiscount = { pct: 0, count: 0 };
+    if (hint) hint.style.display = 'none';
+  }
+
+  updatePriceDisplay(basePrice);
 }
 
 // ─── Form submission ──────────────────────────────────────────────────────────
 async function handleSubmit(event) {
   event.preventDefault();
+
+  // Guard: Apps Script URL not configured
+  if (!CONFIG.APPS_SCRIPT_URL) {
+    alert(bs('alertNoConfig'));
+    return;
+  }
 
   const btn     = document.getElementById('submit-btn');
   const label   = document.getElementById('submit-label');
@@ -255,7 +543,7 @@ async function handleSubmit(event) {
   const name  = document.getElementById('field-name').value.trim();
   const email = document.getElementById('field-email').value.trim();
   if (!name || !email) {
-    alert('Please fill in your name and email.');
+    alert(bs('alertFillIn'));
     return;
   }
 
@@ -265,47 +553,66 @@ async function handleSubmit(event) {
   spinner.style.display = '';
 
   const basePrice  = parseFloat(document.getElementById('field-program-price').value) || 0;
-  const finalPrice = activeDiscount.pct > 0
-    ? basePrice * (1 - activeDiscount.pct / 100)
-    : basePrice;
+  const totalPct   = Math.min(50, activeDiscount.pct + friendsDiscount.pct);
+  const finalPrice = totalPct > 0 ? basePrice * (1 - totalPct / 100) : basePrice;
 
-  const invitedByFriend = document.querySelector('input[name="invitedByFriend"]:checked')?.value === 'yes';
+  const bringingFriends = document.querySelector('input[name="bringingFriends"]:checked')?.value === 'yes';
 
   const payload = {
-    programId:      document.getElementById('field-program-id').value,
-    programName:    document.getElementById('field-program-name').value,
-    basePrice:      basePrice,
-    finalPrice:     parseFloat(finalPrice.toFixed(2)),
-    discountCode:   activeDiscount.code,
-    discountPct:    activeDiscount.pct,
-    name:           name,
-    email:          email,
-    phone:          document.getElementById('field-phone').value.trim(),
-    invitedByFriend: invitedByFriend,
-    friendsCount:   invitedByFriend ? (document.getElementById('field-friends-count').value || '') : '',
-    friendsNames:   invitedByFriend ? (document.getElementById('field-friends-names').value.trim() || '') : '',
-    comments:       document.getElementById('field-comments').value.trim(),
-    submittedAt:    new Date().toISOString(),
+    programId:          document.getElementById('field-program-id').value,
+    programName:        document.getElementById('field-program-name').value,
+    basePrice:          basePrice,
+    finalPrice:         parseFloat(finalPrice.toFixed(2)),
+    discountCode:       activeDiscount.code,
+    discountPct:        activeDiscount.pct,
+    friendsDiscountPct: friendsDiscount.pct,
+    totalDiscountPct:   totalPct,
+    fullName:           name,
+    email:              email,
+    phone:              document.getElementById('field-phone').value.trim(),
+    bringingFriends:    bringingFriends,
+    friendsCount:       bringingFriends ? (document.getElementById('field-friends-count').value || '') : '',
+    friendsNames:       bringingFriends ? (document.getElementById('field-friends-names').value.trim() || '') : '',
+    comments:           document.getElementById('field-comments').value.trim(),
+    submittedAt:        new Date().toISOString(),
   };
 
   try {
-    const res = await fetch(CONFIG.APPS_SCRIPT_URL, {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify(payload),
+    // Send to Apps Script — deployed as "Anyone" so CORS is handled via redirects.
+    // Apps Script redirects POST to a different URL that returns JSON with CORS headers.
+    const response = await fetch(CONFIG.APPS_SCRIPT_URL, {
+      method: 'POST',
+      redirect: 'follow',
+      body: JSON.stringify(payload),
     });
 
-    if (!res.ok) throw new Error(`Server responded with ${res.status}`);
+    let result = { ok: false, paymentLink: '' };
+    try {
+      const text = await response.text();
+      result = JSON.parse(text);
+    } catch (parseErr) {
+      // If response isn't JSON, treat non-error HTTP status as success
+      if (response.ok || response.type === 'opaque') {
+        result = { ok: true, success: true, paymentLink: '' };
+      }
+    }
 
-    // Show success state
-    document.getElementById('booking-form').style.display = 'none';
-    document.getElementById('form-success').style.display  = '';
-    document.getElementById('success-detail').textContent  =
-      `Check your inbox at ${email} for the payment link and confirmation.`;
+    if (result.success || result.ok) {
+      // Show success state
+      document.getElementById('booking-form').style.display = 'none';
+      document.getElementById('form-success').style.display  = '';
+      const msg = result.paymentUrl
+        ? bs('successPayLink')(email)
+        : bs('successFallback')(email);
+      document.getElementById('success-detail').textContent = msg;
+    } else {
+      throw new Error(result.error || 'Booking failed. Please try again.');
+    }
 
   } catch (err) {
     console.error('Booking submission failed:', err);
-    alert('Something went wrong submitting your registration. Please try again or contact us directly.');
+    const detail = err.message || 'Unknown error';
+    alert(bs('alertError') + detail + bs('alertConsole'));
 
     // Re-enable button
     btn.disabled          = false;
@@ -316,6 +623,9 @@ async function handleSubmit(event) {
 
 // ─── Event listeners ──────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
+  // Apply language translations first
+  applyStaticTranslations();
+
   // Wire up modal close
   document.getElementById('modal-close').addEventListener('click', closeModal);
   document.getElementById('modal-overlay').addEventListener('click', e => {
@@ -331,10 +641,67 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Wire up form submit
   document.getElementById('booking-form').addEventListener('submit', handleSubmit);
 
+  // Localhost detection: skip Sheets API (blocked by referrer restrictions / Brave Shields)
+  const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.protocol === 'file:';
+
   // Fetch all data in parallel
   try {
-    await Promise.all([ fetchPrograms(), fetchSessions(), fetchDiscountCodes() ]);
+    if (isLocal) {
+      // Load cached Sheet data instead of Google Sheets API (blocked on localhost)
+      try {
+        const resp = await fetch('../data/sheet-cache.json', { cache: 'no-store' });
+        if (!resp.ok) throw new Error('sheet-cache.json not found');
+        const cache = await resp.json();
+        const progRows = cache.programs || [];
+        const sessRows = cache.sessions || [];
+        programs = progRows.map(r => ({
+          id:               (r[0] || '').toString().trim(),
+          name:             r[1] || '',
+          price:            parseFloat(r[2]) || 0,
+          spotsTotal:       parseInt(r[3]) || 0,
+          spotsLeft:        parseInt(r[4]) || 0,
+          active:           ['TRUE','YES','1'].includes((r[5] || '').toString().toUpperCase().trim()),
+          startDate:        serialToISO(r[6] || ''),
+          endDate:          '',
+          sessionCount:     parseInt(r[7]) || 0,
+          hoursPerSession:  parseFloat(r[8]) || 0,
+          totalHours:       parseFloat(r[9]) || 0,
+          stripePaymentLink: '',
+          description:      r[10] || '',
+          location:         r[11] || '',
+          language:         r[12] || '',
+          image: '', format: '',
+        }));
+        sessions = sessRows.map(r => ({
+          programId:  (r[0] || '').toString().trim(),
+          sessionNum: parseInt(r[2]) || 0,
+          date:       serialToISO(r[3] || ''),
+          timeStart:  serialToTime(r[4] || ''),
+          timeEnd:    serialToTime(r[5] || ''),
+          notes:      '',
+        }));
+        discountCodes = [];
+      } catch (cacheErr) {
+        console.warn('Could not load sheet-cache.json:', cacheErr);
+        programs = [];
+      }
+    } else {
+      await Promise.all([ fetchPrograms(), fetchSessions(), fetchDiscountCodes().catch(() => []) ]);
+    }
     renderPrograms();
+    // Deep link: /booking/?program=SK-001 — scroll to and highlight the program card
+    const urlParams = new URLSearchParams(window.location.search);
+    const preselect = urlParams.get('program');
+    if (preselect) {
+      setTimeout(() => {
+        const card = document.querySelector(`[data-id="${preselect}"]`);
+        if (card) {
+          card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          card.classList.add('is-highlighted');
+          setTimeout(() => card.classList.remove('is-highlighted'), 3000);
+        }
+      }, 200);
+    }
   } catch (err) {
     console.error('Failed to load booking data:', err);
     document.getElementById('programs-loading').innerHTML =
