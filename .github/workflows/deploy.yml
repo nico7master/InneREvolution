@@ -42,18 +42,15 @@ jobs:
           SHEETS_API_KEY:  ${{ secrets.SHEETS_API_KEY }}
           APPS_SCRIPT_URL: ${{ secrets.APPS_SCRIPT_URL }}
         run: |
-          cat > booking/config.js << EOF
-          // Auto-generated at deploy time by GitHub Actions.
-          // DO NOT COMMIT — contains sensitive API keys.
+          cat > booking/config.js << ENDOFCONFIG
           const CONFIG = {
             SHEET_ID:        "${SHEET_ID}",
             SHEETS_API_KEY:  "${SHEETS_API_KEY}",
             APPS_SCRIPT_URL: "${APPS_SCRIPT_URL}"
           };
-          EOF
-
-      - name: Ensure config.js is included in deploy artifact
-        run: sed -i '/booking\/config.js/d' .gitignore
+          ENDOFCONFIG
+          echo "--- config.js generated ---"
+          cat booking/config.js
 
       - name: Compile main SCSS
         run: npm run build:css
@@ -61,10 +58,16 @@ jobs:
       - name: Compile booking SCSS
         run: npm run build:booking
 
+      - name: Prepare deploy (remove .gitignore so all generated files are included)
+        run: |
+          rm -f .gitignore
+          echo "--- Verify config.js exists ---"
+          ls -la booking/config.js
+          head -3 booking/config.js
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Deploy the entire repo root (excluding .git etc.)
           path: .
 
       - name: Deploy to GitHub Pages
