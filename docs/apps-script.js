@@ -1,160 +1,275 @@
 /**
- * InneREvolution — Google Apps Script (Full Suite v3)
+ * InneREvolution — Google Apps Script (Full Suite v4)
  * ─────────────────────────────────────────────────────
- * AUTOMATION OVERVIEW (what is automatic vs manual):
+ * Version: v4 (2026-04-11)
  *
- *   AUTOMATIC (no action needed from you):
- *   - Payment Sent     → YES when booking submitted (confirmation email sent immediately)
- *   - Paid             → YES when Stripe webhook fires after payment
- *   - Intake Form Sent → YES when Stripe webhook fires (sent after payment confirmed)
- *   - Friends Verified → checked daily 09:00 by checkFriendReferrals()
- *   - Referrer Verified→ checked daily 09:00 by checkFriendReferrals()
- *   - Spots Left       → decremented on each booking
- *   - Stripe Link      → auto-created by onEdit() when you fill Program ID+Name+Price
- *   - Start/End Date   → formula in sheet pulling from Sessions tab
+ * FIXES from v3:
+ *  1. handleBooking: LockService, duplicate check, email validation, no formula write
+ *  2. handleStripeWebhook: fixed undefined ss variable
+ *  3. onEdit: correct sheet name + column mapping
+ *  4. formatSheet: correct tab names + column counts
+ *  5. applyConditionalFormatting: correct column positions
+ *  6. applyDataValidations: correct tab names + positions
+ *  7. buildDashboard: correct formula references with emoji tab names
+ *  8. checkFriendReferrals: verified column indices + safeAlert
+ *  9. sendPaymentReminders: correct column mapping + safeAlert
+ * 10. sendDailyReport: correct references + safeAlert
+ * 11. syncSessionsToCalendar: correct column mapping + safeAlert
+ * 12. All trigger functions: safeAlert() instead of getUi().alert()
+ * 13. createAllStripeLinks: correct tab name + column mapping
  *
- *   MANUAL (you fill in):
- *   - All Programs fields except Spots Left, Start Date, End Date, Stripe Link
- *   - Sessions rows (except Calendar Event ID)
- *   - Discount Codes
+ * COLUMN MAPPINGS (ground truth from live sheet):
+ *
+ *   🧘 Kursplanung (data starts row 4, 3 header rows):
+ *     [0]A=Isha Code  [1]B=Instance ID  [2]C=Modul Typ  [3]D=Kursname
+ *     [4]E=Modul  [5]F=Sessions  [6]G=Std/Sess  [7]H=Datum  [8]I=Uhrzeit
+ *     [9]J=Ort  [10]K=Max TN  [11]L=Empf.Preis  [12]M=Preis/TN
+ *     [13]N=Angemeldet(AUTO)  [14]O=Website?  [15]P=Umsatz(AUTO)
+ *     [16]Q=Auslastung%(AUTO)  [17]R=Sprache  [18]S=Total Std
+ *     [19]T=(helper)  [20]U=(Stripe test)  [21]V=Stripe Link
+ *     [22]W=Freie Plätze(AUTO K-N)  [23]X=Beschreibung
+ *
+ *   📋 Buchungen (data starts row 2, 1 header row):
+ *     [0]A=Datum  [1]B=Name  [2]C=Email  [3]D=Telefon  [4]E=Instance ID
+ *     [5]F=Kursname  [6]G=Rabattcode  [7]H=% Rabatt  [8]I=Freunde %
+ *     [9]J=Total Rabatt %  [10]K=Final EUR  [11]L=Payment Sent
+ *     [12]M=Bezahlt  [13]N=Intake gesendet  [14]O=Freunde Anz.
+ *     [15]P=Freunde Namen  [16]Q=Freunde verifiziert  [17]R=Empfehlung von
+ *     [18]S=Empfehler bestätigt  [19]T=Booking ID
+ *
+ *   🏷 Rabatte (data starts row 3, title + header):
+ *     [0]A=Code  [1]B=% Rabatt  [2]C=Beschreibung  [3]D=Gültig bis
+ *     [4]E=Aktiv  [5]F=Nutzungen
+ *
+ *   📅 Sessions (data starts row 2, 1 header row):
+ *     [0]A=Instance ID  [1]B=Kursname  [2]C=Session#  [3]D=Datum
+ *     [4]E=Start time  [5]F=End time  [6]G=Ort  [7]H=TN  [8]I=Status
+ *     [9]J=Notizen  [10]K=CalEventID
  *
  * Script Properties required:
- *   SHEET_ID, CALENDAR_ID, STRIPE_KEY, INSTRUCTOR_EMAIL
+ *   SHEET_ID, CALENDAR_ID, STRIPE_KEY, INSTRUCTOR_EMAIL, STRIPE_WEBHOOK_SECRET
  */
 
 // ─── 0. CONFIG ────────────────────────────────────────────────────────────────
 function getConfig() {
   var p = PropertiesService.getScriptProperties().getProperties();
   return {
-    SHEET_ID:         p.SHEET_ID         || SpreadsheetApp.getActiveSpreadsheet().getId(),
-    CALENDAR_ID:      p.CALENDAR_ID      || '',
-    STRIPE_KEY:       p.STRIPE_KEY       || '',
-    INSTRUCTOR_EMAIL: p.INSTRUCTOR_EMAIL || Session.getActiveUser().getEmail(),
+    SHEET_ID:              p.SHEET_ID              || SpreadsheetApp.getActiveSpreadsheet().getId(),
+    CALENDAR_ID:           p.CALENDAR_ID           || '',
+    STRIPE_KEY:            p.STRIPE_KEY            || '',
+    INSTRUCTOR_EMAIL:      p.INSTRUCTOR_EMAIL      || Session.getActiveUser().getEmail(),
+    STRIPE_WEBHOOK_SECRET: p.STRIPE_WEBHOOK_SECRET || ''
   };
+}
+
+// ─── SAFE ALERT (Bug #12 fix: trigger-safe UI helper) ─────────────────────────
+function safeAlert(title, message, buttons) {
+  try {
+    var ui = SpreadsheetApp.getUi();
+    ui.alert(title, message, buttons || ui.ButtonSet.OK);
+  } catch (e) {
+    Logger.log('[ALERT] ' + title + ': ' + message);
+  }
+}
+
+// ─── EMAIL VALIDATION (Bug #1 addition) ───────────────────────────────────────
+function isValidEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email).trim());
 }
 
 // ─── 1. MENU ──────────────────────────────────────────────────────────────────
 function onOpen() {
   SpreadsheetApp.getUi()
     .createMenu('InneREvolution')
-    .addItem('Format All Tabs',            'formatSheet')
-    .addItem('Rebuild Dashboard',          'buildDashboard')
+    .addItem('Format All Tabs',             'formatSheet')
+    .addItem('Rebuild Dashboard',           'buildDashboard')
     .addSeparator()
-    .addItem('Sync Sessions to Calendar',  'syncSessionsToCalendar')
+    .addItem('Sync Sessions to Calendar',   'syncSessionsToCalendar')
     .addSeparator()
-    .addItem('Check Friend Referrals',     'checkFriendReferrals')
-    .addItem('Send Payment Reminders',     'sendPaymentReminders')
-    .addItem('Send Daily Report',          'sendDailyReport')
+    .addItem('Check Friend Referrals',      'checkFriendReferrals')
+    .addItem('Send Payment Reminders',      'sendPaymentReminders')
+    .addItem('Send Daily Report',           'sendDailyReport')
     .addSeparator()
     .addItem('Create Missing Stripe Links', 'createAllStripeLinks')
-    .addItem('Recolor All Rows by Program ID',  'recolorAllRows')
+    .addItem('Recolor All Rows by Program ID', 'recolorAllRows')
     .addSeparator()
-    .addItem('Setup Automation Triggers',  'setupTriggers')
-    .addItem('Authorize & Test',           'authorizeAndTest')
+    .addItem('Setup Automation Triggers',   'setupTriggers')
+    .addItem('Authorize & Test',            'authorizeAndTest')
     .addToUi();
 }
 
 // ─── 2. WEB APP ───────────────────────────────────────────────────────────────
 function doGet() {
-  return ContentService.createTextOutput('InneREvolution Booking API — OK');
+  return ContentService.createTextOutput('InneREvolution Booking API v4 — OK');
 }
 
 function doPost(e) {
   Logger.log('[REQUEST] doPost received');
   try {
     var data = JSON.parse(e.postData.contents);
-    if (data.type && data.type.indexOf('payment_intent') === 0) return handleStripeWebhook(data);
+    Logger.log('[REQUEST] Parsed data: ' + JSON.stringify(data));
+    if (data.type && data.type.indexOf('payment_intent') === 0) {
+      Logger.log('[REQUEST] Routing to Stripe webhook handler');
+      return handleStripeWebhook(data);
+    }
+    Logger.log('[REQUEST] Routing to booking handler');
     return handleBooking(data);
   } catch (err) {
-    Logger.log('[ERROR] doPost: ' + err.message);
+    Logger.log('[ERROR] doPost: ' + err.message + '\nStack: ' + err.stack);
     return jsonResponse({ success: false, error: err.message });
   }
 }
 
+// ─── HANDLE BOOKING (Bug #1: +LockService, +duplicate check, +email validation, -formula write) ──
 function handleBooking(data) {
-  var cfg  = getConfig();
+  Logger.log('[BOOKING] === START === programId=' + data.programId + ' name=' + data.fullName + ' email=' + data.email);
+
+  // Email validation (Bug #1)
+  if (data.email && !isValidEmail(data.email)) {
+    Logger.log('[BOOKING] FAIL: invalid email: ' + data.email);
+    return jsonResponse({ success: false, error: 'Invalid email address format.' });
+  }
+
+  var cfg = getConfig();
+  Logger.log('[BOOKING] Config SHEET_ID=' + cfg.SHEET_ID);
   var ss   = SpreadsheetApp.openById(cfg.SHEET_ID);
-  var prog = ss.getSheetByName('Programs');
-  var disc = ss.getSheetByName('Discount Codes');
-  var book = ss.getSheetByName('Bookings');
+  var prog = ss.getSheetByName('🧘 Kursplanung') || ss.getSheetByName('Programs');
+  var disc = ss.getSheetByName('🏷 Rabatte')      || ss.getSheetByName('Discount Codes');
+  var book = ss.getSheetByName('📋 Buchungen')     || ss.getSheetByName('Bookings');
+  Logger.log('[BOOKING] Tabs: prog=' + (prog ? prog.getName() : 'NULL') + ' disc=' + (disc ? disc.getName() : 'NULL') + ' book=' + (book ? book.getName() : 'NULL'));
+
+  if (!prog) { Logger.log('[BOOKING] FAIL: prog tab not found'); return jsonResponse({ success: false, error: 'Sheet tab not found: Kursplanung' }); }
+  if (!book) { Logger.log('[BOOKING] FAIL: book tab not found'); return jsonResponse({ success: false, error: 'Sheet tab not found: Buchungen' }); }
 
   var required = ['programId', 'fullName', 'email', 'phone'];
   for (var i = 0; i < required.length; i++) {
-    if (!data[required[i]]) return jsonResponse({ success: false, error: 'Missing: ' + required[i] });
-  }
-
-  var progData = prog.getDataRange().getValues();
-  var progRow  = null;
-  for (var r = 1; r < progData.length; r++) {
-    if (String(progData[r][0]).trim() === String(data.programId).trim()) { progRow = progData[r]; break; }
-  }
-  if (!progRow) return jsonResponse({ success: false, error: 'Program not found: ' + data.programId });
-
-  var basePrice   = parseFloat(String(progRow[2]).replace(/[^0-9.,]/g, '').replace(',', '.')) || 0;
-  var spotsLeft   = parseInt(progRow[4]);
-  var programName = progRow[1];
-  var stripeLink  = progRow[8] || '';
-
-  if (!isNaN(spotsLeft) && spotsLeft <= 0)
-    return jsonResponse({ success: false, error: 'This program is fully booked.' });
-
-  var codeDiscount = 0, usedCode = '';
-  if (data.discountCode) {
-    var discData = disc.getDataRange().getValues();
-    for (var d = 1; d < discData.length; d++) {
-      if (String(discData[d][0]).toUpperCase() === String(data.discountCode).toUpperCase()) {
-        codeDiscount = parseFloat(discData[d][1]) || 0;
-        usedCode = discData[d][0];
-        break;
-      }
+    if (!data[required[i]]) {
+      Logger.log('[BOOKING] FAIL: missing field ' + required[i]);
+      return jsonResponse({ success: false, error: 'Missing: ' + required[i] });
     }
   }
 
-  var friendsPct = parseFloat(data.friendsDiscountPct) || 0;
-  var totalDisc  = Math.min(codeDiscount + friendsPct, 50);
-  var finalPrice = Math.round(basePrice * (1 - totalDisc / 100) * 100) / 100;
+  // LockService for concurrency (Bug #1)
+  var lock = LockService.getScriptLock();
+  try {
+    if (!lock.tryLock(10000)) {
+      Logger.log('[BOOKING] FAIL: could not acquire lock');
+      return jsonResponse({ success: false, error: 'Server busy, please try again.' });
+    }
 
-  book.appendRow([
-    new Date(),          // A: Timestamp — AUTO
-    data.fullName,       // B: Full Name
-    data.email,          // C: Email
-    data.phone,          // D: Phone
-    data.programId,      // E: Program ID
-    programName,         // F: Program Name
-    usedCode,            // G: Discount Code
-    codeDiscount,        // H: Code Discount %
-    friendsPct,          // I: Friends Discount %
-    totalDisc,           // J: Total Discount %
-    finalPrice,          // K: Final Price
-    'YES',               // L: Payment Sent — YES because confirmation email sent immediately below
-    'NO',                // M: Paid — set to YES automatically by Stripe webhook
-    'NO',                // N: Intake Form Sent — set to YES automatically by Stripe webhook after payment
-    data.friendsCount || 0,
-    data.friendNames  || '',
-    'NO',                // Q: Friends Verified — updated daily by checkFriendReferrals()
-    data.referredBy   || '',
-    'NO',                // S: Referrer Verified — updated daily by checkFriendReferrals()
-  ]);
+    var progData = prog.getDataRange().getValues();
+    Logger.log('[BOOKING] Programs: ' + progData.length + ' rows, ' + (progData[0] ? progData[0].length : 0) + ' cols');
 
-  if (!isNaN(spotsLeft)) {
-    for (var pr = 1; pr < progData.length; pr++) {
-      if (String(progData[pr][0]).trim() === String(data.programId).trim()) {
-        prog.getRange(pr + 1, 5).setValue(spotsLeft - 1); break;
+    // Data starts at row 4 (index 3): row 1=title, row 2=colors, row 3=headers
+    // [1] = Instance ID (col B) — the booking lookup key
+    var progRow = null, progRowIndex = -1;
+    for (var r = 3; r < progData.length; r++) {
+      var cellVal = String(progData[r][1]).trim();
+      Logger.log('[BOOKING] Scanning row ' + r + ' col[1]=\"' + cellVal + '\"');
+      if (cellVal === String(data.programId).trim()) { progRow = progData[r]; progRowIndex = r; break; }
+    }
+    if (!progRow) {
+      Logger.log('[BOOKING] FAIL: program not found: ' + data.programId);
+      return jsonResponse({ success: false, error: 'Program not found: ' + data.programId });
+    }
+    Logger.log('[BOOKING] Found program at row ' + progRowIndex);
+
+    // Duplicate booking check (Bug #1): same email + same programId
+    var bookData = book.getDataRange().getValues();
+    for (var b = 1; b < bookData.length; b++) {
+      if (String(bookData[b][2]).toLowerCase().trim() === String(data.email).toLowerCase().trim() &&
+          String(bookData[b][4]).trim() === String(data.programId).trim()) {
+        Logger.log('[BOOKING] FAIL: duplicate booking for ' + data.email + ' / ' + data.programId);
+        return jsonResponse({ success: false, error: 'You are already registered for this program.' });
       }
     }
+
+    // Column mapping (🧘 Kursplanung):
+    // [1]=Instance ID, [3]=Kursname, [12]=Preis/TN, [21]=Stripe Link, [22]=Freie Plätze (AUTO)
+    var basePrice   = parseFloat(String(progRow[12]).replace(/[^0-9.,]/g, '').replace(',', '.')) || 0;
+    var spotsLeft   = parseInt(progRow[22]); // Freie Plätze (read-only formula K-N)
+    var programName = progRow[3];            // Kursname
+    var stripeLink  = progRow[21] || '';     // Stripe Link col V
+    Logger.log('[BOOKING] Data: price=' + basePrice + ' spots=' + spotsLeft + ' name=\"' + programName + '\" stripe=' + (stripeLink ? 'YES' : 'NONE'));
+
+    if (!isNaN(spotsLeft) && spotsLeft <= 0) {
+      Logger.log('[BOOKING] FAIL: fully booked, spots=' + spotsLeft);
+      return jsonResponse({ success: false, error: 'This program is fully booked.' });
+    }
+
+    // Discount code
+    var codeDiscount = 0, usedCode = '';
+    if (data.discountCode && disc) {
+      var discData = disc.getDataRange().getValues();
+      Logger.log('[BOOKING] Discount codes: ' + discData.length + ' rows, looking for \"' + data.discountCode + '\"');
+      // Rabatte: row 0=title, row 1=headers, data from index 2
+      for (var d = 2; d < discData.length; d++) {
+        if (String(discData[d][0]).toUpperCase() === String(data.discountCode).toUpperCase()) {
+          var isActive = String(discData[d][4]).toUpperCase();
+          if (isActive === 'NO' || isActive === 'NEIN') { Logger.log('[BOOKING] Discount code inactive'); break; }
+          var expiryDate = discData[d][3];
+          if (expiryDate instanceof Date && expiryDate < new Date()) { Logger.log('[BOOKING] Discount code expired'); break; }
+          codeDiscount = parseFloat(discData[d][1]) || 0;
+          usedCode = discData[d][0];
+          Logger.log('[BOOKING] Discount found: code=' + usedCode + ' pct=' + codeDiscount);
+          var currentUses = parseInt(discData[d][5]) || 0;
+          disc.getRange(d + 1, 6).setValue(currentUses + 1);
+          break;
+        }
+      }
+    }
+
+    var friendsPct = parseFloat(data.friendsDiscountPct) || 0;
+    var totalDisc  = Math.min(codeDiscount + friendsPct, 50);
+    var finalPrice = Math.round(basePrice * (1 - totalDisc / 100) * 100) / 100;
+    Logger.log('[BOOKING] Price: base=' + basePrice + ' disc=' + totalDisc + '% final=' + finalPrice);
+
+    // Generate booking ID
+    var bookingId = 'BK-' + Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyyMMdd-HHmmss') + '-' + Math.random().toString(36).substr(2, 4).toUpperCase();
+
+    Logger.log('[BOOKING] Writing to Buchungen...');
+    book.appendRow([
+      new Date(),              // [0]  A: Datum
+      data.fullName,           // [1]  B: Name
+      data.email,              // [2]  C: Email
+      data.phone,              // [3]  D: Telefon
+      data.programId,          // [4]  E: Instance ID
+      programName,             // [5]  F: Kursname
+      usedCode,                // [6]  G: Rabattcode
+      codeDiscount,            // [7]  H: % Rabatt
+      friendsPct,              // [8]  I: Freunde %
+      totalDisc,               // [9]  J: Total Rabatt %
+      finalPrice,              // [10] K: Final EUR
+      'YES',                   // [11] L: Payment Sent
+      'NO',                    // [12] M: Bezahlt
+      'NO',                    // [13] N: Intake gesendet
+      data.friendsCount || 0,  // [14] O: Freunde Anz.
+      data.friendNames  || '', // [15] P: Freunde Namen
+      'NO',                    // [16] Q: Freunde verifiziert
+      data.referredBy   || '', // [17] R: Empfehlung von
+      'NO',                    // [18] S: Empfehler bestätigt
+      bookingId                // [19] T: Booking ID
+    ]);
+    Logger.log('[BOOKING] Row written (ID: ' + bookingId + ')');
+
+    // Bug #1 FIX: Do NOT write to Freie Plätze (col W) — it is a formula (K-N)
+    // Angemeldet (col N) is also auto-calculated via COUNTIF from Buchungen
+    // Both update automatically when a new row is appended
+
+    var payUrl = stripeLink;
+    if (stripeLink && data.email)
+      payUrl += (stripeLink.indexOf('?') >= 0 ? '&' : '?') + 'prefilled_email=' + encodeURIComponent(data.email);
+
+    try { sendClientConfirmation(data, programName, finalPrice, totalDisc, payUrl); Logger.log('[BOOKING] Client email sent'); }
+    catch (err) { Logger.log('[EMAIL ERR] Client: ' + err.message); }
+    try { sendInstructorNotification(data, programName, finalPrice, cfg.INSTRUCTOR_EMAIL); Logger.log('[BOOKING] Instructor email sent'); }
+    catch (err) { Logger.log('[EMAIL ERR] Instructor: ' + err.message); }
+
+    Logger.log('[BOOKING] === SUCCESS === ' + data.fullName + ' / ' + programName + ' EUR ' + finalPrice);
+    return jsonResponse({ success: true, bookingId: bookingId, paymentUrl: payUrl, programName: programName, finalPrice: finalPrice });
+  } finally {
+    lock.releaseLock();
   }
-
-  var payUrl = stripeLink;
-  if (stripeLink && data.email)
-    payUrl += (stripeLink.indexOf('?') >= 0 ? '&' : '?') + 'prefilled_email=' + encodeURIComponent(data.email);
-
-  try { sendClientConfirmation(data, programName, finalPrice, totalDisc, payUrl); }
-  catch(err) { Logger.log('[EMAIL ERR] ' + err.message); }
-  try { sendInstructorNotification(data, programName, finalPrice, cfg.INSTRUCTOR_EMAIL); }
-  catch(err) { Logger.log('[EMAIL ERR] ' + err.message); }
-
-  Logger.log('[OK] Booked: ' + data.fullName + ' / ' + programName + ' EUR ' + finalPrice);
-  return jsonResponse({ success: true, paymentUrl: payUrl, programName: programName, finalPrice: finalPrice });
 }
 
 // ─── 3. EMAILS ────────────────────────────────────────────────────────────────
@@ -191,10 +306,6 @@ function sendInstructorNotification(data, programName, finalPrice, instructorEma
   Logger.log('[EMAIL] Instructor notified');
 }
 
-/**
- * Sends intake form email after payment confirmed via Stripe webhook.
- * Called automatically — no manual action needed.
- */
 function sendIntakeForm(name, email, programName) {
   var html = '<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">'
     + '<div style="background:#371964;padding:32px 24px;text-align:center">'
@@ -216,25 +327,24 @@ function sendIntakeForm(name, email, programName) {
   Logger.log('[INTAKE] Form sent to ' + email);
 }
 
-/**
- * Stripe webhook — auto-sets Paid=YES and sends intake form.
- * Configure webhook endpoint in Stripe Dashboard to point to this Web App URL.
- */
+// ─── STRIPE WEBHOOK (Bug #2 fix: defined ss variable properly) ────────────────
 function handleStripeWebhook(event) {
   try {
     var email = event.data && event.data.object && event.data.object.receipt_email;
     if (email) {
       var cfg  = getConfig();
-      var book = SpreadsheetApp.openById(cfg.SHEET_ID).getSheetByName('Bookings');
+      var ss   = SpreadsheetApp.openById(cfg.SHEET_ID); // Bug #2 FIX: ss now defined
+      var book = ss.getSheetByName('📋 Buchungen') || ss.getSheetByName('Bookings');
       var rows = book.getDataRange().getValues();
+      // Buchungen: [2]=Email, [12]=Bezahlt(M), [1]=Name, [5]=Kursname
       for (var r = 1; r < rows.length; r++) {
-        if (String(rows[r][2]).toLowerCase() === email.toLowerCase() && rows[r][12] === 'NO') {
-          book.getRange(r + 1, 13).setValue('YES'); // M: Paid = YES (automatic)
+        if (String(rows[r][2]).toLowerCase() === email.toLowerCase() && String(rows[r][12]).toUpperCase() === 'NO') {
+          book.getRange(r + 1, 13).setValue('YES'); // col M: Bezahlt = YES
           Logger.log('[PAID] ' + email);
           try {
             sendIntakeForm(rows[r][1], email, rows[r][5]);
-            book.getRange(r + 1, 14).setValue('YES'); // N: Intake Form Sent = YES (automatic)
-          } catch(ie) { Logger.log('[INTAKE ERROR] ' + ie.message); }
+            book.getRange(r + 1, 14).setValue('YES'); // col N: Intake gesendet = YES
+          } catch (ie) { Logger.log('[INTAKE ERROR] ' + ie.message); }
         }
       }
     }
@@ -249,82 +359,77 @@ function jsonResponse(obj) {
   return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
 }
 
-// ─── 4. STRIPE AUTO-CREATION ─────────────────────────────────────────────────
-/**
- * onEdit trigger — when you fill Program ID + Name + Price in Programs sheet,
- * automatically calls Stripe API and writes the Payment Link back to col I.
- * Requires STRIPE_KEY in Script Properties.
- */
+// ─── 4. STRIPE AUTO-CREATION (Bug #3 fix: correct sheet name + column mapping) ─
 function onEdit(e) {
   try {
     var sheet = e.source.getActiveSheet();
     var sheetName = sheet.getName();
 
-    // Auto-color row by Program ID when editing Programs, Sessions or Bookings
-    if (sheetName === 'Programs' || sheetName === 'Sessions' || sheetName === 'Bookings') {
-      var pidCol = (sheetName === 'Bookings') ? 5 : 1;  // Bookings col E, others col A
+    // Auto-color row by Program ID when editing relevant tabs
+    if (sheetName === '🧘 Kursplanung' || sheetName === 'Programs' ||
+        sheetName === '📅 Sessions' || sheetName === 'Sessions' ||
+        sheetName === '📋 Buchungen' || sheetName === 'Bookings') {
+      // Kursplanung: Isha Code col A (1); Buchungen: Instance ID col E (5); Sessions: Instance ID col A (1)
+      var pidCol = (sheetName === '📋 Buchungen' || sheetName === 'Bookings') ? 5 : 1;
       var editedRow = e.range.getRow();
-      if (editedRow >= 2) {
+      var minRow = (sheetName === '🧘 Kursplanung' || sheetName === 'Programs') ? 4 : 2;
+      if (editedRow >= minRow) {
         colorRowByProgramId(sheet, editedRow, pidCol);
       }
-      if (sheetName === 'Bookings') return;  // no Stripe logic for Bookings
-      if (sheetName === 'Sessions') return;  // no Stripe logic for Sessions
+      if (sheetName === '📋 Buchungen' || sheetName === 'Bookings') return;
+      if (sheetName === '📅 Sessions' || sheetName === 'Sessions') return;
     }
 
-    if (sheetName !== 'Programs') return;
+    // Bug #3 FIX: check correct sheet name (was 'Programs')
+    if (sheetName !== '🧘 Kursplanung' && sheetName !== 'Programs') return;
     var row = e.range.getRow();
     var col = e.range.getColumn();
-    if (row < 2 || col > 3) return;
+    if (row < 4) return; // Data starts at row 4
 
-    var programId    = String(sheet.getRange(row, 1).getValue() || '').trim();
-    var programName  = String(sheet.getRange(row, 2).getValue() || '').trim();
-    var priceRaw     = String(sheet.getRange(row, 3).getValue() || '');
-    var existingLink = String(sheet.getRange(row, 9).getValue() || '').trim();
+    // Bug #3 FIX: correct column mapping
+    // Instance ID = col B (2), Kursname = col D (4), Preis/TN = col M (13), Stripe Link = col V (22)
+    if (col !== 2 && col !== 4 && col !== 13) return; // Only trigger on relevant columns
 
-    if (!programId || !programName || !priceRaw || existingLink) return;
+    var instanceId   = String(sheet.getRange(row, 2).getValue() || '').trim();  // B: Instance ID
+    var programName  = String(sheet.getRange(row, 4).getValue() || '').trim();  // D: Kursname
+    var priceRaw     = String(sheet.getRange(row, 13).getValue() || '');        // M: Preis/TN
+    var existingLink = String(sheet.getRange(row, 22).getValue() || '').trim(); // V: Stripe Link
+
+    if (!instanceId || !programName || !priceRaw || existingLink) return;
 
     var price = parseFloat(priceRaw.replace(/[^0-9.,]/g, '').replace(',', '.'));
     if (!price || price <= 0) return;
 
     var link = createStripePaymentLink(programName, Math.round(price * 100));
     if (link) {
-      sheet.getRange(row, 9).setValue(link);
+      sheet.getRange(row, 22).setValue(link); // V: Stripe Link
       SpreadsheetApp.getActiveSpreadsheet().toast(
         'Stripe Payment Link created for ' + programName, 'InneREvolution', 5);
       Logger.log('[STRIPE] Auto-created link for ' + programName);
     }
-  } catch(ex) {
+  } catch (ex) {
     Logger.log('[onEdit ERROR] ' + ex.message);
   }
 }
 
 // ─── COLOR HELPERS ────────────────────────────────────────────────────────────
-/**
- * Get or create a random pastel color for a Program ID.
- * Colors are stored in Script Properties as JSON so they persist forever.
- * First time an ID is seen -> random color generated and saved.
- * Same ID always returns the same saved color.
- */
 function getOrCreateIdColor(id) {
   var props = PropertiesService.getScriptProperties();
   var mapJson = props.getProperty('ID_COLOR_MAP') || '{}';
   var map;
-  try { map = JSON.parse(mapJson); } catch(e) { map = {}; }
-
+  try { map = JSON.parse(mapJson); } catch (e) { map = {}; }
   if (!map[id]) {
-    // Random pastel: hue fully random, saturation 45-65%, lightness 78-88%
-    var hue = Math.random();                         // 0..1
-    var sat = 0.45 + Math.random() * 0.20;           // 0.45..0.65
-    var lit = 0.78 + Math.random() * 0.10;           // 0.78..0.88
+    var hue = Math.random();
+    var sat = 0.45 + Math.random() * 0.20;
+    var lit = 0.78 + Math.random() * 0.10;
     var rgb = hslToRgbObj(hue, sat, lit);
     map[id] = 'rgb(' +
-      Math.round(rgb.red   * 255) + ',' +
+      Math.round(rgb.red * 255) + ',' +
       Math.round(rgb.green * 255) + ',' +
-      Math.round(rgb.blue  * 255) + ')';
+      Math.round(rgb.blue * 255) + ')';
     props.setProperty('ID_COLOR_MAP', JSON.stringify(map));
     Logger.log('[COLOR] New color for ' + id + ': ' + map[id]);
   }
-
   return map[id];
 }
 
@@ -335,26 +440,22 @@ function hslToRgbObj(h, s, l) {
     function hue2rgb(p, q, t) {
       if (t < 0) t += 1;
       if (t > 1) t -= 1;
-      if (t < 1/6) return p + (q - p) * 6 * t;
-      if (t < 1/2) return q;
-      if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+      if (t < 1 / 6) return p + (q - p) * 6 * t;
+      if (t < 1 / 2) return q;
+      if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
       return p;
     }
     var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
     var p = 2 * l - q;
-    r = hue2rgb(p, q, h + 1/3);
+    r = hue2rgb(p, q, h + 1 / 3);
     g = hue2rgb(p, q, h);
-    b = hue2rgb(p, q, h - 1/3);
+    b = hue2rgb(p, q, h - 1 / 3);
   }
   return { red: Math.round(r * 1000) / 1000,
            green: Math.round(g * 1000) / 1000,
            blue: Math.round(b * 1000) / 1000 };
 }
 
-/**
- * Color one row in a sheet based on the Program ID in a given column.
- * colIndex: 1-based column number that holds the Program ID.
- */
 function colorRowByProgramId(sheet, rowIndex, colIndex) {
   var id = String(sheet.getRange(rowIndex, colIndex).getValue() || '').trim();
   if (!id) return;
@@ -363,43 +464,27 @@ function colorRowByProgramId(sheet, rowIndex, colIndex) {
   sheet.getRange(rowIndex, 1, 1, numCols).setBackground(color);
 }
 
-/**
- * Recolor all data rows in Sessions (Program ID = col A) and
- * Bookings (Program ID = col E). Run once from the menu after adding rows
- * that were entered before this script was in place.
- */
 function recolorAllRows() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
-
-  // Programs — col A (1)
-  var programs = ss.getSheetByName('Programs');
+  // Kursplanung — Isha Code col A (1), data starts row 4
+  var programs = ss.getSheetByName('🧘 Kursplanung') || ss.getSheetByName('Programs');
   if (programs) {
     var lastRow = programs.getLastRow();
-    for (var r = 2; r <= lastRow; r++) {
-      colorRowByProgramId(programs, r, 1);
-    }
+    for (var r = 4; r <= lastRow; r++) { colorRowByProgramId(programs, r, 1); }
   }
-
-  // Sessions — col A (1)
-  var sessions = ss.getSheetByName('Sessions');
+  // Sessions — Instance ID col A (1), data starts row 2
+  var sessions = ss.getSheetByName('📅 Sessions') || ss.getSheetByName('Sessions');
   if (sessions) {
-    var lastRow = sessions.getLastRow();
-    for (var r = 2; r <= lastRow; r++) {
-      colorRowByProgramId(sessions, r, 1);
-    }
+    var lastRow2 = sessions.getLastRow();
+    for (var r = 2; r <= lastRow2; r++) { colorRowByProgramId(sessions, r, 1); }
   }
-
-  // Bookings — col E (5)
-  var bookings = ss.getSheetByName('Bookings');
+  // Buchungen — Instance ID col E (5), data starts row 2
+  var bookings = ss.getSheetByName('📋 Buchungen') || ss.getSheetByName('Bookings');
   if (bookings) {
-    var lastRow = bookings.getLastRow();
-    for (var r = 2; r <= lastRow; r++) {
-      colorRowByProgramId(bookings, r, 5);
-    }
+    var lastRow3 = bookings.getLastRow();
+    for (var r = 2; r <= lastRow3; r++) { colorRowByProgramId(bookings, r, 5); }
   }
-
-  SpreadsheetApp.getActiveSpreadsheet().toast(
-    'All rows recolored by Program ID!', 'InneREvolution', 4);
+  SpreadsheetApp.getActiveSpreadsheet().toast('All rows recolored by Program ID!', 'InneREvolution', 4);
   Logger.log('[RECOLOR] Done');
 }
 
@@ -415,7 +500,6 @@ function createStripePaymentLink(programName, priceInCents) {
     });
     var priceData = JSON.parse(priceResp.getContentText());
     if (!priceData.id) { Logger.log('[STRIPE ERR] ' + priceResp.getContentText()); return ''; }
-
     var linkResp = UrlFetchApp.fetch('https://api.stripe.com/v1/payment_links', {
       method: 'post',
       headers: { Authorization: 'Bearer ' + cfg.STRIPE_KEY },
@@ -424,80 +508,86 @@ function createStripePaymentLink(programName, priceInCents) {
     });
     var linkData = JSON.parse(linkResp.getContentText());
     return linkData.url || '';
-  } catch(e) {
+  } catch (e) {
     Logger.log('[STRIPE ERR] ' + e.message);
     return '';
   }
 }
-
-/** Run from menu to create Stripe links for all Programs rows missing one. */
+// ─── Bug #13 fix: correct tab name + column mapping for createAllStripeLinks ──
 function createAllStripeLinks() {
   var ss   = SpreadsheetApp.getActiveSpreadsheet();
-  var prog = ss.getSheetByName('Programs');
-  var ui   = SpreadsheetApp.getUi();
+  var prog = ss.getSheetByName('🧘 Kursplanung') || ss.getSheetByName('Programs');
   var rows = prog.getDataRange().getValues();
   var created = 0;
-  for (var r = 1; r < rows.length; r++) {
+  // Data starts at row 4 (index 3)
+  // [1]=Instance ID, [3]=Kursname, [12]=Preis/TN, [21]=Stripe Link (col V, 1-based=22)
+  for (var r = 3; r < rows.length; r++) {
     var row = rows[r];
-    if (!row[0] || !row[1] || !row[2] || row[8]) continue;
-    var price = parseFloat(String(row[2]).replace(/[^0-9.,]/g, '').replace(',', '.'));
+    if (!row[1] || !row[3] || !row[12] || row[21]) continue; // Skip if no ID/Name/Price or already has link
+    var price = parseFloat(String(row[12]).replace(/[^0-9.,]/g, '').replace(',', '.'));
     if (!price) continue;
-    var link = createStripePaymentLink(row[1], Math.round(price * 100));
-    if (link) { prog.getRange(r + 1, 9).setValue(link); Utilities.sleep(300); created++; }
+    var link = createStripePaymentLink(row[3], Math.round(price * 100));
+    if (link) {
+      prog.getRange(r + 1, 22).setValue(link); // col V (1-based = 22)
+      Utilities.sleep(300);
+      created++;
+    }
   }
-  ui.alert('InneREvolution', 'Stripe links created: ' + created, ui.ButtonSet.OK);
+  safeAlert('InneREvolution', 'Stripe links created: ' + created);
 }
 
-// ─── 5. FORMAT SHEET ─────────────────────────────────────────────────────────
+// ─── 5. FORMAT SHEET (Bug #4 fix: correct tab names + column counts) ──────────
 function formatSheet() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var ui = SpreadsheetApp.getUi();
+  // Bug #4 FIX: Use actual emoji tab names and correct column counts
   var TABS = {
-    'Programs'      : { hdr: '#371964', alt: '#F2EDFF', nc: 14 },
-    'Sessions'      : { hdr: '#123062', alt: '#E9F0FF', nc:  7 },
-    'Discount Codes': { hdr: '#0A5A41', alt: '#E4F8EF', nc:  3 },
-    'Bookings'      : { hdr: '#5F1630', alt: '#FFEAF1', nc: 19 },
+    '🧘 Kursplanung': { hdr: '#371964', alt: '#F2EDFF', nc: 24, frozen: 3 },
+    '📅 Sessions':    { hdr: '#123062', alt: '#E9F0FF', nc: 11, frozen: 1 },
+    '🏷 Rabatte':     { hdr: '#0A5A41', alt: '#E4F8EF', nc:  6, frozen: 2 },
+    '📋 Buchungen':   { hdr: '#5F1630', alt: '#FFEAF1', nc: 20, frozen: 1 },
   };
   var COL_WIDTHS = {
-    'Programs'      : [105, 205, 85, 95, 95, 72, 112, 112, 265, 285, 155, 105, 135, 105],
-    'Sessions'      : [105, 82, 112, 92, 92, 265, 225],
-    'Discount Codes': [155, 115, 325],
-    'Bookings'      : [158, 152, 208, 122, 105, 188, 158, 132, 132, 122, 108, 118, 78, 138, 108, 215, 128, 155, 132],
+    '🧘 Kursplanung': [105, 140, 100, 205, 100, 72, 72, 112, 90, 130, 72, 90, 90, 85, 65, 90, 85, 90, 72, 40, 160, 265, 90, 240],
+    '📅 Sessions':    [140, 205, 60, 112, 92, 92, 130, 60, 80, 265, 225],
+    '🏷 Rabatte':     [155, 85, 325, 112, 65, 85],
+    '📋 Buchungen':   [112, 152, 208, 122, 140, 188, 130, 75, 75, 85, 85, 95, 78, 95, 75, 215, 105, 155, 105, 155],
   };
   for (var tabName in TABS) {
     var cfg   = TABS[tabName];
     var sheet = ss.getSheetByName(tabName);
     if (!sheet) continue;
     sheet.setTabColor(cfg.hdr);
-    sheet.setFrozenRows(1);
+    sheet.setFrozenRows(cfg.frozen);
     sheet.getBandings().forEach(function(b) { try { b.remove(); } catch(ex) {} });
     sheet.setConditionalFormatRules([]);
     var maxR = sheet.getMaxRows();
-    var bd = sheet.getRange(1, 1, maxR, cfg.nc).applyRowBanding();
+    var hdrRow = cfg.frozen;
+    var bd = sheet.getRange(hdrRow, 1, maxR - hdrRow + 1, cfg.nc).applyRowBanding();
     bd.setHeaderRowColor(cfg.hdr); bd.setFirstRowColor('#ffffff'); bd.setSecondRowColor(cfg.alt);
-    sheet.getRange(1, 1, 1, cfg.nc)
+    sheet.getRange(hdrRow, 1, 1, cfg.nc)
       .setBackground(cfg.hdr).setFontColor('#ffffff')
       .setFontWeight('bold').setFontFamily('Arial').setFontSize(10)
       .setHorizontalAlignment('center').setVerticalAlignment('middle');
-    sheet.setRowHeight(1, 44);
-    var dataRows = Math.min(maxR - 1, 200);
-    if (dataRows > 0) sheet.setRowHeights(2, dataRows, 26);
+    sheet.setRowHeight(hdrRow, 44);
+    var dataRows = Math.min(maxR - hdrRow, 200);
+    if (dataRows > 0) sheet.setRowHeights(hdrRow + 1, dataRows, 26);
     if (COL_WIDTHS[tabName]) {
       var widths = COL_WIDTHS[tabName];
       for (var ci = 0; ci < widths.length; ci++) sheet.setColumnWidth(ci + 1, widths[ci]);
     }
   }
-  var dash = ss.getSheetByName('Dashboard');
+  var dash = ss.getSheetByName('📊 Buchungs-Dashboard') || ss.getSheetByName('Dashboard');
   if (dash) dash.setTabColor('#161737');
   applyConditionalFormatting(ss);
   applyDataValidations(ss);
-  ui.alert('InneREvolution', 'All tabs formatted successfully!', ui.ButtonSet.OK);
+  safeAlert('InneREvolution', 'All tabs formatted successfully!');
 }
 
-// ─── 6. CONDITIONAL FORMATTING ───────────────────────────────────────────────
+// ─── 6. CONDITIONAL FORMATTING (Bug #5 fix: correct column positions) ─────────
 function applyConditionalFormatting(ss) {
-  var prog = ss.getSheetByName('Programs');
-  var book = ss.getSheetByName('Bookings');
+  var prog = ss.getSheetByName('🧘 Kursplanung') || ss.getSheetByName('Programs');
+  var book = ss.getSheetByName('📋 Buchungen')    || ss.getSheetByName('Bookings');
+  if (!prog || !book) return;
   function cfText(range, text, bg, fg) {
     return SpreadsheetApp.newConditionalFormatRule()
       .whenTextEqualTo(text).setBackground(bg).setFontColor(fg).setBold(true)
@@ -510,58 +600,78 @@ function applyConditionalFormatting(ss) {
     if (cond === 'bet') b = b.whenNumberBetween(n1, n2);
     return b.setBackground(bg).setFontColor(fg).setBold(true).setRanges([range]).build();
   }
-  var pMax = Math.max(prog.getMaxRows() - 1, 1);
+  // Kursplanung data starts row 4
+  var pMax = Math.max(prog.getMaxRows() - 3, 1);
   var bMax = Math.max(book.getMaxRows() - 1, 1);
   var progRules = [];
-  progRules.push(cfText(prog.getRange(2, 6, pMax, 1), 'YES', '#B7E1CD', '#0C552D'));
-  progRules.push(cfText(prog.getRange(2, 6, pMax, 1), 'NO',  '#DCDCDC', '#5A5A5A'));
-  progRules.push(cfNum(prog.getRange(2, 5, pMax, 1),  'eq',  0, 0, '#F2BBBB', '#8C1919'));
-  progRules.push(cfNum(prog.getRange(2, 5, pMax, 1),  'bet', 1, 3, '#FFDAB4', '#A05000'));
-  progRules.push(cfNum(prog.getRange(2, 5, pMax, 1),  'gt',  3, 0, '#B7E1CD', '#0C552D'));
-  progRules.push(cfText(prog.getRange(2, 14, pMax, 1), 'Online',    '#B9D7F5', '#0F4182'));
-  progRules.push(cfText(prog.getRange(2, 14, pMax, 1), 'In-Person', '#B7E1CD', '#0C552D'));
-  progRules.push(cfText(prog.getRange(2, 14, pMax, 1), 'In-person', '#B7E1CD', '#0C552D'));
-  progRules.push(cfText(prog.getRange(2, 14, pMax, 1), 'Hybrid',    '#FFF3B4', '#826400'));
+  // Bug #5 FIX: Website? is col O (15, 1-based), Freie Plätze is col W (23, 1-based)
+  // Website? Yes/No (col 15 = O)
+  progRules.push(cfText(prog.getRange(4, 15, pMax, 1), 'Yes',  '#B7E1CD', '#0C552D'));
+  progRules.push(cfText(prog.getRange(4, 15, pMax, 1), 'YES',  '#B7E1CD', '#0C552D'));
+  progRules.push(cfText(prog.getRange(4, 15, pMax, 1), 'No',   '#DCDCDC', '#5A5A5A'));
+  progRules.push(cfText(prog.getRange(4, 15, pMax, 1), 'NO',   '#DCDCDC', '#5A5A5A'));
+  // Freie Plätze (col 23 = W)
+  progRules.push(cfNum(prog.getRange(4, 23, pMax, 1),  'eq',  0, 0, '#F2BBBB', '#8C1919'));
+  progRules.push(cfNum(prog.getRange(4, 23, pMax, 1),  'bet', 1, 3, '#FFDAB4', '#A05000'));
+  progRules.push(cfNum(prog.getRange(4, 23, pMax, 1),  'gt',  3, 0, '#B7E1CD', '#0C552D'));
+  // Sprache col R (18, 1-based)
+  progRules.push(cfText(prog.getRange(4, 18, pMax, 1), 'English',            '#B9D7F5', '#0F4182'));
+  progRules.push(cfText(prog.getRange(4, 18, pMax, 1), 'Deutsch',            '#B7E1CD', '#0C552D'));
+  progRules.push(cfText(prog.getRange(4, 18, pMax, 1), 'English / Deutsch',  '#FFF3B4', '#826400'));
   prog.setConditionalFormatRules(progRules);
+  // Buchungen: data starts row 2
   var bookRules = [];
+  // Bezahlt col M (13)
   bookRules.push(cfText(book.getRange(2, 13, bMax, 1), 'YES', '#B7E1CD', '#0C552D'));
   bookRules.push(cfText(book.getRange(2, 13, bMax, 1), 'NO',  '#F2BBBB', '#8C1919'));
+  // Payment Sent col L (12)
   bookRules.push(cfText(book.getRange(2, 12, bMax, 1), 'YES', '#B7E1CD', '#0C552D'));
   bookRules.push(cfText(book.getRange(2, 12, bMax, 1), 'NO',  '#FFF3B4', '#826400'));
+  // Intake gesendet col N (14)
   bookRules.push(cfText(book.getRange(2, 14, bMax, 1), 'YES', '#B7E1CD', '#0C552D'));
   bookRules.push(cfText(book.getRange(2, 14, bMax, 1), 'NO',  '#FFF3B4', '#826400'));
+  // Freunde verifiziert col Q (17)
   bookRules.push(cfText(book.getRange(2, 17, bMax, 1), 'YES',     '#B7E1CD', '#0C552D'));
   bookRules.push(cfText(book.getRange(2, 17, bMax, 1), 'PARTIAL', '#FFDAB4', '#A05000'));
   bookRules.push(cfText(book.getRange(2, 17, bMax, 1), 'NO',      '#F2BBBB', '#8C1919'));
+  // Empfehler bestätigt col S (19)
   bookRules.push(cfText(book.getRange(2, 19, bMax, 1), 'YES', '#B7E1CD', '#0C552D'));
   bookRules.push(cfText(book.getRange(2, 19, bMax, 1), 'NO',  '#DCDCDC', '#5A5A5A'));
   book.setConditionalFormatRules(bookRules);
 }
 
-// ─── 7. DATA VALIDATIONS ─────────────────────────────────────────────────────
+// ─── 7. DATA VALIDATIONS (Bug #6 fix: correct tab names + positions) ──────────
 function applyDataValidations(ss) {
-  var prog = ss.getSheetByName('Programs');
-  var book = ss.getSheetByName('Bookings');
-  var n    = 998;
+  var prog = ss.getSheetByName('🧘 Kursplanung') || ss.getSheetByName('Programs');
+  var book = ss.getSheetByName('📋 Buchungen')    || ss.getSheetByName('Bookings');
+  if (!prog || !book) return;
+  var n = 997; // rows of validation
   function dv(vals, strict) {
     return SpreadsheetApp.newDataValidation().requireValueInList(vals, true).setAllowInvalid(!strict).build();
   }
-  prog.getRange(2, 6,  n, 1).setDataValidation(dv(['YES', 'NO'], true));
-  prog.getRange(2, 12, n, 1).setDataValidation(dv(['English', 'Deutsch', 'English / Deutsch'], false));
-  prog.getRange(2, 14, n, 1).setDataValidation(dv(['Online', 'In-Person', 'Hybrid'], false));
+  // Bug #6 FIX: Kursplanung data starts row 4
+  // Website? = col O (15)
+  prog.getRange(4, 15, n, 1).setDataValidation(dv(['Yes', 'No'], true));
+  // Sprache = col R (18)
+  prog.getRange(4, 18, n, 1).setDataValidation(dv(['English', 'Deutsch', 'English / Deutsch'], false));
+  // Buchungen: data starts row 2
+  // Payment Sent col L (12)
   book.getRange(2, 12, n, 1).setDataValidation(dv(['YES', 'NO'], false));
+  // Bezahlt col M (13)
   book.getRange(2, 13, n, 1).setDataValidation(dv(['YES', 'NO'], false));
+  // Intake gesendet col N (14)
   book.getRange(2, 14, n, 1).setDataValidation(dv(['YES', 'NO'], false));
+  // Freunde verifiziert col Q (17)
   book.getRange(2, 17, n, 1).setDataValidation(dv(['YES', 'PARTIAL', 'NO'], false));
+  // Empfehler bestätigt col S (19)
   book.getRange(2, 19, n, 1).setDataValidation(dv(['YES', 'NO'], false));
 }
 
-// ─── 8. DASHBOARD ────────────────────────────────────────────────────────────
+// ─── 8. DASHBOARD (Bug #7 fix: correct formula references with emoji tab names) ─
 function buildDashboard() {
   var ss   = SpreadsheetApp.getActiveSpreadsheet();
-  var dash = ss.getSheetByName('Dashboard');
-  var ui   = SpreadsheetApp.getUi();
-  if (!dash) { ui.alert('Dashboard tab not found.'); return; }
+  var dash = ss.getSheetByName('📊 Buchungs-Dashboard') || ss.getSheetByName('Dashboard');
+  if (!dash) { safeAlert('InneREvolution', 'Dashboard tab not found.'); return; }
   dash.clearContents(); dash.clearFormats();
   dash.setTabColor('#161737'); dash.setFrozenRows(0);
   dash.setColumnWidth(1, 18);
@@ -593,12 +703,15 @@ function buildDashboard() {
   cell(1, 2, 'INNEREVOLUTION  —  BOOKINGS DASHBOARD', '#161737', '#ffffff', 18, true, 'center', 11);
   dash.setRowHeight(2, 10);
   dash.setRowHeight(3, 34); dash.setRowHeight(4, 54); dash.setRowHeight(5, 10);
+  // Bug #7 FIX: Use single-quoted emoji tab names in formulas
+  // Buchungen: B=Name, K=Final EUR, M=Bezahlt, E=Instance ID, O=Freunde Anz, Q=Freunde verif, R=Empfehlung, S=Empfehler best, N=Intake
+  // Kursplanung: B=Instance ID, O=Website?, W=Freie Plätze
   var kpis = [
-    { c: 2,  label: 'TOTAL BOOKINGS',    formula: '=COUNTA(Bookings!B2:B)',                                             color: '#371964' },
-    { c: 4,  label: 'CONFIRMED PAID',    formula: '=COUNTIF(Bookings!M2:M;"YES")',                                      color: '#0A5A41' },
-    { c: 6,  label: 'AWAITING PAYMENT',  formula: '=COUNTIF(Bookings!M2:M;"NO")',                                       color: '#5F1630' },
-    { c: 8,  label: 'ACTIVE PROGRAMS',   formula: '=COUNTIF(Programs!F2:F;"YES")',                                      color: '#123062' },
-    { c: 10, label: 'REVENUE COLLECTED', formula: '=TEXT(SUMIF(Bookings!M2:M;"YES";Bookings!K2:K);"EUR #.##0,00")',     color: '#5C3A00' },
+    { c: 2,  label: 'TOTAL BOOKINGS',    formula: "=COUNTA('📋 Buchungen'!B2:B)",                                                color: '#371964' },
+    { c: 4,  label: 'CONFIRMED PAID',    formula: "=COUNTIF('📋 Buchungen'!M2:M;\"YES\")",                                       color: '#0A5A41' },
+    { c: 6,  label: 'AWAITING PAYMENT',  formula: "=COUNTIF('📋 Buchungen'!M2:M;\"NO\")",                                        color: '#5F1630' },
+    { c: 8,  label: 'ACTIVE PROGRAMS',   formula: "=COUNTIF('🧘 Kursplanung'!O4:O;\"Yes\")",                                     color: '#123062' },
+    { c: 10, label: 'REVENUE COLLECTED', formula: "=TEXT(SUMIF('📋 Buchungen'!M2:M;\"YES\";'📋 Buchungen'!K2:K);\"EUR #.##0,00\")", color: '#5C3A00' },
   ];
   kpis.forEach(function(k) {
     cell(3, k.c, k.label,   k.color, '#ffffff',  8, true, 'center', 2);
@@ -609,22 +722,24 @@ function buildDashboard() {
   dash.setRowHeight(7, 38);
   cell(7, 2, 'PROGRAMS', '#371964', '#ffffff', 12, true, 'center', 11);
   dash.setRowHeight(8, 30);
-  var phCols = ['Program Name', 'Spots Total', 'Spots Left', 'Bookings', 'Revenue', 'Active', 'Format', 'Language', 'Start Date'];
+  var phCols = ['Instance ID', 'Program Name', 'Spots Left', 'Bookings', 'Revenue', 'Website', 'Sprache', 'Datum', 'Ort'];
   phCols.forEach(function(h, i) { cell(8, 2 + i, h, '#5C3D99', '#ffffff', 9, true, 'center', 1); });
   for (var pi = 0; pi < 12; pi++) {
     var pr = 9 + pi; dash.setRowHeight(pr, 25);
-    var sr = pi + 2;
+    var sr = pi + 4; // Data starts row 4
     var bg = pi % 2 === 0 ? '#F2EDFF' : '#ffffff';
+    // Bug #7 FIX: Correct column references for Kursplanung
+    // B=Instance ID, D=Kursname, W=Freie Plätze, O=Website?, R=Sprache, H=Datum, J=Ort
     var pf = [
-      '=IF(Programs!A'+sr+'<>"",Programs!B'+sr+',"")',
-      '=IF(Programs!A'+sr+'<>"",Programs!D'+sr+',"")',
-      '=IF(Programs!A'+sr+'<>"",Programs!E'+sr+',"")',
-      '=IF(Programs!A'+sr+'<>"",COUNTIF(Bookings!E:E;Programs!A'+sr+'),"")',
-      '=IF(Programs!A'+sr+'<>"",TEXT(SUMIF(Bookings!E:E;Programs!A'+sr+';Bookings!K:K);"EUR #.##0,00"),"")',
-      '=IF(Programs!A'+sr+'<>"",Programs!F'+sr+',"")',
-      '=IF(Programs!A'+sr+'<>"",Programs!N'+sr+',"")',
-      '=IF(Programs!A'+sr+'<>"",Programs!L'+sr+',"")',
-      '=IF(Programs!A'+sr+'<>"",TEXT(Programs!G'+sr+',"dd mmm yyyy"),"")',
+      "=IF('🧘 Kursplanung'!B"+sr+"<>\"\",'🧘 Kursplanung'!B"+sr+",\"\")",
+      "=IF('🧘 Kursplanung'!B"+sr+"<>\"\",'🧘 Kursplanung'!D"+sr+",\"\")",
+      "=IF('🧘 Kursplanung'!B"+sr+"<>\"\",'🧘 Kursplanung'!W"+sr+",\"\")",
+      "=IF('🧘 Kursplanung'!B"+sr+"<>\"\",COUNTIF('📋 Buchungen'!E:E;'🧘 Kursplanung'!B"+sr+"),\"\")",
+      "=IF('🧘 Kursplanung'!B"+sr+"<>\"\",TEXT(SUMIF('📋 Buchungen'!E:E;'🧘 Kursplanung'!B"+sr+";'📋 Buchungen'!K:K);\"EUR #.##0,00\"),\"\")",
+      "=IF('🧘 Kursplanung'!B"+sr+"<>\"\",'🧘 Kursplanung'!O"+sr+",\"\")",
+      "=IF('🧘 Kursplanung'!B"+sr+"<>\"\",'🧘 Kursplanung'!R"+sr+",\"\")",
+      "=IF('🧘 Kursplanung'!B"+sr+"<>\"\",TEXT('🧘 Kursplanung'!H"+sr+",\"dd mmm yyyy\"),\"\")",
+      "=IF('🧘 Kursplanung'!B"+sr+"<>\"\",'🧘 Kursplanung'!J"+sr+",\"\")",
     ];
     pf.forEach(function(f, fi) {
       dash.getRange(pr, 2+fi).setFormula(f).setBackground(bg).setHorizontalAlignment('center').setFontSize(9);
@@ -639,21 +754,22 @@ function buildDashboard() {
   cell(23, 6, 'Count',  '#1A3D7A', '#ffffff', 9, true, 'center', 1);
   cell(23, 8, 'Item',   '#8B2040', '#ffffff', 9, true, 'center', 3);
   cell(23, 11,'Count',  '#8B2040', '#ffffff', 9, true, 'center', 1);
+  // Bug #7 FIX: Correct column letters for Buchungen
   var refs = [
-    ['Bookings with friends invited',  '=COUNTIF(Bookings!O2:O;">0")'],
-    ['Total friend spots promised',    '=SUMIF(Bookings!O2:O;">0";Bookings!O2:O)'],
-    ['Friends verified as joined',     '=COUNTIF(Bookings!Q2:Q;"YES")'],
-    ['Friends partially verified',     '=COUNTIF(Bookings!Q2:Q;"PARTIAL")'],
-    ['Bookings listing a referrer',    '=COUNTIFS(Bookings!R2:R;"<>")'],
-    ['Referrers confirmed in system',  '=COUNTIF(Bookings!S2:S;"YES")'],
+    ['Bookings with friends invited',  "=COUNTIF('📋 Buchungen'!O2:O;\">0\")"],
+    ['Total friend spots promised',    "=SUMIF('📋 Buchungen'!O2:O;\">0\";'📋 Buchungen'!O2:O)"],
+    ['Friends verified as joined',     "=COUNTIF('📋 Buchungen'!Q2:Q;\"YES\")"],
+    ['Friends partially verified',     "=COUNTIF('📋 Buchungen'!Q2:Q;\"PARTIAL\")"],
+    ['Bookings listing a referrer',    "=COUNTIFS('📋 Buchungen'!R2:R;\"<>\")"],
+    ['Referrers confirmed in system',  "=COUNTIF('📋 Buchungen'!S2:S;\"YES\")"],
   ];
   var actions = [
-    ['Unpaid bookings',                 '=COUNTIF(Bookings!M2:M;"NO")'],
-    ['Intake forms not yet sent',       '=COUNTIF(Bookings!N2:N;"NO")'],
-    ['Programs fully booked (0 spots)', '=COUNTIF(Programs!E2:E;0)'],
-    ['Programs with 1-3 spots left',    '=COUNTIFS(Programs!E2:E;"<=3";Programs!E2:E;">0")'],
-    ['Friend referrals unverified',     '=COUNTIF(Bookings!Q2:Q;"NO")'],
-    ['Referrers unconfirmed',           '=COUNTIF(Bookings!S2:S;"NO")'],
+    ['Unpaid bookings',                 "=COUNTIF('📋 Buchungen'!M2:M;\"NO\")"],
+    ['Intake forms not yet sent',       "=COUNTIF('📋 Buchungen'!N2:N;\"NO\")"],
+    ['Programs fully booked (0 spots)', "=COUNTIF('🧘 Kursplanung'!W4:W;0)"],
+    ['Programs with 1-3 spots left',    "=COUNTIFS('🧘 Kursplanung'!W4:W;\"<=3\";'🧘 Kursplanung'!W4:W;\">0\")"],
+    ['Friend referrals unverified',     "=COUNTIF('📋 Buchungen'!Q2:Q;\"NO\")"],
+    ['Referrers unconfirmed',           "=COUNTIF('📋 Buchungen'!S2:S;\"NO\")"],
   ];
   for (var ri = 0; ri < 6; ri++) {
     var tr = 24 + ri; dash.setRowHeight(tr, 25);
@@ -667,21 +783,19 @@ function buildDashboard() {
   dash.setRowHeight(31, 10); cell(31, 2, null, '#161737', null, null, null, null, 11);
   dash.setRowHeight(32, 24);
   cell(32, 2, 'Last rebuilt: ' + new Date().toLocaleString(), null, '#aaaaaa', 9, false, 'left', 6);
-  cell(32, 9, 'InneREvolution Booking System', null, '#aaaaaa', 9, false, 'right', 3);
-  ui.alert('InneREvolution', 'Dashboard rebuilt!', ui.ButtonSet.OK);
+  cell(32, 9, 'InneREvolution Booking System v4', null, '#aaaaaa', 9, false, 'right', 3);
+  safeAlert('InneREvolution', 'Dashboard rebuilt!');
 }
 
-// ─── 9. FRIEND REFERRAL CHECK ────────────────────────────────────────────────
-/**
- * Checks Friends Invited (col P) and Referrer Name (col R) against all booked
- * names in col B. Updates Q (Friends Verified) and S (Referrer Verified) automatically.
- * Runs daily at 09:00 via setupTriggers() — no manual action needed.
- */
+// ─── 9. FRIEND REFERRAL CHECK (Bug #8 fix: verified indices + safeAlert) ──────
 function checkFriendReferrals() {
-  var ss   = SpreadsheetApp.getActiveSpreadsheet();
-  var book = ss.getSheetByName('Bookings');
+  var cfg  = getConfig();
+  var ss   = SpreadsheetApp.openById(cfg.SHEET_ID);
+  var book = ss.getSheetByName('📋 Buchungen') || ss.getSheetByName('Bookings');
   var data = book.getDataRange().getValues();
-  var ui   = SpreadsheetApp.getUi();
+  // Bug #8 FIX: verified column indices match Buchungen layout
+  // [1]=Name, [14]=Freunde Anz, [15]=Freunde Namen, [16]=Freunde verifiziert
+  // [17]=Empfehlung von, [18]=Empfehler bestätigt. Data starts at index 1.
   var booked = {};
   for (var r = 1; r < data.length; r++) {
     if (data[r][1]) booked[String(data[r][1]).toLowerCase().trim()] = true;
@@ -696,37 +810,41 @@ function checkFriendReferrals() {
       var names   = friendNames.split(/[,;]+/).map(function(n) { return n.toLowerCase().trim(); }).filter(Boolean);
       var matched = names.filter(function(n) { return booked[n]; }).length;
       var newQ    = matched === names.length ? 'YES' : matched > 0 ? 'PARTIAL' : 'NO';
-      if (String(row[16]) !== newQ) { book.getRange(i + 1, 17).setValue(newQ); updates++; }
+      if (String(row[16]) !== newQ) { book.getRange(i + 1, 17).setValue(newQ); updates++; } // col Q (17)
     }
     var referrer = String(row[17] || '').toLowerCase().trim();
     if (referrer) {
       var newS = booked[referrer] ? 'YES' : 'NO';
-      if (String(row[18]) !== newS) { book.getRange(i + 1, 19).setValue(newS); updates++; }
+      if (String(row[18]) !== newS) { book.getRange(i + 1, 19).setValue(newS); updates++; } // col S (19)
     }
   }
   Logger.log('[REFERRALS] ' + updates + ' updates applied');
-  ui.alert('InneREvolution', 'Referral check complete.\n' + updates + ' cell(s) updated.', ui.ButtonSet.OK);
+  safeAlert('InneREvolution', 'Referral check complete.\n' + updates + ' cell(s) updated.');
 }
 
-// ─── 10. PAYMENT REMINDERS ───────────────────────────────────────────────────
+// ─── 10. PAYMENT REMINDERS (Bug #9 fix: correct column mapping + safeAlert) ───
 function sendPaymentReminders() {
   var cfg  = getConfig();
   var ss   = SpreadsheetApp.openById(cfg.SHEET_ID);
-  var book = ss.getSheetByName('Bookings');
-  var prog = ss.getSheetByName('Programs');
-  var ui   = SpreadsheetApp.getUi();
+  var book = ss.getSheetByName('📋 Buchungen')   || ss.getSheetByName('Bookings');
+  var prog = ss.getSheetByName('🧘 Kursplanung') || ss.getSheetByName('Programs');
+  // Bug #9 FIX: Build stripe link map from Kursplanung
+  // Instance ID = col B ([1]), Stripe Link = col V ([21]). Data starts at index 3 (row 4).
   var stripeLinks = {};
-  prog.getDataRange().getValues().forEach(function(r, i) {
-    if (i > 0 && r[0]) stripeLinks[String(r[0]).trim()] = r[8] || '';
-  });
+  var progData = prog.getDataRange().getValues();
+  for (var p = 3; p < progData.length; p++) {
+    var pid = String(progData[p][1] || '').trim(); // [1] = Instance ID
+    if (pid) stripeLinks[pid] = progData[p][21] || ''; // [21] = Stripe Link
+  }
   var cutoff = new Date(); cutoff.setDate(cutoff.getDate() - 2);
   var rows = book.getDataRange().getValues();
   var sent = 0;
+  // Buchungen: [0]=Datum, [1]=Name, [2]=Email, [4]=Instance ID, [5]=Kursname, [10]=Final EUR, [12]=Bezahlt
   for (var r = 1; r < rows.length; r++) {
     var row = rows[r];
-    if (!row[1] || String(row[12]).toUpperCase() !== 'NO') continue;
-    if (!row[0] || new Date(row[0]) >= cutoff) continue;
-    var name = row[1], email = row[2], pid = String(row[4]);
+    if (!row[1] || String(row[12]).toUpperCase() !== 'NO') continue; // Skip if paid
+    if (!row[0] || new Date(row[0]) >= cutoff) continue; // Skip recent bookings
+    var name = row[1], email = row[2], pid = String(row[4]).trim();
     var progName = row[5], price = parseFloat(row[10]) || 0;
     var link = stripeLinks[pid] || '';
     if (link && email) link += (link.indexOf('?') >= 0 ? '&' : '?') + 'prefilled_email=' + encodeURIComponent(email);
@@ -744,20 +862,20 @@ function sendPaymentReminders() {
       sent++; Logger.log('[REMINDER] -> ' + email);
     } catch(e) { Logger.log('[REMINDER ERROR] ' + email + ': ' + e.message); }
   }
-  ui.alert('InneREvolution', 'Payment reminders sent: ' + sent, ui.ButtonSet.OK);
+  safeAlert('InneREvolution', 'Payment reminders sent: ' + sent);
 }
 
-// ─── 11. DAILY REPORT ────────────────────────────────────────────────────────
+// ─── 11. DAILY REPORT (Bug #10 fix: correct sheet/column references + safeAlert) ─
 function sendDailyReport() {
   var cfg = getConfig();
-  var ui  = SpreadsheetApp.getUi();
-  if (!cfg.INSTRUCTOR_EMAIL) { ui.alert('Set INSTRUCTOR_EMAIL in Script Properties first.'); return; }
+  if (!cfg.INSTRUCTOR_EMAIL) { safeAlert('InneREvolution', 'Set INSTRUCTOR_EMAIL in Script Properties first.'); return; }
   var ss   = SpreadsheetApp.openById(cfg.SHEET_ID);
-  var book = ss.getSheetByName('Bookings');
-  var prog = ss.getSheetByName('Programs');
+  var book = ss.getSheetByName('📋 Buchungen')   || ss.getSheetByName('Bookings');
+  var prog = ss.getSheetByName('🧘 Kursplanung') || ss.getSheetByName('Programs');
   var today = new Date(); today.setHours(0, 0, 0, 0);
   var rows  = book.getDataRange().getValues();
   var newToday = [], unpaid = [], totalRev = 0, paidCount = 0;
+  // Buchungen: [0]=Datum, [1]=Name, [2]=Email, [5]=Kursname, [10]=Final EUR, [12]=Bezahlt
   for (var r = 1; r < rows.length; r++) {
     var row = rows[r];
     if (!row[1]) continue;
@@ -766,8 +884,12 @@ function sendDailyReport() {
     if (paid === 'NO')  unpaid.push(row);
     if (paid === 'YES') { paidCount++; totalRev += parseFloat(row[10]) || 0; }
   }
-  var activeProgs = prog.getDataRange().getValues()
-    .filter(function(r, i) { return i > 0 && String(r[5]).toUpperCase() === 'YES'; }).length;
+  // Kursplanung: [14]=Website? (col O). Data starts at index 3.
+  var progRows = prog.getDataRange().getValues();
+  var activeProgs = 0;
+  for (var pi = 3; pi < progRows.length; pi++) {
+    if (String(progRows[pi][14]).toUpperCase() === 'YES') activeProgs++;
+  }
   function trRow(cells, bg) {
     return '<tr style="background:' + bg + '">' + cells.map(function(c) { return '<td style="padding:6px 10px;border-bottom:1px solid #eee">' + c + '</td>'; }).join('') + '</tr>';
   }
@@ -796,13 +918,13 @@ function sendDailyReport() {
       + unpaid.slice(0,15).map(function(r, i) { return trRow([r[1], r[2], r[5], (parseFloat(r[10])||0).toFixed(2)], i%2===0?'#FFEAF1':'#fff'); }).join('')
       + '</table>';
   }
-  html += '<p style="margin-top:32px;color:#aaa;font-size:11px;text-align:center">InneREvolution Yoga — Automated Daily Report</p></div></div>';
+  html += '<p style="margin-top:32px;color:#aaa;font-size:11px;text-align:center">InneREvolution Yoga — Automated Daily Report v4</p></div></div>';
   GmailApp.sendEmail(cfg.INSTRUCTOR_EMAIL,
     'InneREvolution Daily Report — ' + today.toDateString(),
     paidCount + ' paid | EUR ' + totalRev.toFixed(2) + ' revenue | ' + unpaid.length + ' unpaid',
     { htmlBody: html });
   Logger.log('[REPORT] Sent to ' + cfg.INSTRUCTOR_EMAIL);
-  ui.alert('InneREvolution', 'Daily report sent to ' + cfg.INSTRUCTOR_EMAIL, ui.ButtonSet.OK);
+  safeAlert('InneREvolution', 'Daily report sent to ' + cfg.INSTRUCTOR_EMAIL);
 }
 
 // ─── 12. TRIGGER SETUP ───────────────────────────────────────────────────────
@@ -813,23 +935,25 @@ function setupTriggers() {
   ScriptApp.newTrigger('sendPaymentReminders'  ).timeBased().atHour(10).everyDays(1).create();
   ScriptApp.newTrigger('syncSessionsToCalendar').timeBased().atHour(0 ).everyDays(1).create();
   Logger.log('[TRIGGERS] 4 triggers installed');
-  SpreadsheetApp.getUi().alert('InneREvolution',
+  safeAlert('InneREvolution',
     'Automation triggers installed:\n\n'
     + '  08:00  Daily instructor report\n'
     + '  09:00  Friend referral check (auto-updates col Q + S)\n'
     + '  10:00  Payment reminders\n'
     + '  00:00  Calendar sync\n\n'
-    + 'All run daily automatically.',
-    SpreadsheetApp.getUi().ButtonSet.OK);
+    + 'All run daily automatically.');
 }
 
 // ─── 13. AUTHORIZE & TEST ─────────────────────────────────────────────────────
 function authorizeAndTest() {
   var cfg = getConfig();
-  var ui  = SpreadsheetApp.getUi();
   var ok = [], errors = [];
-  try { var n = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Bookings').getLastRow(); ok.push('[OK] Sheets: ' + n + ' rows in Bookings'); }
-  catch(e) { errors.push('[FAIL] Sheets: ' + e.message); }
+  try {
+    var ss = SpreadsheetApp.openById(cfg.SHEET_ID);
+    var bookSheet = ss.getSheetByName('📋 Buchungen') || ss.getSheetByName('Bookings');
+    var n = bookSheet ? bookSheet.getLastRow() : 0;
+    ok.push('[OK] Sheets: ' + n + ' rows in Buchungen');
+  } catch(e) { errors.push('[FAIL] Sheets: ' + e.message); }
   try { GmailApp.getInboxUnreadCount(); ok.push('[OK] Gmail: authorized'); }
   catch(e) { errors.push('[FAIL] Gmail: ' + e.message); }
   if (cfg.CALENDAR_ID) {
@@ -837,37 +961,47 @@ function authorizeAndTest() {
     catch(e) { errors.push('[FAIL] Calendar: ' + e.message); }
   } else { ok.push('[--] Calendar: CALENDAR_ID not set (optional)'); }
   ok.push(cfg.STRIPE_KEY ? '[OK] Stripe key: set' : '[--] Stripe key: not set — add STRIPE_KEY to Script Properties');
-  ui.alert('Authorization Test', ok.join('\n') + (errors.length ? '\n\n' + errors.join('\n') : ''), ui.ButtonSet.OK);
+  ok.push(cfg.STRIPE_WEBHOOK_SECRET ? '[OK] Webhook secret: set' : '[--] Webhook secret: not set');
+  safeAlert('Authorization Test', ok.join('\n') + (errors.length ? '\n\n' + errors.join('\n') : ''));
 }
 
-// ─── 14. CALENDAR SYNC ───────────────────────────────────────────────────────
+// ─── 14. CALENDAR SYNC (Bug #11 fix: correct column mapping + safeAlert) ─────
 function syncSessionsToCalendar() {
   var cfg = getConfig();
-  var ui  = SpreadsheetApp.getUi();
-  if (!cfg.CALENDAR_ID) { ui.alert('InneREvolution', 'CALENDAR_ID not set in Script Properties.', ui.ButtonSet.OK); return; }
+  if (!cfg.CALENDAR_ID) { safeAlert('InneREvolution', 'CALENDAR_ID not set in Script Properties.'); return; }
   var ss      = SpreadsheetApp.openById(cfg.SHEET_ID);
-  var sesSh   = ss.getSheetByName('Sessions');
-  var progSh  = ss.getSheetByName('Programs');
+  var sesSh   = ss.getSheetByName('📅 Sessions')    || ss.getSheetByName('Sessions');
+  var progSh  = ss.getSheetByName('🧘 Kursplanung') || ss.getSheetByName('Programs');
   var sesData = sesSh.getDataRange().getValues();
   var cal     = CalendarApp.getCalendarById(cfg.CALENDAR_ID);
-  if (!cal) { ui.alert('Calendar not found — check CALENDAR_ID.'); return; }
+  if (!cal) { safeAlert('InneREvolution', 'Calendar not found — check CALENDAR_ID.'); return; }
+  // Build prog name map from Kursplanung: [1]=Instance ID, [3]=Kursname. Data starts index 3.
   var progMap = {};
-  progSh.getDataRange().getValues().forEach(function(r, i) {
-    if (i > 0 && r[0]) progMap[String(r[0]).trim()] = r[1] || r[0];
-  });
+  var progData = progSh.getDataRange().getValues();
+  for (var p = 3; p < progData.length; p++) {
+    var pid = String(progData[p][1] || '').trim();
+    if (pid) progMap[pid] = progData[p][3] || pid; // Kursname or fallback to ID
+  }
   var created = 0, updated = 0, skipped = 0;
+  // Bug #11 FIX: Sessions column mapping
+  // [0]=Instance ID, [1]=Kursname, [2]=Session#, [3]=Datum, [4]=Start time, [5]=End time
+  // [9]=Notizen, [10]=CalEventID. Data starts at index 1 (row 2).
   for (var r = 1; r < sesData.length; r++) {
     var row = sesData[r];
-    var pid = String(row[0] || '').trim();
-    var sesNum = row[1], dateRaw = row[2], tStart = row[3], tEnd = row[4];
-    var notes = row[5] || '', evId = String(row[6] || '').trim();
-    if (!pid || !dateRaw) { skipped++; continue; }
+    var instanceId = String(row[0] || '').trim();
+    var sesNum  = row[2];           // [2] Session#
+    var dateRaw = row[3];           // [3] Datum
+    var tStart  = row[4];           // [4] Start time
+    var tEnd    = row[5];           // [5] End time
+    var notes   = row[9] || '';     // [9] Notizen
+    var evId    = String(row[10] || '').trim(); // [10] CalEventID
+    if (!instanceId || !dateRaw) { skipped++; continue; }
     var sessionDate = parseSheetDate(dateRaw);
     if (!sessionDate) { skipped++; continue; }
     var startDt = buildDateTime(sessionDate, tStart);
     var endDt   = buildDateTime(sessionDate, tEnd || tStart);
     if (!startDt) { skipped++; continue; }
-    var progName = progMap[pid] || pid;
+    var progName = progMap[instanceId] || row[1] || instanceId;
     var title    = progName + (sesNum ? ' — Session ' + sesNum : '');
     var desc     = notes || (progName + ' / Session ' + sesNum);
     try {
@@ -878,18 +1012,17 @@ function syncSessionsToCalendar() {
           else throw new Error('not found');
         } catch(ex) {
           var ne = cal.createEvent(title, startDt, endDt, { description: desc });
-          sesSh.getRange(r + 1, 7).setValue(ne.getId()); created++;
+          sesSh.getRange(r + 1, 11).setValue(ne.getId()); created++; // col K (11, 1-based)
         }
       } else {
         var ne2 = cal.createEvent(title, startDt, endDt, { description: desc });
-        sesSh.getRange(r + 1, 7).setValue(ne2.getId()); created++;
+        sesSh.getRange(r + 1, 11).setValue(ne2.getId()); created++; // col K (11, 1-based)
       }
     } catch(e) { Logger.log('[CALENDAR ERROR] row ' + (r+1) + ': ' + e.message); skipped++; }
   }
   Logger.log('[CALENDAR] created=' + created + ' updated=' + updated + ' skipped=' + skipped);
-  ui.alert('InneREvolution',
-    'Calendar sync complete:\nCreated: ' + created + '\nUpdated: ' + updated + '\nSkipped: ' + skipped,
-    ui.ButtonSet.OK);
+  safeAlert('InneREvolution',
+    'Calendar sync complete:\nCreated: ' + created + '\nUpdated: ' + updated + '\nSkipped: ' + skipped);
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -908,6 +1041,8 @@ function buildDateTime(base, timeVal) {
   var mins;
   if (typeof timeVal === 'number') {
     mins = Math.round(timeVal * 24 * 60);
+  } else if (timeVal instanceof Date) {
+    mins = timeVal.getHours() * 60 + timeVal.getMinutes();
   } else if (typeof timeVal === 'string' && timeVal.indexOf(':') >= 0) {
     var p = timeVal.split(':');
     mins = parseInt(p[0]) * 60 + parseInt(p[1] || 0);

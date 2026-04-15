@@ -674,7 +674,13 @@ document.addEventListener('DOMContentLoaded', async () => {
           timeEnd:    serialToTime(r[5] || ''),
           notes:      '',
         }));
-        discountCodes = [];
+        // Load discount codes from cache if available
+        const codeRows = cache.discountCodes || [];
+        discountCodes = codeRows.map(r => ({
+          code:        (r[0] || '').toUpperCase().trim(),
+          pct:         parseFloat(r[1]) || 0,
+          description: r[2] || '',
+        }));
       } catch (cacheErr) {
         console.warn('Could not load sheet-cache.json:', cacheErr);
         programs = [];

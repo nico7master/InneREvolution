@@ -85,6 +85,7 @@
           "status": {
             "type": "string",
             "enum": [
+              "confirmed",
               "scheduled",
               "draft",
               "cancelled"

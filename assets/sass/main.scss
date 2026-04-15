@@ -857,7 +857,7 @@ button,
 /* Header */
 #header {
   position: relative;
-  background: url("../../images/wallpaper-1981.jpeg") no-repeat center center
+  background: url("../../images/backgrounds/wallpaper-1981.jpeg") no-repeat center center
     fixed;
   background-size: cover;
   background-color: #2d3485; /* Fallback color */
@@ -1041,7 +1041,7 @@ body.homepage {
 }
 
 .dropotron {
-  background: url("../../images/homeCardBg1.png");
+  background: url("../../images/backgrounds/homeCardBg1.png");
   background-position: center top;
   background-size: cover;
   background-repeat: no-repeat;
@@ -1114,7 +1114,7 @@ body.homepage {
 
   align-items: center;
   text-align: center;
-  background: url("../../images/homeCardBg1.png");
+  background: url("../../images/backgrounds/homeCardBg1.png");
   background-size: 100% auto;
   background-color: #5b5336;
   padding: $spacing-xxxl 0 $spacing-xxxl 0;
@@ -1445,7 +1445,7 @@ body.homepage {
 }
 
 .hatha-yoga-wrapper {
-  background: url("../../images/home-outreach-texture.jpg") no-repeat center center
+  background: url("../../images/backgrounds/home-outreach-texture.jpg") no-repeat center center
     fixed;
   background-size: cover; /* Show entire image, adjust to cover if needed */
   background-color: #5b5336; /* Fallback color */
@@ -1463,7 +1463,7 @@ body.homepage {
 
 /* Bio Wrapper */
 .bio-wrapper {
-  background: url("../../images/wallpaper-411editedLarge.jpeg") no-repeat center
+  background: url("../../images/backgrounds/wallpaper-411editedLarge.jpeg") no-repeat center
     center fixed;
   background-size: cover; /* Show entire image, adjust to cover if needed */
   background-color: #5b5336; /* Fallback color */
@@ -1747,7 +1747,7 @@ body.homepage {
 
 /* sadhguru Wrapper */
 .sadhguru-wrapper {
-  background: url("../../images/SadhguruPage1.jpg") no-repeat center center
+  background: url("../../images/programs/SadhguruPage1.jpg") no-repeat center center
     fixed;
   background-size: cover; /* Show entire image, adjust to cover if needed */
   background-color: #5b5336; /* Fallback color */
@@ -1952,7 +1952,7 @@ body.homepage {
 
 /* Readings Wrapper */
 .readings-wrapper {
-  background: url("../../images/lingabhairavi_chi.png") no-repeat center center
+  background: url("../../images/programs/lingabhairavi_chi.png") no-repeat center center
     fixed;
   background-size: cover;
   background-color: #5b5336; /* Fallback color */
@@ -2294,7 +2294,7 @@ body.homepage {
   width: 100% !important;
   left: 0 !important;
   transform: none !important;
-  background: url("../../images/homeCardBg1.png") repeat #5b5336 !important;
+  background: url("../../images/backgrounds/homeCardBg1.png") repeat #5b5336 !important;
   background-size: 100% auto !important;
   transition: all 0.3s ease;
   margin-bottom: 0;
@@ -2654,7 +2654,7 @@ body.homepage {
 }
 
 #program-calendar {
-  background: url("../../images/homeCardBg1.png") repeat !important;
+  background: url("../../images/backgrounds/homeCardBg1.png") repeat !important;
   background-size: 100% auto !important;
   background-color: #5b5336 !important;
   padding: $spacing-xxl 0;
@@ -2879,8 +2879,6 @@ body.homepage {
       top: 0;
       width: 100%;
       height: 100%;
-      background: url("../../images/overlay.png");
-      background-size: 128px 128px;
     }
 
     .link {
@@ -11157,7 +11155,7 @@ header .icon.circled {
 /* Header */
 #header {
   position: relative;
-  background: url("../../images/wallpaper-1981.jpeg") no-repeat center center fixed;
+  background: url("../../images/backgrounds/wallpaper-1981.jpeg") no-repeat center center fixed;
   background-size: cover;
   background-color: #2d3485; /* Fallback color */
   color: #fff;
@@ -11325,7 +11323,7 @@ body.homepage.is-preload #header:after {
 }
 
 .dropotron {
-  background: url("../../images/homeCardBg1.png");
+  background: url("../../images/backgrounds/homeCardBg1.png");
   background-position: center top;
   background-size: cover;
   background-repeat: no-repeat;
@@ -11388,7 +11386,7 @@ body.homepage.is-preload #header:after {
 #banner {
   align-items: center;
   text-align: center;
-  background: url("../../images/homeCardBg1.png");
+  background: url("../../images/backgrounds/homeCardBg1.png");
   background-size: 100% auto;
   background-color: #5b5336;
   padding: 5em 0 5em 0;
@@ -11662,7 +11660,7 @@ body.homepage.is-preload #header:after {
 }
 
 .hatha-yoga-wrapper {
-  background: url("../../images/home-outreach-texture.jpg") no-repeat center center fixed;
+  background: url("../../images/backgrounds/home-outreach-texture.jpg") no-repeat center center fixed;
   background-size: cover; /* Show entire image, adjust to cover if needed */
   background-color: #5b5336; /* Fallback color */
   padding: 6em 0;
@@ -11678,7 +11676,7 @@ body.homepage.is-preload #header:after {
 
 /* Bio Wrapper */
 .bio-wrapper {
-  background: url("../../images/wallpaper-411editedLarge.jpeg") no-repeat center center fixed;
+  background: url("../../images/backgrounds/wallpaper-411editedLarge.jpeg") no-repeat center center fixed;
   background-size: cover; /* Show entire image, adjust to cover if needed */
   background-color: #5b5336; /* Fallback color */
   padding: 6em 0;
@@ -11922,7 +11920,7 @@ body.homepage.is-preload #header:after {
 
 /* sadhguru Wrapper */
 .sadhguru-wrapper {
-  background: url("../../images/SadhguruPage1.jpg") no-repeat center center fixed;
+  background: url("../../images/programs/SadhguruPage1.jpg") no-repeat center center fixed;
   background-size: cover; /* Show entire image, adjust to cover if needed */
   background-color: #5b5336; /* Fallback color */
   padding: 6em 0;
@@ -12106,7 +12104,7 @@ body.homepage.is-preload #header:after {
 }
 /* Readings Wrapper */
 .readings-wrapper {
-  background: url("../../images/lingabhairavi_chi.png") no-repeat center center fixed;
+  background: url("../../images/programs/lingabhairavi_chi.png") no-repeat center center fixed;
   background-size: cover;
   background-color: #5b5336; /* Fallback color */
   padding: 6em 0;
@@ -12405,7 +12403,7 @@ body.homepage.is-preload #header:after {
   width: 100% !important;
   left: 0 !important;
   transform: none !important;
-  background: url("../../images/homeCardBg1.png") repeat #5b5336 !important;
+  background: url("../../images/backgrounds/homeCardBg1.png") repeat #5b5336 !important;
   background-size: 100% auto !important;
   transition: all 0.3s ease;
   margin-bottom: 0;
@@ -12709,7 +12707,7 @@ body.homepage.is-preload #header:after {
   }
 }
 #program-calendar {
-  background: url("../../images/homeCardBg1.png") repeat !important;
+  background: url("../../images/backgrounds/homeCardBg1.png") repeat !important;
   background-size: 100% auto !important;
   background-color: #5b5336 !important;
   padding: 4em 0;
@@ -12925,8 +12923,6 @@ body.homepage.is-preload #header:after {
     top: 0;
     width: 100%;
     height: 100%;
-    background: url("../../images/overlay.png");
-    background-size: 128px 128px;
   }
   #navPanel .link {
     position: relative;
@@ -17555,7 +17551,7 @@ body.homepage .stars > .stars-fore::after {
     radial-gradient(circle at 52% 86%, rgba(121, 94, 62, 0.22), transparent 34%),
     radial-gradient(circle at 72% 54%, rgba(87, 117, 80, 0.2), transparent 30%),
     linear-gradient(180deg, rgba(57, 80, 58, 0.94) 0%, rgba(63, 51, 40, 0.96) 100%),
-    url("../../images/home-outreach-texture.jpg");
+    url("../../images/backgrounds/home-outreach-texture.jpg");
   background-size: auto, auto, auto, auto, cover, 140% auto;
   background-position: 12% 16%, 82% 18%, 52% 86%, 72% 54%, center center, 56% 32%;
   background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat;
@@ -17580,7 +17576,7 @@ body.homepage .stars > .stars-fore::after {
     radial-gradient(circle at 18% 22%, rgba(210, 229, 197, 0.14), transparent 22%),
     radial-gradient(circle at 78% 18%, rgba(166, 122, 85, 0.1), transparent 18%),
     radial-gradient(circle at 52% 82%, rgba(124, 160, 116, 0.12), transparent 26%),
-    url("../../images/home-outreach-texture.jpg");
+    url("../../images/backgrounds/home-outreach-texture.jpg");
   background-size: auto, auto, auto, 175% auto;
   background-position: 18% 22%, 78% 18%, 52% 82%, 42% 74%;
   background-repeat: no-repeat, no-repeat, no-repeat, no-repeat;
@@ -17692,7 +17688,7 @@ body.homepage .stars > .stars-fore::after {
   background-image:
     linear-gradient(145deg, rgba(122, 92, 64, 0.88), rgba(82, 59, 41, 0.90)),
     radial-gradient(circle at 88% 22%, rgba(201, 162, 119, 0.18), transparent 38%),
-    url("../../images/home-outreach-texture.jpg");
+    url("../../images/backgrounds/home-outreach-texture.jpg");
   background-size: cover, auto, 185% auto;
   background-position: center center, 88% 22%, 64% 48%;
   background-repeat: no-repeat, no-repeat, no-repeat;
@@ -17983,7 +17979,7 @@ section#banner .quote-text h2 {
     radial-gradient(circle at 52% 86%, rgba(121, 94, 62, 0.22), transparent 34%),
     radial-gradient(circle at 72% 54%, rgba(87, 117, 80, 0.2), transparent 30%),
     linear-gradient(180deg, rgba(57, 80, 58, 0.94) 0%, rgba(63, 51, 40, 0.96) 100%),
-    url("../../images/home-outreach-texture.jpg");
+    url("../../images/backgrounds/home-outreach-texture.jpg");
   background-size: auto, auto, auto, auto, cover, 140% auto;
   background-position: 12% 16%, 82% 18%, 52% 86%, 72% 54%, center center, 56% 32%;
   background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat;
@@ -18008,7 +18004,7 @@ section#banner .quote-text h2 {
     radial-gradient(circle at 18% 22%, rgba(210, 229, 197, 0.14), transparent 22%),
     radial-gradient(circle at 78% 18%, rgba(166, 122, 85, 0.1), transparent 18%),
     radial-gradient(circle at 52% 82%, rgba(124, 160, 116, 0.12), transparent 26%),
-    url("../../images/home-outreach-texture.jpg");
+    url("../../images/backgrounds/home-outreach-texture.jpg");
   background-size: auto, auto, auto, 175% auto;
   background-position: 18% 22%, 78% 18%, 52% 82%, 42% 74%;
   background-repeat: no-repeat, no-repeat, no-repeat, no-repeat;
@@ -18119,7 +18115,7 @@ section#banner .quote-text h2 {
   background-image:
     linear-gradient(145deg, rgba(122, 92, 64, 0.88), rgba(82, 59, 41, 0.90)),
     radial-gradient(circle at 88% 22%, rgba(201, 162, 119, 0.18), transparent 38%),
-    url("../../images/home-outreach-texture.jpg");
+    url("../../images/backgrounds/home-outreach-texture.jpg");
   background-size: cover, auto, 185% auto;
   background-position: center center, 88% 22%, 64% 48%;
   background-repeat: no-repeat, no-repeat, no-repeat;
@@ -18807,43 +18803,23 @@ section#banner,
   background-color: #f5eee4 !important;
   background-image:
     linear-gradient(rgba(245, 238, 228, 0.42), rgba(245, 238, 228, 0.42)),
-    url("../../images/wallpaper-411editedLarge.jpeg") !important;
+    url("../../images/backgrounds/wallpaper-411editedLarge.jpeg") !important;
   background-position: center center !important;
   background-repeat: no-repeat !important;
   background-size: cover !important;
 }
 
-section#Bio,
-#Bio {
-  background-color: #1f1d1a !important;
-  background-image:
-    linear-gradient(rgba(20, 18, 16, 0.34), rgba(20, 18, 16, 0.34)),
-    url("../../images/NicoSchlagerBackground.jpeg") !important;
-  background-position: center center !important;
-  background-repeat: no-repeat !important;
-  background-size: cover !important;
-}
 
 /* --- Final hard fix: quote banners use white textured background; Nico stays on Bio only --- */
 section#banner,
 #banner {
   background-color: #f6f0e7 !important;
-  background-image: url("../../images/homeCardBg1.png") !important;
+  background-image: url("../../images/backgrounds/homeCardBg1.png") !important;
   background-position: center top !important;
   background-repeat: repeat-y !important;
   background-size: 100% auto !important;
 }
 
-section#Bio,
-#Bio {
-  background-color: #1f1d1a !important;
-  background-image:
-    linear-gradient(rgba(20, 18, 16, 0.34), rgba(20, 18, 16, 0.34)),
-    url("../../images/NicoSchlagerBackground.jpeg") !important;
-  background-position: center center !important;
-  background-repeat: no-repeat !important;
-  background-size: cover !important;
-}
 
 
 
@@ -18853,7 +18829,7 @@ section#Bio,
   padding: 7em 0;
   text-align: center;
   background-color: #f6f0e7 !important;
-  background-image: url("../../images/homeCardBg1.png") !important;
+  background-image: url("../../images/backgrounds/homeCardBg1.png") !important;
   background-position: center top !important;
   background-repeat: repeat-y !important;
   background-size: 100% auto !important;
@@ -18891,8 +18867,7 @@ section#Bio,
   overflow: hidden;
   background-color: #10243a !important;
   background-image:
-    linear-gradient(135deg, rgba(8, 23, 39, 0.84), rgba(8, 37, 63, 0.60) 48%, rgba(40, 136, 201, 0.42) 100%),
-    url("../../images/NicoSchlagerBackground.jpeg") !important;
+    linear-gradient(135deg, rgba(8, 23, 39, 0.84), rgba(8, 37, 63, 0.60) 48%, rgba(40, 136, 201, 0.42) 100%) !important;
   background-position: center center !important;
   background-repeat: no-repeat !important;
   background-size: cover !important;
@@ -19139,7 +19114,7 @@ section#Bio,
   background-color: #10243a !important;
   background-image:
     linear-gradient(135deg, rgba(8, 23, 39, 0.82), rgba(8, 37, 63, 0.60) 48%, rgba(40, 136, 201, 0.34) 100%),
-    url("../../images/NotUsed/BackgroundBio.jpg") !important;
+    url("../../images/backgrounds/BackgroundBio.jpg") !important;
   background-position: center center !important;
   background-repeat: no-repeat !important;
   background-size: cover !important;
@@ -19183,7 +19158,7 @@ section#Bio,
   background-color: #10243a !important;
   background-image:
     linear-gradient(135deg, rgba(8, 23, 39, 0.84), rgba(8, 37, 63, 0.60) 48%, rgba(40, 136, 201, 0.42) 100%),
-    url("../../images/NotUsed/wallpaper-411edited.jpeg") !important;
+    url("../../images/backgrounds/wallpaper-411edited.jpeg") !important;
   background-position: center center !important;
   background-repeat: no-repeat !important;
   background-size: cover !important;
@@ -19233,7 +19208,7 @@ section#Bio,
   background-color: #10243a !important;
   background-image:
     linear-gradient(135deg, rgba(8, 23, 39, 0.78), rgba(8, 37, 63, 0.52) 48%, rgba(40, 136, 201, 0.26) 100%),
-    url("../../images/NotUsed/BackgroundBio.jpg") !important;
+    url("../../images/backgrounds/BackgroundBio.jpg") !important;
   background-position: center center !important;
   background-repeat: no-repeat !important;
   background-size: cover !important;
@@ -19291,7 +19266,7 @@ section#Bio,
   background-color: #10243a !important;
   background-image:
     linear-gradient(135deg, rgba(8, 23, 39, 0.78), rgba(8, 37, 63, 0.52) 48%, rgba(40, 136, 201, 0.26) 100%),
-    url("../../images/NotUsed/BackgroundBio.jpg") !important;
+    url("../../images/backgrounds/BackgroundBio.jpg") !important;
   background-position: center center !important;
   background-repeat: no-repeat !important;
   background-size: cover !important;
@@ -19343,7 +19318,7 @@ section#Bio,
     radial-gradient(circle at 16% 18%, rgba(120, 214, 255, 0.22), transparent 28%),
     radial-gradient(circle at 84% 16%, rgba(89, 173, 255, 0.18), transparent 24%),
     linear-gradient(135deg, rgba(8, 23, 39, 0.88), rgba(8, 37, 63, 0.72) 48%, rgba(40, 136, 201, 0.52) 100%),
-    url("../../images/NotUsed/wallpaper-411edited.jpeg") !important;
+    url("../../images/backgrounds/wallpaper-411edited.jpeg") !important;
   background-position: center center !important;
   background-repeat: no-repeat !important;
   background-size: cover !important;
@@ -19383,7 +19358,7 @@ section#Bio,
     radial-gradient(circle at 16% 18%, rgba(120, 214, 255, 0.22), transparent 28%),
     radial-gradient(circle at 84% 16%, rgba(89, 173, 255, 0.18), transparent 24%),
     linear-gradient(135deg, rgba(8, 23, 39, 0.88), rgba(8, 37, 63, 0.72) 48%, rgba(40, 136, 201, 0.52) 100%),
-    url("../../images/NotUsed/wallpaper-411edited.jpeg") !important;
+    url("../../images/backgrounds/wallpaper-411edited.jpeg") !important;
   background-position: center center !important;
   background-repeat: no-repeat !important;
   background-size: cover !important;
@@ -19419,7 +19394,7 @@ section#Bio,
     radial-gradient(circle at 16% 18%, rgba(120, 214, 255, 0.22), transparent 28%),
     radial-gradient(circle at 84% 16%, rgba(89, 173, 255, 0.18), transparent 24%),
     linear-gradient(135deg, rgba(8, 23, 39, 0.88), rgba(8, 37, 63, 0.72) 48%, rgba(40, 136, 201, 0.52) 100%),
-    url("../../images/NotUsed/wallpaper-411edited.jpeg") !important;
+    url("../../images/backgrounds/wallpaper-411edited.jpeg") !important;
   background-position: center center !important;
   background-repeat: no-repeat !important;
   background-size: cover !important;
@@ -19458,7 +19433,7 @@ section#Bio,
     radial-gradient(circle at 16% 18%, rgba(120, 214, 255, 0.22), transparent 28%),
     radial-gradient(circle at 84% 16%, rgba(89, 173, 255, 0.18), transparent 24%),
     linear-gradient(135deg, rgba(8, 23, 39, 0.88), rgba(8, 37, 63, 0.72) 48%, rgba(40, 136, 201, 0.52) 100%),
-    url("../../images/NotUsed/wallpaper-411edited.jpeg") !important;
+    url("../../images/backgrounds/wallpaper-411edited.jpeg") !important;
   background-position: center center !important;
   background-repeat: no-repeat !important;
   background-size: cover !important;
@@ -19482,7 +19457,7 @@ section#Bio,
   min-height: auto;
   background:
     linear-gradient(135deg, rgba(2, 8, 32, 0.92), rgba(9, 24, 71, 0.78)),
-    url("../../images/SadhguruPage1.jpg") no-repeat center center scroll; /* fixed moved to ::before */
+    url("../../images/programs/SadhguruPage1.jpg") no-repeat center center scroll; /* fixed moved to ::before */
   background-size: cover;
   background-position: center center !important;
   background-color: #071027;
@@ -20061,7 +20036,7 @@ section#Bio,
 #program-calendar.programs-showcase::before {
   inset: 0;
   z-index: 0;
-  background: url("../../images/NotUsed/Ib_secion1bg2.jpg") center center / 100% 100% no-repeat;
+  background: url("../../images/backgrounds/Ib_secion1bg2.jpg") center center / 100% 100% no-repeat;
   opacity: 0.54;
   filter: saturate(0.92) brightness(1) contrast(1.08);
 }
@@ -20338,7 +20313,7 @@ section#Bio,
   overflow: hidden;
   background:
     linear-gradient(180deg, rgba(21, 3, 4, 0.26) 0%, rgba(56, 7, 9, 0.42) 100%),
-    url("../../images/lingabhairavi_chi.png") no-repeat center center fixed;
+    url("../../images/programs/lingabhairavi_chi.png") no-repeat center center fixed;
   background-size: cover;
 }
 
@@ -20587,6 +20562,27 @@ section#Bio,
     transform: scale(1.25);
   }
 }
+
+/* Booking CTA below program cards */
+/* Booking CTA below program cards */
+.programs-booking-cta {
+  text-align: center;
+  margin-top: 2em;
+  padding-bottom: 0.5em;
+
+  .hatha-button {
+    border-color: rgba(255, 221, 244, 0.36) !important;
+    background: linear-gradient(135deg, rgba(255, 209, 149, 0.92), rgba(245, 170, 113, 0.92)) !important;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.22) !important;
+    color: rgba(60, 30, 10, 0.9) !important;
+  }
+
+  .hatha-button:hover {
+    background: linear-gradient(135deg, rgba(255, 220, 160, 0.98), rgba(255, 180, 120, 0.98)) !important;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.3) !important;
+  }
+}
+
 
 
 /* Quote banner below Programs: widen quote text */
@@ -21230,7 +21226,7 @@ body.homepage .sadhguru-wrapper::before {
     radial-gradient(circle at 18% 22%, rgba(114, 160, 255, 0.2), transparent 28%),
     radial-gradient(circle at 82% 18%, rgba(244, 216, 154, 0.12), transparent 24%),
     radial-gradient(circle at 52% 78%, rgba(60, 101, 214, 0.18), transparent 34%),
-    url("../../images/SadhguruPage1.jpg") no-repeat center center !important;
+    url("../../images/programs/SadhguruPage1.jpg") no-repeat center center !important;
   background-size: auto, auto, auto, cover !important;
   background-attachment: scroll, scroll, scroll, fixed !important;
 }
@@ -21338,7 +21334,7 @@ body #carousel {
 
 /* === YOGA PROGRAMS CAROUSEL - GREEN BACKGROUND === */
 body #carousel {
-  background: url("../../images/NotUsed/1773693174686-2u3ey7o20x1.jpeg") center center/cover no-repeat !important;
+  background: url("../../images/backgrounds/1773693174686-2u3ey7o20x1.jpeg") center center/cover no-repeat !important;
   background-color: #2a3a2a !important;
 }
 

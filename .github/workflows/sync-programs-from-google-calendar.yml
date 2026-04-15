@@ -1,9 +1,12 @@
 name: Sync programs from Google Calendar
 
+# DISABLED: Google Sheet is now the source of truth for programs.
+# The programs.json file remains as a static fallback only.
+# Run manually via workflow_dispatch if you need to refresh programs.json.
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '0 * * * *'
+  # schedule:           # <-- disabled; Sheet API feeds the site directly
+  #   - cron: '0 * * * *'
 
 # Prevent calendar sync from racing with Pages deployment.
 # cancel-in-progress: false = queue behind running deploy, never cancel it.

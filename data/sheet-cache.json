@@ -11,7 +11,7 @@
       2,
       3,
       6,
-      "Surya Kriya ist eine kraftvolle yogische Praxis von enormem Alter, konzipiert als ganzheitlicher Prozess f\u00fcr Gesundheit, Wohlbefinden und vollst\u00e4ndiges inneres Wohlbefinden. \u201eSurya\" bedeutet \u201eSonne\" und \u201eKriya\" bedeutet \u201einnerer Energieprozess.\" Es ist ein kraftvoller Prozess der Aktivierung der Sonne in uns durch Aktivierung des Solarplexus zur Erh\u00f6hung des *samat prana*, oder der Sonnenhitze, im System.",
+      "Surya Kriya ist eine kraftvolle yogische Praxis von enormem Alter, konzipiert als ganzheitlicher Prozess für Gesundheit, Wohlbefinden und vollständiges inneres Wohlbefinden. „Surya\" bedeutet „Sonne\" und „Kriya\" bedeutet „innerer Energieprozess.\" Es ist ein kraftvoller Prozess der Aktivierung der Sonne in uns durch Aktivierung des Solarplexus zur Erhöhung des *samat prana*, oder der Sonnenhitze, im System.",
       "Bad Tatzmannsdorf, Reduce",
       "Deutsch"
     ],
@@ -26,7 +26,7 @@
       3,
       1.5,
       4.5,
-      "Upa-Yoga bedeutet im Wesentlichen \u201eSub-Yoga\" oder \u201ePre-Yoga.\" Es ist ein einfacher, jedoch kraftvoller Satz von 10 Praktiken, die die Gelenke, Muskeln und das Energiesystem aktivieren und Leichtigkeit in das gesamte System bringen.",
+      "Upa-Yoga bedeutet im Wesentlichen „Sub-Yoga\" oder „Pre-Yoga.\" Es ist ein einfacher, jedoch kraftvoller Satz von 10 Praktiken, die die Gelenke, Muskeln und das Energiesystem aktivieren und Leichtigkeit in das gesamte System bringen.",
       "Bad Tatzmannsdorf, Reduce",
       "Deutsch"
     ]
@@ -79,6 +79,33 @@
       46172,
       0.7916666666678793,
       0.8541666666666666
+    ]
+  ],
+  "discountCodes": [
+    [
+      "FRIEND10",
+      "10",
+      "Friend referral"
+    ],
+    [
+      "VIP15",
+      "15",
+      "Loyal client"
+    ],
+    [
+      "STUDENT10",
+      "20",
+      "Student"
+    ],
+    [
+      "EARLY20",
+      "20",
+      "Early bird"
+    ],
+    [
+      "FAMILY30",
+      "30",
+      "Family and close Friends"
     ]
   ]
 }
