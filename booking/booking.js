@@ -633,8 +633,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Wire up form submit
   document.getElementById('booking-form').addEventListener('submit', handleSubmit);
 
-  // Localhost detection: skip Sheets API (blocked by referrer restrictions / Brave Shields)
-  const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.protocol === 'file:';
+  // Local dev detection: Five Server, Live Server, file:// etc.
+  // Skip Sheets API on local servers (blocked by API key domain restrictions / Brave Shields)
+  const hn = location.hostname;
+  const isLocal = hn === 'localhost' || hn === '127.0.0.1' || hn === '0.0.0.0' || hn === '[::1]' || /^(10|172\.(1[6-9]|2\d|3[01])|192\.168)\./.test(hn) || location.protocol === 'file:';
 
   // Fetch all data in parallel
   try {
