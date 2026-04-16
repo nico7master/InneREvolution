@@ -117,8 +117,11 @@ a {
 
 // ─── Hero ─────────────────────────────────────────────────────────────────────
 .booking-hero {
-  /* Sunset yoga hero image — no gradient overlay, text uses shadow for legibility */
+  /* Sunset yoga hero image — compressed+WebP for fast load */
   background: url('../images/backgrounds/booking-hero-bg.jpg') center bottom / cover no-repeat;
+  @supports (background-image: url('a.webp')) {
+    background-image: url('../images/backgrounds/booking-hero-bg.webp');
+  }
 
   // Thin white fade at the very bottom edge — section transition only
   &::after {
