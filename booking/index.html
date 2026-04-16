@@ -94,7 +94,7 @@
 
           <!-- Discount code toggle -->
           <div class="form-group discount-toggle-row">
-            <button type="button" class="btn-text-link" id="discount-toggle-btn" onclick="toggleDiscountField()">
+            <button type="button" class="btn-text-link" id="discount-toggle-btn">
               Have a discount code?
             </button>
           </div>
@@ -122,11 +122,11 @@
             <span class="group-label">Are you bringing friends? <small class="field-hint">(10% off per friend joining)</small></span>
             <div class="radio-group">
               <label class="radio-label">
-                <input type="radio" name="bringingFriends" value="no" checked onchange="toggleFriends(false)" />
+              <input type="radio" name="bringingFriends" value="no" checked />
                 No
               </label>
               <label class="radio-label">
-                <input type="radio" name="bringingFriends" value="yes" onchange="toggleFriends(true)" />
+              <input type="radio" name="bringingFriends" value="yes" />
                 Yes
               </label>
             </div>
@@ -135,7 +135,7 @@
           <div id="friends-section" class="friends-section" style="display:none;">
             <div class="form-group">
               <label for="field-friends-count">How many friends are joining with you?</label>
-              <input type="number" id="field-friends-count" name="friendsCount" min="1" max="10" placeholder="1" oninput="onFriendsCountChange()" />
+              <input type="number" id="field-friends-count" name="friendsCount" min="1" max="10" placeholder="1" />
               <span id="friends-discount-hint" class="discount-result is-valid" style="display:none;"></span>
             </div>
             <div class="form-group">

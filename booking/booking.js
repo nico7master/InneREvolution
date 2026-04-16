@@ -297,7 +297,7 @@ function buildCard(p) {
           ${spotsHtml}
           <button
             class="btn-register"
-            onclick="openModal('${p.id}')"
+            data-program-id="${p.id}"
             ${isFull ? 'disabled aria-disabled="true"' : ''}>
             ${isFull ? bs('soldOutBtn') : bs('registerBtn')}
           </button>
@@ -629,6 +629,23 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Wire up discount input
   document.getElementById('field-discount').addEventListener('input', onDiscountInput);
+
+  // Discount toggle button
+  document.getElementById('discount-toggle-btn').addEventListener('click', toggleDiscountField);
+
+  // Friends radio buttons
+  document.querySelectorAll('input[name="bringingFriends"]').forEach(function(radio) {
+    radio.addEventListener('change', function() { toggleFriends(this.value === 'yes'); });
+  });
+
+  // Friends count input
+  document.getElementById('field-friends-count').addEventListener('input', onFriendsCountChange);
+
+  // Register buttons (delegated — cards are rendered dynamically)
+  document.getElementById('programs-grid').addEventListener('click', function(e) {
+    var btn = e.target.closest('.btn-register');
+    if (btn && !btn.disabled) openModal(btn.dataset.programId);
+  });
 
   // Wire up form submit
   document.getElementById('booking-form').addEventListener('submit', handleSubmit);
