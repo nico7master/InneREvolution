@@ -38,6 +38,16 @@ dist/
 build/
 *.min.js
 *.min.css
+# Keep vendor libs that must be deployed
+!assets/js/swiper-bundle.min.js
+!assets/css/swiper-bundle.min.css
+!assets/css/fontawesome-all.min.css
+!assets/js/jquery.min.js
+!assets/js/jquery.scrolly.min.js
+!assets/js/jquery.scrollex.min.js
+!assets/js/jquery.dropotron.min.js
+!assets/js/breakpoints.min.js
+!assets/js/browser.min.js
 
 # Environment files
 .env
