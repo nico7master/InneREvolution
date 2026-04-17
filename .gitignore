@@ -69,3 +69,6 @@ docs/.clasp.json
 
 # Backup files — never commit
 .tmp/
+
+# Booking config — generated at deploy time from GitHub Secrets
+booking/config.js
