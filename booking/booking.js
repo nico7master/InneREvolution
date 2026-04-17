@@ -204,11 +204,19 @@ async function fetchDiscountCodes() {
 
 // ─── Date/time formatting ─────────────────────────────────────────────────────
 function formatDate(raw) {
-  // Input: ISO date string e.g. "2026-05-02" or "2026-05-02T18:00:00"
-  // Output: locale-formatted short date
+  // CSP-safe: avoids toLocaleDateString() which triggers eval-like Intl locale
+  // loading in Chromium-based browsers with strict script-src CSP.
   if (!raw) return '';
   const d = new Date(raw.includes('T') ? raw : raw + 'T00:00:00');
-  return d.toLocaleDateString(bs('dateLocale'), { weekday: 'short', day: '2-digit', month: 'short' });
+  if (isNaN(d.getTime())) return raw;
+  const lang = window._bookingLang || 'en';
+  var weekdays = lang === 'de'
+    ? ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa']
+    : ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  var months = lang === 'de'
+    ? ['Jan', 'Feb', 'M\u00e4r', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez']
+    : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  return weekdays[d.getDay()] + ', ' + String(d.getDate()).padStart(2, '0') + ' ' + months[d.getMonth()];
 }
 
 function formatTime(raw) {
