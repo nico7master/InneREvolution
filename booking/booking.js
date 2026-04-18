@@ -51,6 +51,11 @@ var BOOKING_STRINGS = {
     alertConsole:       '\n\nOpen F12 console for full details.',
     successPayLink:     function(e) { return 'Check your inbox at ' + e + ' \u2014 a secure payment link is on its way to confirm your spot.'; },
     successFallback:    function(e) { return 'Check your inbox at ' + e + ' for your payment link and confirmation.'; },
+    successSpamTip:     'If nothing arrives within 2 minutes, please check your spam folder.',
+    successContactFallback: function(mail) { return 'Still nothing? Email us directly at ' + mail + '.'; },
+    alertTimeout:       'The request is taking longer than expected. Your booking may still go through \u2014 please check your email in a few minutes before retrying.',
+    alertNetwork:       'We couldn\u2019t reach the booking server. Please check your internet connection and try again.',
+    alertInvalidEmail:  'Please enter a valid email address (e.g. name@example.com).',
     dateLocale:         'en-GB',
   },
   de: {
@@ -98,6 +103,11 @@ var BOOKING_STRINGS = {
     alertConsole:       '\n\n\u00d6ffne die F12-Konsole f\u00fcr Details.',
     successPayLink:     function(e) { return 'Schau in dein Postfach (' + e + ') \u2014 ein sicherer Zahlungslink ist unterwegs, um deinen Platz zu best\u00e4tigen.'; },
     successFallback:    function(e) { return 'Schau in dein Postfach (' + e + ') f\u00fcr deinen Zahlungslink und deine Best\u00e4tigung.'; },
+    successSpamTip:     'Falls innerhalb von 2 Minuten nichts ankommt, schau bitte auch im Spam-Ordner nach.',
+    successContactFallback: function(mail) { return 'Immer noch nichts? Schreib uns direkt an ' + mail + '.'; },
+    alertTimeout:       'Die Anfrage dauert l\u00e4nger als gewohnt. Deine Buchung k\u00f6nnte trotzdem durchgehen \u2014 bitte pr\u00fcfe in ein paar Minuten dein Postfach, bevor du es erneut versuchst.',
+    alertNetwork:       'Der Buchungsserver ist gerade nicht erreichbar. Bitte pr\u00fcfe deine Internetverbindung und versuche es erneut.',
+    alertInvalidEmail:  'Bitte gib eine g\u00fcltige E-Mail-Adresse ein (z.\u202fB. name@beispiel.com).',
     dateLocale:         'de-AT',
   }
 };
@@ -533,7 +543,21 @@ function onFriendsCountChange() {
   updatePriceDisplay(basePrice);
 }
 
+// ─── Contact fallback for error messaging ─────────────────────────────────────
+const INSTRUCTOR_CONTACT_EMAIL = 'info@innerevolutionyoga.life';
+
+// Simple but robust email validator (RFC-5322 subset)
+function isValidEmailFormat(value) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value);
+}
+
 // ─── Form submission ──────────────────────────────────────────────────────────
+// NOTE: We use `fetch(..., { mode: 'no-cors' })` because Google Apps Script web
+// apps 302-redirect to googleusercontent.com without Access-Control-Allow-Origin
+// headers, which the browser blocks on a cross-origin POST from innerevolutionyoga.life.
+// Tradeoff: the response is OPAQUE — we cannot read Apps Script's JSON reply.
+// Mitigation: pre-validate aggressively here; Apps Script sends all confirmation,
+// error and admin-alert emails server-side.
 async function handleSubmit(event) {
   event.preventDefault();
 
@@ -547,11 +571,17 @@ async function handleSubmit(event) {
   const label   = document.getElementById('submit-label');
   const spinner = document.getElementById('submit-spinner');
 
-  // Basic validation
+  // ── Pre-submit validation (critical — we can't read server response) ──
   const name  = document.getElementById('field-name').value.trim();
   const email = document.getElementById('field-email').value.trim();
+
   if (!name || !email) {
     alert(bs('alertFillIn'));
+    return;
+  }
+  if (!isValidEmailFormat(email)) {
+    alert(bs('alertInvalidEmail'));
+    document.getElementById('field-email').focus();
     return;
   }
 
@@ -582,39 +612,48 @@ async function handleSubmit(event) {
     friendsCount:       bringingFriends ? (document.getElementById('field-friends-count').value || '') : '',
     friendsNames:       bringingFriends ? (document.getElementById('field-friends-names').value.trim() || '') : '',
     comments:           document.getElementById('field-comments').value.trim(),
+    lang:               window._bookingLang || 'en',
     submittedAt:        new Date().toISOString(),
   };
 
+  // ── Fire the request with a 15-second abort timeout ──
+  const controller = new AbortController();
+  const timeoutId  = setTimeout(() => controller.abort(), 15000);
+
   try {
-    // POST to Apps Script — use redirect:follow to get the actual JSON response.
-    // No Content-Type header → text/plain → 'simple request' → no CORS preflight.
-    // Apps Script 302-redirects to googleusercontent.com which returns JSON with CORS headers.
-    const response = await fetch(CONFIG.APPS_SCRIPT_URL, {
-      method: 'POST',
+    await fetch(CONFIG.APPS_SCRIPT_URL, {
+      method:   'POST',
+      mode:     'no-cors',
       redirect: 'follow',
-      body: JSON.stringify(payload),
+      body:     JSON.stringify(payload),
+      signal:   controller.signal,
     });
-    const result = await response.json();
+    clearTimeout(timeoutId);
 
-    if (result.success) {
-      // Show success state
-      document.getElementById('booking-form').style.display = 'none';
-      document.getElementById('form-success').style.display  = '';
-      const msg = result.paymentUrl
-        ? bs('successPayLink')(email)
-        : bs('successFallback')(email);
-      document.getElementById('success-detail').textContent = msg;
-    } else {
-      throw new Error(result.error || 'Booking failed. Please try again.');
-    }
-
+    // Request completed without network error — assume success.
+    // Apps Script is now responsible for ALL success/failure communication via email.
+    document.getElementById('booking-form').style.display = 'none';
+    document.getElementById('form-success').style.display = '';
+    document.getElementById('success-detail').textContent =
+      bs('successFallback')(email) + ' ' +
+      bs('successSpamTip')  + ' ' +
+      bs('successContactFallback')(INSTRUCTOR_CONTACT_EMAIL);
 
   } catch (err) {
+    clearTimeout(timeoutId);
     console.error('Booking submission failed:', err);
-    const detail = err.message || 'Unknown error';
-    alert(bs('alertError') + detail + bs('alertConsole'));
 
-    // Re-enable button
+    // Classify the failure for a useful user message
+    let userMsg;
+    if (err.name === 'AbortError') {
+      userMsg = bs('alertTimeout');
+    } else {
+      // TypeError 'Failed to fetch' = network / DNS / offline
+      userMsg = bs('alertNetwork');
+    }
+    alert(userMsg + '\n\n' + bs('successContactFallback')(INSTRUCTOR_CONTACT_EMAIL));
+
+    // Re-enable the button so the user can retry
     btn.disabled          = false;
     label.style.display   = '';
     spinner.style.display = 'none';
