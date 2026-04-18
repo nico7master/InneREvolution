@@ -53,12 +53,19 @@
 // ─── 0. CONFIG ────────────────────────────────────────────────────────────────
 function getConfig() {
   var p = PropertiesService.getScriptProperties().getProperties();
+  var testMode = (p.TEST_MODE || 'true').toString().toLowerCase() === 'true';
+  // Auto-select webhook secret based on TEST_MODE
+  var webhookSecret = testMode
+    ? (p.STRIPE_WEBHOOK_SECRET_TEST || p.STRIPE_WEBHOOK_SECRET || '')
+    : (p.STRIPE_WEBHOOK_SECRET_LIVE || p.STRIPE_WEBHOOK_SECRET || '');
   return {
     SHEET_ID:              p.SHEET_ID              || SpreadsheetApp.getActiveSpreadsheet().getId(),
     CALENDAR_ID:           p.CALENDAR_ID           || '',
-    STRIPE_KEY:            p.STRIPE_KEY            || '',
+    STRIPE_KEY:            testMode ? (p.STRIPE_KEY_TEST || p.STRIPE_KEY || '') : (p.STRIPE_KEY_LIVE || p.STRIPE_KEY || ''),
     INSTRUCTOR_EMAIL:      p.INSTRUCTOR_EMAIL      || Session.getActiveUser().getEmail(),
-    STRIPE_WEBHOOK_SECRET: p.STRIPE_WEBHOOK_SECRET || ''
+    STRIPE_WEBHOOK_SECRET: webhookSecret,
+    INTAKE_FORM_URL:       p.INTAKE_FORM_URL       || 'https://innerevolutionyoga.life/intake',
+    TEST_MODE:             testMode
   };
 }
 
@@ -108,7 +115,7 @@ function doPost(e) {
   try {
     var data = JSON.parse(e.postData.contents);
     Logger.log('[REQUEST] Parsed data: ' + JSON.stringify(data));
-    if (data.type && data.type.indexOf('payment_intent') === 0) {
+    if (data.type && (data.type.indexOf('payment_intent') === 0 || data.type === 'checkout.session.completed')) {
       Logger.log('[REQUEST] Routing to Stripe webhook handler');
       return handleStripeWebhook(data);
     }
@@ -260,7 +267,7 @@ function handleBooking(data) {
     if (stripeLink && data.email)
       payUrl += (stripeLink.indexOf('?') >= 0 ? '&' : '?') + 'prefilled_email=' + encodeURIComponent(data.email);
 
-    try { sendClientConfirmation(data, programName, finalPrice, totalDisc, payUrl); Logger.log('[BOOKING] Client email sent'); }
+    try { sendClientConfirmation(data, programName, finalPrice, totalDisc, payUrl, progRow[7], progRow[9]); Logger.log('[BOOKING] Client email sent'); }
     catch (err) { Logger.log('[EMAIL ERR] Client: ' + err.message); }
     try { sendInstructorNotification(data, programName, finalPrice, cfg.INSTRUCTOR_EMAIL); Logger.log('[BOOKING] Instructor email sent'); }
     catch (err) { Logger.log('[EMAIL ERR] Instructor: ' + err.message); }
@@ -273,56 +280,125 @@ function handleBooking(data) {
 }
 
 // ─── 3. EMAILS ────────────────────────────────────────────────────────────────
-function sendClientConfirmation(data, programName, finalPrice, discountPct, payUrl) {
-  var discHtml = discountPct > 0
-    ? '<p style="color:#5F1630"><strong>' + discountPct + '% discount applied</strong></p>' : '';
+function sendClientConfirmation(data, programName, finalPrice, discountPct, payUrl, datum, ort) {
+  var dateStr = '';
+  if (datum) {
+    try {
+      var d = datum instanceof Date ? datum : new Date(datum);
+      if (!isNaN(d.getTime())) dateStr = d.toLocaleDateString('de-AT', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    } catch(e) { Logger.log('[DATE] ' + e.message); }
+  }
+  var infoRows = '';
+  if (programName) infoRows += '<tr><td style="padding:8px 0;color:#666;white-space:nowrap">🧘 Programm</td><td style="padding:8px 0;padding-left:16px;font-weight:600;color:#371964">' + programName + '</td></tr>';
+  if (dateStr)     infoRows += '<tr><td style="padding:8px 0;color:#666;white-space:nowrap">📅 Datum</td><td style="padding:8px 0;padding-left:16px">' + dateStr + '</td></tr>';
+  if (ort)         infoRows += '<tr><td style="padding:8px 0;color:#666;white-space:nowrap">📍 Ort</td><td style="padding:8px 0;padding-left:16px">' + ort + '</td></tr>';
+  if (discountPct > 0) infoRows += '<tr><td style="padding:8px 0;color:#666;white-space:nowrap">🏷 Rabatt</td><td style="padding:8px 0;padding-left:16px;color:#0A5A41;font-weight:600">-' + discountPct + '%</td></tr>';
+  infoRows += '<tr style="border-top:2px solid #e0d4f7"><td style="padding:12px 0 4px;font-weight:bold;font-size:15px;color:#371964">Gesamtbetrag</td><td style="padding:12px 0 4px;padding-left:16px;font-size:22px;font-weight:bold;color:#371964">EUR ' + finalPrice.toFixed(2) + '</td></tr>';
   var btnHtml = payUrl
-    ? '<p style="text-align:center;margin:24px 0"><a href="' + payUrl + '" style="background:#FF6B35;color:#ffffff;padding:14px 32px;border-radius:6px;text-decoration:none;font-weight:bold;font-size:16px">Complete Payment</a></p>' : '';
-  var html = '<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">'
-    + '<div style="background:#371964;padding:32px 24px;text-align:center"><h1 style="color:#ffffff;margin:0;font-size:22px">InneREvolution Yoga</h1><p style="color:#c8b8ef;margin:8px 0 0">Registration Confirmed</p></div>'
-    + '<div style="padding:24px;background:#fafafa">'
-    + '<p>Dear <strong>' + data.fullName + '</strong>,</p>'
-    + '<p>Thank you for registering for <strong>' + programName + '</strong>.</p>'
-    + discHtml
-    + '<div style="background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:16px;margin:16px 0">'
-    + '<p style="margin:4px 0"><strong>Program:</strong> ' + programName + '</p>'
-    + '<p style="margin:4px 0"><strong>Total due:</strong> <span style="color:#371964;font-size:18px;font-weight:bold">EUR ' + finalPrice.toFixed(2) + '</span></p>'
-    + '</div>' + btnHtml
-    + '<p style="color:#666;font-size:13px">Questions? Just reply to this email.</p>'
-    + '<p>Namaste,<br><strong>Nico — InneREvolution Yoga</strong></p></div></div>';
-  GmailApp.sendEmail(data.email, 'Registration Confirmed: ' + programName,
-    'Thank you for registering. Total: EUR ' + finalPrice.toFixed(2), { htmlBody: html });
+    ? '<div style="text-align:center;margin:32px 0"><a href="' + payUrl + '" style="display:inline-block;background:linear-gradient(135deg,#FF6B35,#e8562a);color:#ffffff;padding:16px 40px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:17px;letter-spacing:0.5px">🙏 Jetzt bezahlen</a></div>'
+    : '';
+  var html =
+    '<div style="font-family:Helvetica Neue,Arial,sans-serif;max-width:600px;margin:0 auto;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08)">'
+    + '<div style="background:linear-gradient(135deg,#371964 0%,#5a2d8a 100%);padding:40px 32px;text-align:center">'
+    + '<p style="color:#c8b8ef;margin:0 0 8px;font-size:12px;letter-spacing:3px;text-transform:uppercase">InneREvolution Yoga</p>'
+    + '<h1 style="color:#ffffff;margin:0;font-size:26px;font-weight:300;letter-spacing:1px">Anmeldung bestätigt</h1>'
+    + '<p style="color:#e0d4f7;margin:12px 0 0;font-size:15px">✨ Dein Platz ist reserviert</p>'
+    + '</div>'
+    + '<div style="padding:36px 32px">'
+    + '<p style="font-size:16px;color:#333;margin:0 0 8px">Liebe/r <strong>' + data.fullName + '</strong>,</p>'
+    + '<p style="font-size:15px;color:#555;line-height:1.7;margin:0 0 24px">Vielen Dank für deine Anmeldung zu <strong style="color:#371964">' + programName + '</strong>. Wir freuen uns sehr, diese Praxis mit dir zu teilen.</p>'
+    + '<div style="background:#f8f5ff;border-radius:10px;padding:24px;margin:0 0 8px">'
+    + '<p style="margin:0 0 12px;color:#371964;font-size:12px;letter-spacing:2px;text-transform:uppercase;font-weight:600">Deine Anmeldung</p>'
+    + '<table style="width:100%;border-collapse:collapse">' + infoRows + '</table>'
+    + '</div>'
+    + btnHtml
+    + '<p style="font-size:13px;color:#999;text-align:center;margin:0 0 24px">Dein Platz ist reserviert — die Zahlung sichert deine Teilnahme.</p>'
+    + '<div style="border-top:1px solid #eee;margin:24px 0"></div>'
+    + '<p style="font-size:14px;color:#555;line-height:1.7">Hast du Fragen? Antworte einfach auf diese E-Mail — wir helfen dir gerne.</p>'
+    + '<p style="font-size:15px;color:#371964;margin:24px 0 0">Namaste 🙏<br><strong>Nico &amp; das InneREvolution-Team</strong></p>'
+    + '</div>'
+    + '<div style="background:#f0ebf8;padding:16px 32px;text-align:center">'
+    + '<p style="margin:0;font-size:12px;color:#999">InneREvolution Yoga &nbsp;|&nbsp; <a href="https://innerevolutionyoga.life" style="color:#7b4fc0;text-decoration:none">innerevolutionyoga.life</a></p>'
+    + '</div>'
+    + '</div>';
+  GmailApp.sendEmail(data.email, '🙏 Anmeldung bestätigt — ' + programName,
+    'Liebe/r ' + data.fullName + ', dein Platz in ' + programName + ' ist reserviert. Gesamtbetrag: EUR ' + finalPrice.toFixed(2) + (payUrl ? ' — Jetzt bezahlen: ' + payUrl : ''),
+    { htmlBody: html });
   Logger.log('[EMAIL] Confirmation -> ' + data.email);
 }
 
 function sendInstructorNotification(data, programName, finalPrice, instructorEmail) {
   if (!instructorEmail) return;
-  var friends = parseInt(data.friendsCount) > 0 ? ' (+ ' + data.friendsCount + ' friend(s))' : '';
+  var friends = parseInt(data.friendsCount) > 0
+    ? '<tr><td style="padding:6px 12px;color:#666;background:#f9f9f9;font-size:13px">Freunde mitbringen</td><td style="padding:6px 12px;font-size:13px">' + data.friendsCount + (data.friendNames ? ' — ' + data.friendNames : '') + '</td></tr>'
+    : '';
+  var comments = data.comments
+    ? '<tr><td style="padding:6px 12px;color:#666;background:#f9f9f9;font-size:13px">Anmerkungen</td><td style="padding:6px 12px;font-size:13px">' + data.comments + '</td></tr>'
+    : '';
+  var referral = data.referredBy
+    ? '<tr><td style="padding:6px 12px;color:#666;background:#f9f9f9;font-size:13px">Empfohlen von</td><td style="padding:6px 12px;font-size:13px">' + data.referredBy + '</td></tr>'
+    : '';
+  var html =
+    '<div style="font-family:Arial,sans-serif;max-width:560px">'
+    + '<div style="background:#161737;padding:20px 24px;border-radius:8px 8px 0 0">'
+    + '<p style="color:#8888bb;margin:0;font-size:11px;text-transform:uppercase;letter-spacing:2px">Neue Buchung</p>'
+    + '<h2 style="color:#ffffff;margin:6px 0 0;font-size:20px">' + data.fullName + '</h2>'
+    + '<p style="color:#c8b8ef;margin:6px 0 0;font-size:14px">' + programName + '</p>'
+    + '</div>'
+    + '<div style="border:1px solid #eee;border-top:none;border-radius:0 0 8px 8px;overflow:hidden">'
+    + '<table style="width:100%;border-collapse:collapse">'
+    + '<tr><td style="padding:6px 12px;color:#666;background:#f9f9f9;font-size:13px">E-Mail</td><td style="padding:6px 12px;font-size:13px"><a href="mailto:' + data.email + '" style="color:#371964">' + data.email + '</a></td></tr>'
+    + '<tr><td style="padding:6px 12px;color:#666;background:#f9f9f9;font-size:13px">Telefon</td><td style="padding:6px 12px;font-size:13px">' + data.phone + '</td></tr>'
+    + '<tr><td style="padding:6px 12px;color:#666;background:#f9f9f9;font-size:13px">Programm</td><td style="padding:6px 12px;font-size:13px"><strong>' + programName + '</strong></td></tr>'
+    + '<tr><td style="padding:6px 12px;color:#666;background:#f9f9f9;font-size:13px">Betrag</td><td style="padding:6px 12px"><strong style="color:#0A5A41;font-size:16px">EUR ' + finalPrice.toFixed(2) + '</strong></td></tr>'
+    + friends + referral + comments
+    + '</table>'
+    + '</div>'
+    + '<p style="font-size:11px;color:#bbb;margin-top:12px">Gebucht über die InneREvolution-Website</p>'
+    + '</div>';
   GmailApp.sendEmail(instructorEmail,
-    '[New Booking] ' + data.fullName + ' - ' + programName,
-    'Name: ' + data.fullName + '\nEmail: ' + data.email + '\nPhone: ' + data.phone
-    + '\nProgram: ' + programName + '\nPrice: EUR ' + finalPrice.toFixed(2) + friends
-    + '\nReferral: ' + (data.referredBy || 'none'));
+    '[Neue Buchung] ' + data.fullName + ' — ' + programName + ' (EUR ' + finalPrice.toFixed(2) + ')',
+    'Neue Buchung: ' + data.fullName + ' | ' + data.email + ' | ' + programName + ' | EUR ' + finalPrice.toFixed(2),
+    { htmlBody: html });
   Logger.log('[EMAIL] Instructor notified');
 }
 
 function sendIntakeForm(name, email, programName) {
-  var html = '<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">'
-    + '<div style="background:#371964;padding:32px 24px;text-align:center">'
-    + '<h1 style="color:#ffffff;margin:0;font-size:22px">InneREvolution Yoga</h1>'
-    + '<p style="color:#c8b8ef;margin:8px 0 0">Payment Received — Welcome!</p></div>'
-    + '<div style="padding:24px;background:#fafafa">'
-    + '<p>Dear <strong>' + name + '</strong>,</p>'
-    + '<p>Your payment for <strong>' + programName + '</strong> has been confirmed. You are officially registered!</p>'
-    + '<p>To help us prepare the best experience for you, please complete your intake form:</p>'
-    + '<p style="text-align:center;margin:24px 0"><a href="https://innerevolutionyoga.life/intake" '
-    + 'style="background:#371964;color:#ffffff;padding:14px 32px;border-radius:6px;text-decoration:none;font-weight:bold">'
-    + 'Complete Intake Form</a></p>'
-    + '<p style="color:#666;font-size:13px">Please complete this before the first session. Questions? Reply to this email.</p>'
-    + '<p>Namaste,<br><strong>Nico — InneREvolution Yoga</strong></p></div></div>';
+  var cfg = getConfig();
+  var intakeUrl = cfg.INTAKE_FORM_URL || 'https://innerevolutionyoga.life/intake';
+  var html =
+    '<div style="font-family:Helvetica Neue,Arial,sans-serif;max-width:600px;margin:0 auto;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08)">'
+    + '<div style="background:linear-gradient(135deg,#0A5A41 0%,#1a8a60 100%);padding:40px 32px;text-align:center">'
+    + '<p style="color:#a8dfc9;margin:0 0 8px;font-size:12px;letter-spacing:3px;text-transform:uppercase">InneREvolution Yoga</p>'
+    + '<h1 style="color:#ffffff;margin:0;font-size:26px;font-weight:300;letter-spacing:1px">Zahlung bestätigt</h1>'
+    + '<p style="color:#d4f0e7;margin:12px 0 0;font-size:16px">✅ Du bist dabei!</p>'
+    + '</div>'
+    + '<div style="padding:36px 32px">'
+    + '<p style="font-size:16px;color:#333;margin:0 0 8px">Liebe/r <strong>' + name + '</strong>,</p>'
+    + '<p style="font-size:15px;color:#555;line-height:1.7;margin:0 0 24px">Deine Zahlung für <strong style="color:#371964">' + programName + '</strong> wurde erfolgreich empfangen. Dein Platz ist nun offiziell gesichert. 🎉</p>'
+    + '<div style="background:#f8f5ff;border-radius:10px;padding:24px;margin:0 0 28px">'
+    + '<p style="margin:0 0 16px;color:#371964;font-size:12px;letter-spacing:2px;text-transform:uppercase;font-weight:600">Deine nächsten Schritte</p>'
+    + '<table style="width:100%;border-collapse:collapse">'
+    + '<tr><td style="padding:10px 0;vertical-align:top;width:36px;font-size:20px">1️⃣</td><td style="padding:10px 0;font-size:14px;color:#444;line-height:1.6"><strong>Fülle das Intake-Formular aus</strong><br>Das hilft uns, dich besser kennenzulernen und das beste Erlebnis für dich vorzubereiten.</td></tr>'
+    + '<tr><td style="padding:10px 0;vertical-align:top;font-size:20px">2️⃣</td><td style="padding:10px 0;font-size:14px;color:#444;line-height:1.6"><strong>Trag das Datum in deinen Kalender ein</strong><br>Du erhältst rechtzeitig eine Erinnerung mit allen Details zu Ort und Ablauf.</td></tr>'
+    + '<tr><td style="padding:10px 0;vertical-align:top;font-size:20px">3️⃣</td><td style="padding:10px 0;font-size:14px;color:#444;line-height:1.6"><strong>Komm mit einem offenen Herzen</strong><br>Trage bequeme Kleidung und bringe eine Wasserflasche mit. Ein Notizbuch ist willkommen.</td></tr>'
+    + '</table>'
+    + '</div>'
+    + '<div style="text-align:center;margin:0 0 32px">'
+    + '<p style="font-size:14px;color:#555;margin:0 0 20px">Bitte fülle das Formular vor der ersten Session aus:</p>'
+    + '<a href="' + intakeUrl + '" style="display:inline-block;background:linear-gradient(135deg,#371964,#5a2d8a);color:#ffffff;padding:16px 40px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:16px;letter-spacing:0.5px">Intake-Formular ausfüllen →</a>'
+    + '</div>'
+    + '<div style="border-top:1px solid #eee;margin:24px 0"></div>'
+    + '<p style="font-size:14px;color:#555;line-height:1.7">Hast du Fragen? Antworte einfach auf diese E-Mail — wir sind für dich da.</p>'
+    + '<p style="font-size:15px;color:#371964;margin:24px 0 0">Namaste 🙏<br><strong>Nico &amp; das InneREvolution-Team</strong></p>'
+    + '</div>'
+    + '<div style="background:#f0ebf8;padding:16px 32px;text-align:center">'
+    + '<p style="margin:0;font-size:12px;color:#999">InneREvolution Yoga &nbsp;|&nbsp; <a href="https://innerevolutionyoga.life" style="color:#7b4fc0;text-decoration:none">innerevolutionyoga.life</a></p>'
+    + '</div>'
+    + '</div>';
   GmailApp.sendEmail(email,
-    'Welcome to ' + programName + ' — Please Complete Your Intake Form',
-    'Your payment is confirmed. Complete your intake form at https://innerevolutionyoga.life/intake',
+    '✅ Zahlung bestätigt — Willkommen bei ' + programName + '!',
+    'Liebe/r ' + name + ', deine Zahlung für ' + programName + ' wurde bestätigt. Bitte fülle das Intake-Formular aus: ' + intakeUrl,
     { htmlBody: html });
   Logger.log('[INTAKE] Form sent to ' + email);
 }
@@ -330,7 +406,8 @@ function sendIntakeForm(name, email, programName) {
 // ─── STRIPE WEBHOOK (Bug #2 fix: defined ss variable properly) ────────────────
 function handleStripeWebhook(event) {
   try {
-    var email = event.data && event.data.object && event.data.object.receipt_email;
+    var obj   = event.data && event.data.object;
+    var email = obj && ((obj.customer_details && obj.customer_details.email) || obj.receipt_email || obj.customer_email);
     if (email) {
       var cfg  = getConfig();
       var ss   = SpreadsheetApp.openById(cfg.SHEET_ID); // Bug #2 FIX: ss now defined
