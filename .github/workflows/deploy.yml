@@ -38,7 +38,7 @@ jobs:
       # !! Secrets are injected here — config.js is NEVER committed to git
       - name: Generate booking/config.js from secrets
         env:
-          SHEET_ID:        ${{ secrets.SHEET_ID }}
+          SHEET_ID:        ${{ secrets.PROGRAMS_SHEET_ID }}
           SHEETS_API_KEY:  ${{ secrets.SHEETS_API_KEY }}
           APPS_SCRIPT_URL: ${{ secrets.APPS_SCRIPT_URL }}
         run: |
