@@ -42,15 +42,19 @@ jobs:
           SHEETS_API_KEY:  ${{ secrets.SHEETS_API_KEY }}
           APPS_SCRIPT_URL: ${{ secrets.APPS_SCRIPT_URL }}
         run: |
-          cat > booking/config.js << ENDOFCONFIG
-          const CONFIG = {
-            SHEET_ID:        "${SHEET_ID}",
-            SHEETS_API_KEY:  "${SHEETS_API_KEY}",
-            APPS_SCRIPT_URL: "${APPS_SCRIPT_URL}"
-          };
-          ENDOFCONFIG
-          echo "--- config.js generated ---"
-          cat booking/config.js
+          node -e "
+            const fs = require('fs');
+            const content = [
+              'const CONFIG = {',
+              '  SHEET_ID:        \"' + process.env.SHEET_ID.trim() + '\",' ,
+              '  SHEETS_API_KEY:  \"' + process.env.SHEETS_API_KEY.trim() + '\",' ,
+              '  APPS_SCRIPT_URL: \"' + process.env.APPS_SCRIPT_URL.trim() + '\"' ,
+              '};'
+            ].join('\n');
+            fs.writeFileSync('booking/config.js', content + '\n');
+            console.log('--- config.js generated ---');
+            console.log(content);
+          "
 
       - name: Compile main SCSS
         run: npm run build:css
