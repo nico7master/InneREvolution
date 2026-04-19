@@ -123,6 +123,7 @@ function doPost(e) {
     return handleBooking(data);
   } catch (err) {
     Logger.log('[ERROR] doPost: ' + err.message + '\nStack: ' + err.stack);
+    try { sendErrorAlert('doPost', err, e ? e.postData : null); } catch(e2) {}
     return jsonResponse({ success: false, error: err.message });
   }
 }
@@ -298,9 +299,9 @@ function handleBooking(data) {
     }
 
     try { sendClientConfirmation(data, programName, finalPrice, totalDisc, payUrl, sessionsStr, progRow[9]); Logger.log('[BOOKING] Client email sent'); }
-    catch (err) { Logger.log('[EMAIL ERR] Client: ' + err.message); }
+    catch (err) { Logger.log('[EMAIL ERR] Client: ' + err.message); try { sendErrorAlert('sendClientConfirmation', err, data); } catch(e2) {} }
     try { sendInstructorNotification(data, programName, finalPrice, cfg.INSTRUCTOR_EMAIL); Logger.log('[BOOKING] Instructor email sent'); }
-    catch (err) { Logger.log('[EMAIL ERR] Instructor: ' + err.message); }
+    catch (err) { Logger.log('[EMAIL ERR] Instructor: ' + err.message); try { sendErrorAlert('sendInstructorNotification', err, data); } catch(e2) {} }
 
     Logger.log('[BOOKING] === SUCCESS === ' + data.fullName + ' / ' + programName + ' EUR ' + finalPrice);
     return jsonResponse({ success: true, bookingId: bookingId, paymentUrl: payUrl, programName: programName, finalPrice: finalPrice });
@@ -309,6 +310,43 @@ function handleBooking(data) {
   }
 }
 
+
+
+// ─── ERROR ALERTS ─────────────────────────────────────────────────────────────
+function sendErrorAlert(context, err, data) {
+  try {
+    var cfg           = getConfig();
+    var instructorEmail = cfg.INSTRUCTOR_EMAIL || 'info@innerevolutionyoga.life';
+    var timestamp     = new Date().toLocaleString('de-AT', { timeZone: 'Europe/Vienna' });
+    var dataStr       = '';
+    if (data) {
+      try { dataStr = JSON.stringify(data, null, 2); } catch(e) { dataStr = String(data); }
+    }
+    var html =
+      '<div style="font-family:Arial,sans-serif;max-width:600px;background:#fff;border-radius:8px;overflow:hidden">'
+      + '<div style="background:#c0392b;padding:20px 24px">'
+      + '<h2 style="color:#fff;margin:0;font-size:18px">⚠️ Apps Script Error</h2>'
+      + '<p style="color:#f5a8a8;margin:6px 0 0;font-size:13px">InneREvolution Booking System — ' + timestamp + '</p>'
+      + '</div>'
+      + '<div style="padding:24px;background:#fafafa">'
+      + '<table style="width:100%;border-collapse:collapse;font-size:13px">'
+      + '<tr><td style="padding:6px 12px;background:#f0f0f0;color:#666;width:120px">Kontext</td><td style="padding:6px 12px"><strong>' + context + '</strong></td></tr>'
+      + '<tr><td style="padding:6px 12px;background:#f0f0f0;color:#666">Fehler</td><td style="padding:6px 12px;color:#c0392b"><strong>' + err.message + '</strong></td></tr>'
+      + (err.stack ? '<tr><td style="padding:6px 12px;background:#f0f0f0;color:#666;vertical-align:top">Stack</td><td style="padding:6px 12px;font-size:11px;color:#888;white-space:pre-wrap">' + err.stack + '</td></tr>' : '')
+      + (dataStr ? '<tr><td style="padding:6px 12px;background:#f0f0f0;color:#666;vertical-align:top">Daten</td><td style="padding:6px 12px;font-size:11px;color:#555;white-space:pre-wrap">' + dataStr + '</td></tr>' : '')
+      + '</table>'
+      + '<p style="margin:16px 0 0;font-size:12px;color:#999">Automatisch generiert vom InneREvolution Booking System</p>'
+      + '</div>'
+      + '</div>';
+    GmailApp.sendEmail(instructorEmail,
+      '[⚠️ BOOKING ERROR] ' + context + ' — ' + err.message.substring(0, 80),
+      'Error in ' + context + ': ' + err.message + '\n\nData: ' + dataStr,
+      { htmlBody: html });
+    Logger.log('[ERROR ALERT] Sent to ' + instructorEmail);
+  } catch(alertErr) {
+    Logger.log('[ERROR ALERT FAILED] ' + alertErr.message);
+  }
+}
 
 // ─── 3. EMAILS ────────────────────────────────────────────────────────────────
 function sendClientConfirmation(data, programName, finalPrice, discountPct, payUrl, sessionsStr, ort) {
