@@ -288,41 +288,64 @@ function sendClientConfirmation(data, programName, finalPrice, discountPct, payU
       if (!isNaN(d.getTime())) dateStr = d.toLocaleDateString('de-AT', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
     } catch(e) { Logger.log('[DATE] ' + e.message); }
   }
+  // Use HTML entities for emojis to avoid encoding issues in GmailApp
   var infoRows = '';
-  if (programName) infoRows += '<tr><td style="padding:8px 0;color:#666;white-space:nowrap">🧘 Programm</td><td style="padding:8px 0;padding-left:16px;font-weight:600;color:#371964">' + programName + '</td></tr>';
-  if (dateStr)     infoRows += '<tr><td style="padding:8px 0;color:#666;white-space:nowrap">📅 Datum</td><td style="padding:8px 0;padding-left:16px">' + dateStr + '</td></tr>';
-  if (ort)         infoRows += '<tr><td style="padding:8px 0;color:#666;white-space:nowrap">📍 Ort</td><td style="padding:8px 0;padding-left:16px">' + ort + '</td></tr>';
-  if (discountPct > 0) infoRows += '<tr><td style="padding:8px 0;color:#666;white-space:nowrap">🏷 Rabatt</td><td style="padding:8px 0;padding-left:16px;color:#0A5A41;font-weight:600">-' + discountPct + '%</td></tr>';
+  if (programName) infoRows += '<tr><td style="padding:8px 0;color:#666;white-space:nowrap">&#129496; Programm</td><td style="padding:8px 0;padding-left:16px;font-weight:600;color:#371964">' + programName + '</td></tr>';
+  if (dateStr)     infoRows += '<tr><td style="padding:8px 0;color:#666;white-space:nowrap">&#128197; Datum</td><td style="padding:8px 0;padding-left:16px">' + dateStr + '</td></tr>';
+  if (ort)         infoRows += '<tr><td style="padding:8px 0;color:#666;white-space:nowrap">&#128205; Ort</td><td style="padding:8px 0;padding-left:16px">' + ort + '</td></tr>';
+  if (discountPct > 0) infoRows += '<tr><td style="padding:8px 0;color:#666;white-space:nowrap">&#127991;&#65039; Rabatt</td><td style="padding:8px 0;padding-left:16px;color:#0A5A41;font-weight:600">-' + discountPct + '%</td></tr>';
   infoRows += '<tr style="border-top:2px solid #e0d4f7"><td style="padding:12px 0 4px;font-weight:bold;font-size:15px;color:#371964">Gesamtbetrag</td><td style="padding:12px 0 4px;padding-left:16px;font-size:22px;font-weight:bold;color:#371964">EUR ' + finalPrice.toFixed(2) + '</td></tr>';
   var btnHtml = payUrl
-    ? '<div style="text-align:center;margin:32px 0"><a href="' + payUrl + '" style="display:inline-block;background:linear-gradient(135deg,#FF6B35,#e8562a);color:#ffffff;padding:16px 40px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:17px;letter-spacing:0.5px">🙏 Jetzt bezahlen</a></div>'
+    ? '<div style="text-align:center;margin:32px 0"><a href="' + payUrl + '" style="display:inline-block;background:linear-gradient(135deg,#FF6B35,#e8562a);color:#ffffff;padding:16px 40px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:17px;letter-spacing:0.5px">&#128591; Jetzt bezahlen</a></div>'
     : '';
+  // Signature block (from signature_gmail_v5.html)
+  var sig =
+    '<table cellpadding="0" cellspacing="0" border="0" style="max-width:480px;background:linear-gradient(135deg,#0a1628 0%,#0f1e38 100%);border-radius:16px;overflow:hidden;border:1px solid #2e2a22;">'
+    + '<tr>'
+    + '<td style="padding:18px 0 18px 16px;vertical-align:middle;width:90px;">'
+    + '<img src="https://raw.githubusercontent.com/§§secret(INSTA_GIT_USER)/InneREvolution/main/images/signature/NicoSchlagerProfileYoga.png" width="82" style="display:block;" />'
+    + '</td>'
+    + '<td style="padding:18px 12px;vertical-align:middle;">'
+    + '<div style="color:#D6CEBC;font-size:18px;font-weight:bold;letter-spacing:1px;margin:0 0 3px 0;font-family:Georgia,serif;">Nico Schlager</div>'
+    + '<div style="color:#D6CEBC;font-size:11px;letter-spacing:2px;text-transform:uppercase;margin:0 0 6px 0;font-family:Georgia,serif;">Klassisches Hatha Yoga</div>'
+    + '<div style="font-size:15px;font-weight:bold;letter-spacing:2.5px;color:#D6CEBC;margin:0 0 8px 0;font-family:Georgia,serif;">INNE<span style="font-size:30px;line-height:0;vertical-align:middle;position:relative;top:-2px;color:#FFFFFF;">&reg;</span>EVOLUTION</div>'
+    + '<a href="https://innerevolutionyoga.life/de" style="color:#D6CEBC;font-size:13px;text-decoration:none;font-weight:bold;display:block;margin:0 0 8px 0;font-family:Georgia,serif;">innerevolutionyoga.life</a>'
+    + '<table cellpadding="0" cellspacing="0" border="0"><tr>'
+    + '<td style="padding-right:10px;"><a href="https://wa.me/qr/3CTAALSBOSBXH1" target="_blank"><img src="https://raw.githubusercontent.com/§§secret(INSTA_GIT_USER)/InneREvolution/main/images/signature/icon_whatsapp.png" width="22" height="22" style="display:block;" /></a></td>'
+    + '<td style="padding-right:10px;"><a href="https://www.instagram.com/innerevolution.yoga?igsh=dGdmdjNtN21reWd3" target="_blank"><img src="https://raw.githubusercontent.com/§§secret(INSTA_GIT_USER)/InneREvolution/main/images/signature/icon_instagram.png" width="22" height="22" style="display:block;" /></a></td>'
+    + '<td><a href="https://innerevolutionyoga.life/de" target="_blank"><img src="https://raw.githubusercontent.com/§§secret(INSTA_GIT_USER)/InneREvolution/main/images/signature/icon_globe.png" width="22" height="22" style="display:block;" /></a></td>'
+    + '</tr></table>'
+    + '</td>'
+    + '<td style="padding:16px 16px 16px 0;vertical-align:middle;width:82px;text-align:center;">'
+    + '<img src="https://raw.githubusercontent.com/§§secret(INSTA_GIT_USER)/InneREvolution/main/images/signature/Logo%20Mystical%20Simple%20Cut%20Reduced.png" width="72" style="display:block;" />'
+    + '</td>'
+    + '</tr>'
+    + '<tr><td colspan="3" style="height:2px;background:linear-gradient(90deg,transparent,#B0A896,transparent);"></td></tr>'
+    + '</table>';
   var html =
     '<div style="font-family:Helvetica Neue,Arial,sans-serif;max-width:600px;margin:0 auto;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08)">'
     + '<div style="background:linear-gradient(135deg,#371964 0%,#5a2d8a 100%);padding:40px 32px;text-align:center">'
     + '<p style="color:#c8b8ef;margin:0 0 8px;font-size:12px;letter-spacing:3px;text-transform:uppercase">InneREvolution Yoga</p>'
-    + '<h1 style="color:#ffffff;margin:0;font-size:26px;font-weight:300;letter-spacing:1px">Anmeldung bestätigt</h1>'
-    + '<p style="color:#e0d4f7;margin:12px 0 0;font-size:15px">✨ Dein Platz ist reserviert</p>'
+    + '<h1 style="color:#ffffff;margin:0;font-size:26px;font-weight:300;letter-spacing:1px">Anmeldung best&#228;tigt</h1>'
+    + '<p style="color:#e0d4f7;margin:12px 0 0;font-size:15px">&#10024; Dein Platz ist reserviert</p>'
     + '</div>'
     + '<div style="padding:36px 32px">'
-    + '<p style="font-size:16px;color:#333;margin:0 0 8px">Liebe/r <strong>' + data.fullName + '</strong>,</p>'
-    + '<p style="font-size:15px;color:#555;line-height:1.7;margin:0 0 24px">Vielen Dank für deine Anmeldung zu <strong style="color:#371964">' + programName + '</strong>. Wir freuen uns sehr, diese Praxis mit dir zu teilen.</p>'
+    + '<p style="font-size:16px;color:#333;margin:0 0 8px">Namaskaram <strong>' + data.fullName + '</strong> &#128591;&#127996;</p>'
+    + '<p style="font-size:15px;color:#555;line-height:1.7;margin:0 0 24px">Vielen Dank f&#252;r deine Anmeldung zu <strong style="color:#371964">' + programName + '</strong>. Es freut mich sehr, diese fantastische yogische Praxis mit dir zu teilen.</p>'
     + '<div style="background:#f8f5ff;border-radius:10px;padding:24px;margin:0 0 8px">'
     + '<p style="margin:0 0 12px;color:#371964;font-size:12px;letter-spacing:2px;text-transform:uppercase;font-weight:600">Deine Anmeldung</p>'
     + '<table style="width:100%;border-collapse:collapse">' + infoRows + '</table>'
     + '</div>'
     + btnHtml
-    + '<p style="font-size:13px;color:#999;text-align:center;margin:0 0 24px">Dein Platz ist reserviert — die Zahlung sichert deine Teilnahme.</p>'
+    + '<p style="font-size:13px;color:#999;text-align:center;margin:0 0 24px">Dein Platz ist reserviert &#8212; die Zahlung sichert deine Teilnahme.</p>'
     + '<div style="border-top:1px solid #eee;margin:24px 0"></div>'
-    + '<p style="font-size:14px;color:#555;line-height:1.7">Hast du Fragen? Antworte einfach auf diese E-Mail — wir helfen dir gerne.</p>'
-    + '<p style="font-size:15px;color:#371964;margin:24px 0 0">Namaste 🙏<br><strong>Nico &amp; das InneREvolution-Team</strong></p>'
-    + '</div>'
-    + '<div style="background:#f0ebf8;padding:16px 32px;text-align:center">'
-    + '<p style="margin:0;font-size:12px;color:#999">InneREvolution Yoga &nbsp;|&nbsp; <a href="https://innerevolutionyoga.life" style="color:#7b4fc0;text-decoration:none">innerevolutionyoga.life</a></p>'
+    + '<p style="font-size:14px;color:#555;line-height:1.7">Hast du Fragen? Antworte einfach auf diese E-Mail &#8212; ich helfe dir gerne.</p>'
+    + '<p style="font-size:15px;color:#371964;margin:24px 0 0">Pranam,</p>'
+    + sig
     + '</div>'
     + '</div>';
-  GmailApp.sendEmail(data.email, '🙏 Anmeldung bestätigt — ' + programName,
-    'Liebe/r ' + data.fullName + ', dein Platz in ' + programName + ' ist reserviert. Gesamtbetrag: EUR ' + finalPrice.toFixed(2) + (payUrl ? ' — Jetzt bezahlen: ' + payUrl : ''),
+  GmailApp.sendEmail(data.email, '&#128591; Anmeldung best&#228;tigt &#8212; ' + programName,
+    'Namaskaram ' + data.fullName + ', dein Platz in ' + programName + ' ist reserviert. Gesamtbetrag: EUR ' + finalPrice.toFixed(2) + (payUrl ? ' — Jetzt bezahlen: ' + payUrl : ''),
     { htmlBody: html });
   Logger.log('[EMAIL] Confirmation -> ' + data.email);
 }
@@ -366,39 +389,61 @@ function sendInstructorNotification(data, programName, finalPrice, instructorEma
 function sendIntakeForm(name, email, programName) {
   var cfg = getConfig();
   var intakeUrl = cfg.INTAKE_FORM_URL || 'https://innerevolutionyoga.life/intake';
+  // Signature block (from signature_gmail_v5.html)
+  var sig =
+    '<table cellpadding="0" cellspacing="0" border="0" style="max-width:480px;background:linear-gradient(135deg,#0a1628 0%,#0f1e38 100%);border-radius:16px;overflow:hidden;border:1px solid #2e2a22;">'
+    + '<tr>'
+    + '<td style="padding:18px 0 18px 16px;vertical-align:middle;width:90px;">'
+    + '<img src="https://raw.githubusercontent.com/§§secret(INSTA_GIT_USER)/InneREvolution/main/images/signature/NicoSchlagerProfileYoga.png" width="82" style="display:block;" />'
+    + '</td>'
+    + '<td style="padding:18px 12px;vertical-align:middle;">'
+    + '<div style="color:#D6CEBC;font-size:18px;font-weight:bold;letter-spacing:1px;margin:0 0 3px 0;font-family:Georgia,serif;">Nico Schlager</div>'
+    + '<div style="color:#D6CEBC;font-size:11px;letter-spacing:2px;text-transform:uppercase;margin:0 0 6px 0;font-family:Georgia,serif;">Klassisches Hatha Yoga</div>'
+    + '<div style="font-size:15px;font-weight:bold;letter-spacing:2.5px;color:#D6CEBC;margin:0 0 8px 0;font-family:Georgia,serif;">INNE<span style="font-size:30px;line-height:0;vertical-align:middle;position:relative;top:-2px;color:#FFFFFF;">&reg;</span>EVOLUTION</div>'
+    + '<a href="https://innerevolutionyoga.life/de" style="color:#D6CEBC;font-size:13px;text-decoration:none;font-weight:bold;display:block;margin:0 0 8px 0;font-family:Georgia,serif;">innerevolutionyoga.life</a>'
+    + '<table cellpadding="0" cellspacing="0" border="0"><tr>'
+    + '<td style="padding-right:10px;"><a href="https://wa.me/qr/3CTAALSBOSBXH1" target="_blank"><img src="https://raw.githubusercontent.com/§§secret(INSTA_GIT_USER)/InneREvolution/main/images/signature/icon_whatsapp.png" width="22" height="22" style="display:block;" /></a></td>'
+    + '<td style="padding-right:10px;"><a href="https://www.instagram.com/innerevolution.yoga?igsh=dGdmdjNtN21reWd3" target="_blank"><img src="https://raw.githubusercontent.com/§§secret(INSTA_GIT_USER)/InneREvolution/main/images/signature/icon_instagram.png" width="22" height="22" style="display:block;" /></a></td>'
+    + '<td><a href="https://innerevolutionyoga.life/de" target="_blank"><img src="https://raw.githubusercontent.com/§§secret(INSTA_GIT_USER)/InneREvolution/main/images/signature/icon_globe.png" width="22" height="22" style="display:block;" /></a></td>'
+    + '</tr></table>'
+    + '</td>'
+    + '<td style="padding:16px 16px 16px 0;vertical-align:middle;width:82px;text-align:center;">'
+    + '<img src="https://raw.githubusercontent.com/§§secret(INSTA_GIT_USER)/InneREvolution/main/images/signature/Logo%20Mystical%20Simple%20Cut%20Reduced.png" width="72" style="display:block;" />'
+    + '</td>'
+    + '</tr>'
+    + '<tr><td colspan="3" style="height:2px;background:linear-gradient(90deg,transparent,#B0A896,transparent);"></td></tr>'
+    + '</table>';
   var html =
     '<div style="font-family:Helvetica Neue,Arial,sans-serif;max-width:600px;margin:0 auto;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08)">'
     + '<div style="background:linear-gradient(135deg,#0A5A41 0%,#1a8a60 100%);padding:40px 32px;text-align:center">'
     + '<p style="color:#a8dfc9;margin:0 0 8px;font-size:12px;letter-spacing:3px;text-transform:uppercase">InneREvolution Yoga</p>'
-    + '<h1 style="color:#ffffff;margin:0;font-size:26px;font-weight:300;letter-spacing:1px">Zahlung bestätigt</h1>'
-    + '<p style="color:#d4f0e7;margin:12px 0 0;font-size:16px">✅ Du bist dabei!</p>'
+    + '<h1 style="color:#ffffff;margin:0;font-size:26px;font-weight:300;letter-spacing:1px">Zahlung best&#228;tigt</h1>'
+    + '<p style="color:#d4f0e7;margin:12px 0 0;font-size:16px">&#9989; Du bist dabei!</p>'
     + '</div>'
     + '<div style="padding:36px 32px">'
-    + '<p style="font-size:16px;color:#333;margin:0 0 8px">Liebe/r <strong>' + name + '</strong>,</p>'
-    + '<p style="font-size:15px;color:#555;line-height:1.7;margin:0 0 24px">Deine Zahlung für <strong style="color:#371964">' + programName + '</strong> wurde erfolgreich empfangen. Dein Platz ist nun offiziell gesichert. 🎉</p>'
+    + '<p style="font-size:16px;color:#333;margin:0 0 8px">Namaskaram <strong>' + name + '</strong> &#128591;&#127996;</p>'
+    + '<p style="font-size:15px;color:#555;line-height:1.7;margin:0 0 24px">Deine Zahlung f&#252;r <strong style="color:#371964">' + programName + '</strong> wurde erfolgreich empfangen. Dein Platz ist nun offiziell gesichert. &#127881;</p>'
     + '<div style="background:#f8f5ff;border-radius:10px;padding:24px;margin:0 0 28px">'
-    + '<p style="margin:0 0 16px;color:#371964;font-size:12px;letter-spacing:2px;text-transform:uppercase;font-weight:600">Deine nächsten Schritte</p>'
+    + '<p style="margin:0 0 16px;color:#371964;font-size:12px;letter-spacing:2px;text-transform:uppercase;font-weight:600">Deine n&#228;chsten Schritte</p>'
     + '<table style="width:100%;border-collapse:collapse">'
-    + '<tr><td style="padding:10px 0;vertical-align:top;width:36px;font-size:20px">1️⃣</td><td style="padding:10px 0;font-size:14px;color:#444;line-height:1.6"><strong>Fülle das Intake-Formular aus</strong><br>Das hilft uns, dich besser kennenzulernen und das beste Erlebnis für dich vorzubereiten.</td></tr>'
-    + '<tr><td style="padding:10px 0;vertical-align:top;font-size:20px">2️⃣</td><td style="padding:10px 0;font-size:14px;color:#444;line-height:1.6"><strong>Trag das Datum in deinen Kalender ein</strong><br>Du erhältst rechtzeitig eine Erinnerung mit allen Details zu Ort und Ablauf.</td></tr>'
-    + '<tr><td style="padding:10px 0;vertical-align:top;font-size:20px">3️⃣</td><td style="padding:10px 0;font-size:14px;color:#444;line-height:1.6"><strong>Komm mit einem offenen Herzen</strong><br>Trage bequeme Kleidung und bringe eine Wasserflasche mit. Ein Notizbuch ist willkommen.</td></tr>'
+    + '<tr><td style="padding:10px 0;vertical-align:top;width:36px;font-size:18px;font-weight:bold;color:#371964">1.</td><td style="padding:10px 0;font-size:14px;color:#444;line-height:1.6"><strong>F&#252;lle das Intake-Formular aus</strong><br>Das hilft uns, dich besser kennenzulernen und das beste Erlebnis f&#252;r dich vorzubereiten.</td></tr>'
+    + '<tr><td style="padding:10px 0;vertical-align:top;font-size:18px;font-weight:bold;color:#371964">2.</td><td style="padding:10px 0;font-size:14px;color:#444;line-height:1.6"><strong>Trag das Datum in deinen Kalender ein</strong><br>Du erh&#228;ltst rechtzeitig eine Erinnerung mit allen Details zu Ort und Ablauf.</td></tr>'
+    + '<tr><td style="padding:10px 0;vertical-align:top;font-size:18px;font-weight:bold;color:#371964">3.</td><td style="padding:10px 0;font-size:14px;color:#444;line-height:1.6"><strong>Komm mit einem offenen Herzen</strong><br>Trage bequeme Kleidung und bringe eine Wasserflasche mit. Ein Notizbuch ist willkommen.</td></tr>'
     + '</table>'
     + '</div>'
     + '<div style="text-align:center;margin:0 0 32px">'
-    + '<p style="font-size:14px;color:#555;margin:0 0 20px">Bitte fülle das Formular vor der ersten Session aus:</p>'
-    + '<a href="' + intakeUrl + '" style="display:inline-block;background:linear-gradient(135deg,#371964,#5a2d8a);color:#ffffff;padding:16px 40px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:16px;letter-spacing:0.5px">Intake-Formular ausfüllen →</a>'
+    + '<p style="font-size:14px;color:#555;margin:0 0 20px">Bitte f&#252;lle das Formular vor der ersten Session aus:</p>'
+    + '<a href="' + intakeUrl + '" style="display:inline-block;background:linear-gradient(135deg,#371964,#5a2d8a);color:#ffffff;padding:16px 40px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:16px;letter-spacing:0.5px">Intake-Formular ausf&#252;llen &#8594;</a>'
     + '</div>'
     + '<div style="border-top:1px solid #eee;margin:24px 0"></div>'
-    + '<p style="font-size:14px;color:#555;line-height:1.7">Hast du Fragen? Antworte einfach auf diese E-Mail — wir sind für dich da.</p>'
-    + '<p style="font-size:15px;color:#371964;margin:24px 0 0">Namaste 🙏<br><strong>Nico &amp; das InneREvolution-Team</strong></p>'
-    + '</div>'
-    + '<div style="background:#f0ebf8;padding:16px 32px;text-align:center">'
-    + '<p style="margin:0;font-size:12px;color:#999">InneREvolution Yoga &nbsp;|&nbsp; <a href="https://innerevolutionyoga.life" style="color:#7b4fc0;text-decoration:none">innerevolutionyoga.life</a></p>'
+    + '<p style="font-size:14px;color:#555;line-height:1.7">Hast du Fragen? Antworte einfach auf diese E-Mail &#8212; ich bin f&#252;r dich da.</p>'
+    + '<p style="font-size:15px;color:#371964;margin:24px 0 0">Pranam,</p>'
+    + sig
     + '</div>'
     + '</div>';
   GmailApp.sendEmail(email,
-    '✅ Zahlung bestätigt — Willkommen bei ' + programName + '!',
-    'Liebe/r ' + name + ', deine Zahlung für ' + programName + ' wurde bestätigt. Bitte fülle das Intake-Formular aus: ' + intakeUrl,
+    '&#9989; Zahlung best&#228;tigt &#8212; Willkommen bei ' + programName + '!',
+    'Namaskaram ' + name + ', deine Zahlung fuer ' + programName + ' wurde bestaetigt. Bitte fuelle das Intake-Formular aus: ' + intakeUrl,
     { htmlBody: html });
   Logger.log('[INTAKE] Form sent to ' + email);
 }
