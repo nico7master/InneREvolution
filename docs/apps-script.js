@@ -364,20 +364,22 @@ function sendClientConfirmation(data, programName, finalPrice, discountPct, payU
   var sig =
     '<table cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#0d1830;border-radius:10px;overflow:hidden;border:1px solid #2e2a22;margin-top:8px;">'
     + '<tr>'
-    + '<td width="72" style="padding:14px 0 14px 12px;vertical-align:middle;">'
+    + '<td width="80" style="padding:16px 0 16px 16px;vertical-align:middle;background:#0d1830;">'
     + '<img src="https://innerevolutionyoga.life/images/signature/NicoSchlagerProfileYoga.png" width="64" height="64" style="display:block;border-radius:4px;" />'
     + '</td>'
-    + '<td style="padding:12px 10px;vertical-align:middle;">'
-    + '<div style="color:#D6CEBC;font-size:15px;font-weight:bold;letter-spacing:0.5px;margin:0 0 1px;font-family:Georgia,serif;">Nico Schlager</div>'
-    + '<div style="color:#a0987e;font-size:10px;letter-spacing:2px;text-transform:uppercase;margin:0 0 4px;font-family:Georgia,serif;">Klassisches Hatha Yoga</div>'
-    + '<div style="font-size:12px;font-weight:bold;letter-spacing:2px;color:#D6CEBC;margin:0 0 5px;font-family:Georgia,serif;">INNE<span style="font-size:20px;line-height:0;vertical-align:middle;position:relative;top:-1px;color:#fff;">&reg;</span>EVOLUTION</div>'
-    + '<a href="https://innerevolutionyoga.life/de" style="color:#9ab4d8;font-size:11px;text-decoration:none;font-weight:bold;display:block;margin:0 0 7px;font-family:Georgia,serif;">innerevolutionyoga.life</a>'
+    + '<td style="padding:14px 12px;vertical-align:middle;width:100%;background:#0d1830;">'
+    + '<div style="color:#D6CEBC;font-size:15px;font-weight:bold;letter-spacing:0.5px;margin:0 0 2px;font-family:Georgia,serif;">Nico Schlager</div>'
+    + '<div style="color:#a0987e;font-size:10px;letter-spacing:2px;text-transform:uppercase;margin:0 0 5px;font-family:Georgia,serif;">Klassisches Hatha Yoga</div>'
+    + '<div style="font-size:12px;font-weight:bold;letter-spacing:2px;color:#D6CEBC;margin:0 0 6px;font-family:Georgia,serif;">INNE<span style="font-size:18px;line-height:0;vertical-align:middle;position:relative;top:-1px;color:#fff;">&reg;</span>EVOLUTION</div>'
+    + '<a href="https://innerevolutionyoga.life/de" style="color:#9ab4d8;font-size:11px;text-decoration:none;font-weight:bold;display:block;margin:0 0 8px;font-family:Georgia,serif;">innerevolutionyoga.life</a>'
     + '<table cellpadding="0" cellspacing="0" border="0"><tr>'
-    + '<td style="padding-right:7px;"><a href="https://wa.me/qr/3CTAALSBOSBXH1" target="_blank"><img src="https://innerevolutionyoga.life/images/signature/icon_whatsapp.png" width="20" height="20" style="display:block;" /></a></td>'
-    + '<td style="padding-right:7px;"><a href="https://www.instagram.com/innerevolution.yoga" target="_blank"><img src="https://innerevolutionyoga.life/images/signature/icon_instagram.png" width="20" height="20" style="display:block;" /></a></td>'
-    + '<td style="padding-right:7px;"><a href="https://innerevolutionyoga.life/de" target="_blank"><img src="https://innerevolutionyoga.life/images/signature/icon_globe.png" width="20" height="20" style="display:block;" /></a></td>'
-    + '<td><img src="https://innerevolutionyoga.life/images/signature/Logo%20Mystical%20Simple%20Cut%20Reduced.png" width="36" style="display:block;opacity:0.9;" /></td>'
+    + '<td style="padding-right:8px;"><a href="https://wa.me/qr/3CTAALSBOSBXH1" target="_blank"><img src="https://innerevolutionyoga.life/images/signature/icon_whatsapp.png" width="20" height="20" style="display:block;" /></a></td>'
+    + '<td style="padding-right:8px;"><a href="https://www.instagram.com/innerevolution.yoga" target="_blank"><img src="https://innerevolutionyoga.life/images/signature/icon_instagram.png" width="20" height="20" style="display:block;" /></a></td>'
+    + '<td><a href="https://innerevolutionyoga.life/de" target="_blank"><img src="https://innerevolutionyoga.life/images/signature/icon_globe.png" width="20" height="20" style="display:block;" /></a></td>'
     + '</tr></table>'
+    + '</td>'
+    + '<td width="64" style="padding:16px 16px 16px 0;vertical-align:middle;text-align:center;background:#0d1830;">'
+    + '<img src="https://innerevolutionyoga.life/images/signature/Logo%20Mystical%20Simple%20Cut%20Reduced.png" width="44" style="display:block;opacity:0.95;" />'
     + '</td>'
     + '</tr>'
     + '</table>';
@@ -404,7 +406,7 @@ function sendClientConfirmation(data, programName, finalPrice, discountPct, payU
     + '</div>'
     + '</div>';
   // Subject: use plain Unicode emoji — GmailApp handles UTF-8 subjects fine
-  GmailApp.sendEmail(data.email, '🙏 Anmeldung bestätigt — ' + programName,
+  GmailApp.sendEmail(data.email, 'Anmeldung bestätigt — ' + programName,
     'Namaskaram ' + data.fullName + ', dein Platz in ' + programName + ' ist reserviert. Gesamtbetrag: EUR ' + finalPrice.toFixed(2) + (payUrl ? ' — Jetzt bezahlen: ' + payUrl : ''),
     { htmlBody: html });
   Logger.log('[EMAIL] Confirmation -> ' + data.email);
