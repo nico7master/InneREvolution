@@ -352,17 +352,17 @@ function sendErrorAlert(context, err, data) {
 function sendClientConfirmation(data, programName, finalPrice, discountPct, payUrl, sessionsStr, ort) {
   // Build booking info rows — use real UTF-8 emoji (GS V8 handles them; HTML entities don't render in email subjects)
   var infoRows = '';
-  if (programName) infoRows += '<tr><td style="padding:8px 0;color:#777;white-space:nowrap;vertical-align:top">🧘 Programm</td><td style="padding:8px 0;padding-left:16px;font-weight:600;color:#371964">' + programName + '</td></tr>';
-  if (sessionsStr) infoRows += '<tr><td style="padding:8px 0;color:#777;white-space:nowrap;vertical-align:top">📅 Datum</td><td style="padding:8px 0;padding-left:16px;line-height:2">' + sessionsStr + '</td></tr>';
-  if (ort)         infoRows += '<tr><td style="padding:8px 0;color:#777;white-space:nowrap;vertical-align:top">📍 Ort</td><td style="padding:8px 0;padding-left:16px">' + ort + '</td></tr>';
-  if (discountPct > 0) infoRows += '<tr><td style="padding:8px 0;color:#777;white-space:nowrap">🏷️ Rabatt</td><td style="padding:8px 0;padding-left:16px;color:#0A5A41;font-weight:600">-' + discountPct + '%</td></tr>';
+  if (programName) infoRows += '<tr><td style="padding:8px 0;color:#777;white-space:nowrap;vertical-align:top">&#x1F9D8; Programm</td><td style="padding:8px 0;padding-left:16px;font-weight:600;color:#371964">' + programName + '</td></tr>';
+  if (sessionsStr) infoRows += '<tr><td style="padding:8px 0;color:#777;white-space:nowrap;vertical-align:top">&#x1F4C5; Datum</td><td style="padding:8px 0;padding-left:16px;line-height:2">' + sessionsStr + '</td></tr>';
+  if (ort)         infoRows += '<tr><td style="padding:8px 0;color:#777;white-space:nowrap;vertical-align:top">&#x1F4CD; Ort</td><td style="padding:8px 0;padding-left:16px">' + ort + '</td></tr>';
+  if (discountPct > 0) infoRows += '<tr><td style="padding:8px 0;color:#777;white-space:nowrap">&#x1F3F7;&#xFE0F; Rabatt</td><td style="padding:8px 0;padding-left:16px;color:#0A5A41;font-weight:600">-' + discountPct + '%</td></tr>';
   infoRows += '<tr style="border-top:2px solid #e0d4f7"><td style="padding:12px 0 4px;font-weight:bold;font-size:15px;color:#371964">Gesamtbetrag</td><td style="padding:12px 0 4px;padding-left:16px;font-size:22px;font-weight:bold;color:#371964">EUR ' + finalPrice.toFixed(2) + '</td></tr>';
   var btnHtml = payUrl
-    ? '<div style="text-align:center;margin:32px 0"><a href="' + payUrl + '" style="display:inline-block;background:#e8562a;color:#ffffff;padding:16px 40px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:17px;letter-spacing:0.5px">🙏 Jetzt bezahlen</a></div>'
+    ? '<div style="text-align:center;margin:32px 0"><a href="' + payUrl + '" style="display:inline-block;background:#e8562a;color:#ffffff;padding:16px 40px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:17px;letter-spacing:0.5px">&#x1F64F; Jetzt bezahlen</a></div>'
     : '';
   // Gmail-safe signature: solid bg (no gradient), width:100%, compact
   var sig =
-    '<table cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:420px;background:#0d1830;border-radius:10px;overflow:hidden;border:1px solid #2e2a22;margin-top:8px;">'
+    '<table cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#0d1830;border-radius:10px;overflow:hidden;border:1px solid #2e2a22;margin-top:8px;">'
     + '<tr>'
     + '<td width="72" style="padding:14px 0 14px 12px;vertical-align:middle;">'
     + '<img src="https://innerevolutionyoga.life/images/signature/NicoSchlagerProfileYoga.png" width="64" height="64" style="display:block;border-radius:4px;" />'
@@ -389,7 +389,7 @@ function sendClientConfirmation(data, programName, finalPrice, discountPct, payU
     + '<p style="color:#e0d4f7;margin:12px 0 0;font-size:15px">✨ Dein Platz ist reserviert</p>'
     + '</div>'
     + '<div style="padding:36px 32px">'
-    + '<p style="font-size:16px;color:#333;margin:0 0 8px">Namaskaram <strong>' + data.fullName + '</strong> 🙏🏽</p>'
+    + '<p style="font-size:16px;color:#333;margin:0 0 8px">Namaskaram <strong>' + data.fullName + '</strong> &#x1F64F;</p>'
     + '<p style="font-size:15px;color:#555;line-height:1.7;margin:0 0 24px">Vielen Dank für deine Anmeldung zu <strong style="color:#371964">' + programName + '</strong>. Es freut mich sehr, diese yogische Praxis mit dir teilen zu dürfen.</p>'
     + '<div style="background:#f8f5ff;border-radius:10px;padding:24px;margin:0 0 8px">'
     + '<p style="margin:0 0 12px;color:#371964;font-size:12px;letter-spacing:2px;text-transform:uppercase;font-weight:600">Deine Anmeldung</p>'
