@@ -270,7 +270,7 @@ function handleBooking(data) {
 
     // Build formatted session list from Sessions tab for the confirmation email
     var sessionsStr = '';
-    var sessSheet   = ss.getSheetByName('Sessions');
+    var sessSheet   = ss.getSheetByName('📅 Sessions') || ss.getSheetByName('Sessions');
     if (sessSheet) {
       var DAYS_DE   = ['So','Mo','Di','Mi','Do','Fr','Sa'];
       var MONTHS_DE = ['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
@@ -292,10 +292,10 @@ function handleBooking(data) {
         if (isNaN(sd.getTime())) continue;
         var ts  = sRow[4] ? fmtTime(sRow[4]) : '';
         var te  = sRow[5] ? fmtTime(sRow[5]) : '';
-        var timeStr = (ts && te) ? '<span style="color:#888;font-size:13px">' + ts + '–' + te + '</span>' : '';
-        sesLines.push('<strong>' + DAYS_DE[sd.getDay()] + ', ' + sd.getDate() + '. ' + MONTHS_DE[sd.getMonth()] + '</strong>' + (timeStr ? '&nbsp;&nbsp;' + timeStr : ''));
+        var timeStr = (ts && te) ? '<div style="color:#888;font-size:13px;margin-top:2px">' + ts + '\u2013' + te + '</div>' : '';
+        sesLines.push('<div style="margin-bottom:6px"><strong>' + DAYS_DE[sd.getDay()] + ', ' + sd.getDate() + '. ' + MONTHS_DE[sd.getMonth()] + '</strong>' + timeStr + '</div>');
       }
-      sessionsStr = sesLines.join('<br>');
+      sessionsStr = sesLines.join('');
     }
 
     try { sendClientConfirmation(data, programName, finalPrice, totalDisc, payUrl, sessionsStr, progRow[9]); Logger.log('[BOOKING] Client email sent'); }
@@ -362,12 +362,12 @@ function sendClientConfirmation(data, programName, finalPrice, discountPct, payU
     : '';
   // Gmail-safe signature: solid bg (no gradient), width:100%, compact
   var sig =
-    '<table cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#0d1830;border-radius:10px;overflow:hidden;border:1px solid #2e2a22;margin-top:8px;">'
+    '<table cellpadding="0" cellspacing="0" border="0" width="560" bgcolor="#0d1830" style="background:#0d1830;border-radius:10px;overflow:hidden;border:1px solid #2e2a22;margin-top:8px;">'
     + '<tr>'
-    + '<td width="80" style="padding:16px 0 16px 16px;vertical-align:middle;background:#0d1830;">'
+    + '<td width="80" bgcolor="#0d1830" style="background:#0d1830;padding:16px 0 16px 16px;vertical-align:middle;">'
     + '<img src="https://innerevolutionyoga.life/images/signature/NicoSchlagerProfileYoga.png" width="64" height="64" style="display:block;border-radius:4px;" />'
     + '</td>'
-    + '<td style="padding:14px 12px;vertical-align:middle;width:100%;background:#0d1830;">'
+    + '<td width="408" bgcolor="#0d1830" style="background:#0d1830;padding:14px 12px;vertical-align:middle;">'
     + '<div style="color:#D6CEBC;font-size:15px;font-weight:bold;letter-spacing:0.5px;margin:0 0 2px;font-family:Georgia,serif;">Nico Schlager</div>'
     + '<div style="color:#a0987e;font-size:10px;letter-spacing:2px;text-transform:uppercase;margin:0 0 5px;font-family:Georgia,serif;">Klassisches Hatha Yoga</div>'
     + '<div style="font-size:12px;font-weight:bold;letter-spacing:2px;color:#D6CEBC;margin:0 0 6px;font-family:Georgia,serif;">INNE<span style="font-size:18px;line-height:0;vertical-align:middle;position:relative;top:-1px;color:#fff;">&reg;</span>EVOLUTION</div>'
@@ -378,8 +378,8 @@ function sendClientConfirmation(data, programName, finalPrice, discountPct, payU
     + '<td><a href="https://innerevolutionyoga.life/de" target="_blank"><img src="https://innerevolutionyoga.life/images/signature/icon_globe.png" width="20" height="20" style="display:block;" /></a></td>'
     + '</tr></table>'
     + '</td>'
-    + '<td width="64" style="padding:16px 16px 16px 0;vertical-align:middle;text-align:center;background:#0d1830;">'
-    + '<img src="https://innerevolutionyoga.life/images/signature/Logo%20Mystical%20Simple%20Cut%20Reduced.png" width="44" style="display:block;opacity:0.95;" />'
+    + '<td width="72" bgcolor="#0d1830" style="background:#0d1830;padding:16px 16px 16px 0;vertical-align:middle;text-align:center;">'
+    + '<img src="https://innerevolutionyoga.life/images/signature/Logo%20Mystical%20Simple%20Cut%20Reduced.png" width="48" style="display:block;margin:0 auto;opacity:0.95;" />'
     + '</td>'
     + '</tr>'
     + '</table>';
@@ -406,7 +406,7 @@ function sendClientConfirmation(data, programName, finalPrice, discountPct, payU
     + '</div>'
     + '</div>';
   // Subject: use plain Unicode emoji — GmailApp handles UTF-8 subjects fine
-  GmailApp.sendEmail(data.email, 'Anmeldung bestätigt — ' + programName,
+  GmailApp.sendEmail(data.email, '\uD83D\uDE4F Anmeldung best\u00E4tigt \u2014 ' + programName,
     'Namaskaram ' + data.fullName + ', dein Platz in ' + programName + ' ist reserviert. Gesamtbetrag: EUR ' + finalPrice.toFixed(2) + (payUrl ? ' — Jetzt bezahlen: ' + payUrl : ''),
     { htmlBody: html });
   Logger.log('[EMAIL] Confirmation -> ' + data.email);
