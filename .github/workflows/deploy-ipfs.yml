@@ -1,0 +1,108 @@
+name: Deploy to IPFS via Pinata
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ipfs-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy-ipfs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Same config.js generation as GitHub Pages deploy
+      - name: Generate booking/config.js from secrets
+        env:
+          SHEET_ID: ${{ secrets.PROGRAMS_SHEET_ID }}
+          SHEETS_API_KEY: ${{ secrets.SHEETS_API_KEY }}
+          APPS_SCRIPT_URL: ${{ secrets.APPS_SCRIPT_URL }}
+        run: |
+          printf 'const CONFIG = {
+  SHEET_ID:        "%s",
+  SHEETS_API_KEY:  "%s",
+  APPS_SCRIPT_URL: "%s"
+};
+'             "$SHEET_ID" "$SHEETS_API_KEY" "$APPS_SCRIPT_URL" > booking/config.js
+          echo "--- config.js generated ---"
+
+      - name: Compile main SCSS
+        run: npm run build:css
+
+      - name: Compile booking SCSS
+        run: npm run build:booking
+
+      # Create clean deploy directory excluding dev/backup/source files
+      - name: Prepare IPFS deploy directory
+        run: |
+          mkdir -p _ipfs_deploy
+          rsync -a             --exclude='.git'             --exclude='.github'             --exclude='node_modules'             --exclude='.a0proj'             --exclude='.tmp'             --exclude='.vscode'             --exclude='docs'             --exclude='scripts'             --exclude='*.bak'             --exclude='*.broken'             --exclude='*.map'             --exclude='*.revert_mistake'             --exclude='SHEETS_*'             --exclude='package.json'             --exclude='package-lock.json'             --exclude='fiveserver.config.js'             --exclude='agentzero.txt'             --exclude='.gitignore'             --exclude='.gitattributes'             --exclude='CNAME'             --exclude='*_ARCHITECTURE.promptinclude.md'             --exclude='images/NotUsed'             --exclude='images/UsedOriginal'             --exclude='images/Yoga/Original'             --exclude='SVGs/NotUsed'             --exclude='assets/sass'             --exclude='booking/booking.scss'             --exclude='booking/config.js.example'             --exclude='data/programs.schema.json'             --exclude='data/sheet-cache.json'             ./ _ipfs_deploy/
+
+          echo "--- IPFS deploy directory ---"
+          du -sh _ipfs_deploy
+          find _ipfs_deploy -maxdepth 2 -type d | head -30
+
+      - name: Pin to IPFS via Pinata
+        id: pinata
+        uses: anantaramdas/ipfs-pinata-deploy-action@v1.6.4
+        with:
+          pin-name: 'inneREvolution-website'
+          path: './_ipfs_deploy'
+          pinata-api-key: ${{ secrets.PINATA_API_KEY }}
+          pinata-secret-api-key: ${{ secrets.PINATA_SECRET_API_KEY }}
+          remove-old: true
+          verbose: true
+
+      - name: Verify IPFS deployment
+        run: |
+          CID="${{ steps.pinata.outputs.hash }}"
+          echo "Verifying deployment on Pinata gateway..."
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}"             --max-time 30             "https://gateway.pinata.cloud/ipfs/${CID}/")
+          echo "Gateway HTTP status: $HTTP_STATUS"
+          if [ "$HTTP_STATUS" = "200" ]; then
+            echo "✅ Site is live on IPFS!"
+          else
+            echo "⚠️ Gateway returned $HTTP_STATUS (may need a few minutes to propagate)"
+          fi
+
+      - name: Output IPFS deployment info
+        run: |
+          CID="${{ steps.pinata.outputs.hash }}"
+          echo "=========================================="
+          echo "🚀 IPFS Deployment Complete!"
+          echo "=========================================="
+          echo "CID: $CID"
+          echo "Gateway: https://gateway.pinata.cloud/ipfs/$CID"
+          echo "IPFS URI: ipfs://$CID"
+          echo ""
+          echo "🔗 To update Unstoppable Domain:"
+          echo "   1. Go to https://manage.unstoppabledomains.com/"
+          echo "   2. Select 'innerevolution.brave'"
+          echo "   3. Set dweb.ipfs.hash = $CID"
+          echo "=========================================="
+
+      - name: Update GitHub job summary
+        run: |
+          CID="${{ steps.pinata.outputs.hash }}"
+          echo "## 🌐 IPFS Deployment" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Field | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| CID | ${CID} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Pinata Gateway | [Open site](https://gateway.pinata.cloud/ipfs/${CID}) |" >> $GITHUB_STEP_SUMMARY
+          echo "| IPFS URI | ipfs://${CID} |" >> $GITHUB_STEP_SUMMARY
+          echo "| UD Record | dweb.ipfs.hash = ${CID} |" >> $GITHUB_STEP_SUMMARY

@@ -71,3 +71,6 @@ docs/.clasp.json
 .tmp/
 
 # Booking config — generated at deploy time from GitHub Secrets
+
+# Project context notes — keep local
+*.promptinclude.md
