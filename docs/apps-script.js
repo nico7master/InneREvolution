@@ -1,60 +1,121 @@
 /**
- * InneREvolution — Google Apps Script (Full Suite v4)
+ * InneREvolution — Google Apps Script (Full Suite v5 / deploy v75)
  * ─────────────────────────────────────────────────────
- * Version: v4 (2026-04-11)
+ * Version: v5 (2026-04-22)   —   Robustness overhaul
  *
- * FIXES from v3:
- *  1. handleBooking: LockService, duplicate check, email validation, no formula write
- *  2. handleStripeWebhook: fixed undefined ss variable
- *  3. onEdit: correct sheet name + column mapping
- *  4. formatSheet: correct tab names + column counts
- *  5. applyConditionalFormatting: correct column positions
- *  6. applyDataValidations: correct tab names + positions
- *  7. buildDashboard: correct formula references with emoji tab names
- *  8. checkFriendReferrals: verified column indices + safeAlert
- *  9. sendPaymentReminders: correct column mapping + safeAlert
- * 10. sendDailyReport: correct references + safeAlert
- * 11. syncSessionsToCalendar: correct column mapping + safeAlert
- * 12. All trigger functions: safeAlert() instead of getUi().alert()
- * 13. createAllStripeLinks: correct tab name + column mapping
+ * NEW IN v75 (vs v74 / code version v4):
+ *   R1. Stripe webhook signature NOT verifiable via Apps Script headers.
+ *       Instead: every incoming webhook event is re-fetched via Stripe API
+ *       (/v1/events/{id}) to confirm authenticity before marking paid.
+ *   R2. Webhook matches booking by `client_reference_id` (= Booking ID),
+ *       not by email. Fixes cross-contamination when one email has
+ *       multiple bookings.
+ *   R3. Payment URL returned to client now includes
+ *       `&client_reference_id=BK-...` so the Stripe Checkout carries the
+ *       booking ID back into the webhook event.
+ *   R4. Central `COLS` constant — single source of truth for column
+ *       indices. No more scattered magic numbers.
+ *   R5. API token required on doPost booking requests (`data.apiToken`)
+ *       to block anonymous bots. Webhook path is exempt (verified via R1).
+ *   R6. Global rate-limit via CacheService (30 bookings / minute max).
+ *   R7. `createStripePaymentLink` caches product IDs by program name in
+ *       Script Properties → no duplicate Stripe products on re-edit.
+ *   R8. Cancellation flow: signed `doGet(?action=cancel&id=BK-..&t=..)`
+ *       marks booking cancelled, frees the spot, notifies instructor.
+ *   R9. `logError()` helper writes to `📛 Error Log` sheet (created on
+ *       demand) + emails instructor on critical errors.
+ *   R10. Friend referral matching now tries email first, then name.
  *
- * COLUMN MAPPINGS (ground truth from live sheet):
+ * PRESERVED FROM v74:
+ *   - All email HTML templates (client confirmation, instructor,
+ *     intake, payment reminder, daily report)
+ *   - LockService concurrency protection on bookings
+ *   - Duplicate booking prevention (email + programId)
+ *   - Tab-name fallbacks (emoji ↔ English)
+ *   - safeAlert() trigger-safe UI helper
  *
- *   🧘 Kursplanung (data starts row 4, 3 header rows):
- *     [0]A=Isha Code  [1]B=Instance ID  [2]C=Modul Typ  [3]D=Kursname
- *     [4]E=Modul  [5]F=Sessions  [6]G=Std/Sess  [7]H=Datum  [8]I=Uhrzeit
- *     [9]J=Ort  [10]K=Max TN  [11]L=Empf.Preis  [12]M=Preis/TN
- *     [13]N=Angemeldet(AUTO)  [14]O=Website?  [15]P=Umsatz(AUTO)
- *     [16]Q=Auslastung%(AUTO)  [17]R=Sprache  [18]S=Total Std
- *     [19]T=(helper)  [20]U=(Stripe test)  [21]V=Stripe Link
- *     [22]W=Freie Plätze(AUTO K-N)  [23]X=Beschreibung
- *
- *   📋 Buchungen (data starts row 2, 1 header row):
- *     [0]A=Datum  [1]B=Name  [2]C=Email  [3]D=Telefon  [4]E=Instance ID
- *     [5]F=Kursname  [6]G=Rabattcode  [7]H=% Rabatt  [8]I=Freunde %
- *     [9]J=Total Rabatt %  [10]K=Final EUR  [11]L=Payment Sent
- *     [12]M=Bezahlt  [13]N=Intake gesendet  [14]O=Freunde Anz.
- *     [15]P=Freunde Namen  [16]Q=Freunde verifiziert  [17]R=Empfehlung von
- *     [18]S=Empfehler bestätigt  [19]T=Booking ID
- *
- *   🏷 Rabatte (data starts row 3, title + header):
- *     [0]A=Code  [1]B=% Rabatt  [2]C=Beschreibung  [3]D=Gültig bis
- *     [4]E=Aktiv  [5]F=Nutzungen
- *
- *   📅 Sessions (data starts row 2, 1 header row):
- *     [0]A=Instance ID  [1]B=Kursname  [2]C=Session#  [3]D=Datum
- *     [4]E=Start time  [5]F=End time  [6]G=Ort  [7]H=TN  [8]I=Status
- *     [9]J=Notizen  [10]K=CalEventID
+ * COLUMN MAPPINGS (see COLS constant below for single source of truth):
+ *   🧘 Kursplanung (data starts row 4, 3 header rows)
+ *   📋 Buchungen   (data starts row 2, 1 header row)
+ *   🏷 Rabatte     (data starts row 3, title + header)
+ *   📅 Sessions    (data starts row 2, 1 header row)
  *
  * Script Properties required:
- *   SHEET_ID, CALENDAR_ID, STRIPE_KEY, INSTRUCTOR_EMAIL, STRIPE_WEBHOOK_SECRET
+ *   SHEET_ID, CALENDAR_ID, INSTRUCTOR_EMAIL,
+ *   STRIPE_KEY_TEST, STRIPE_KEY_LIVE, STRIPE_WEBHOOK_SECRET_TEST,
+ *   STRIPE_WEBHOOK_SECRET_LIVE, TEST_MODE, INTAKE_FORM_URL,
+ *   API_TOKEN (shared secret with the website),
+ *   CANCELLATION_SECRET (HMAC key for cancel URLs)
  */
 
-// ─── 0. CONFIG ────────────────────────────────────────────────────────────────
+// ─── 0. COLUMN MAPS — SINGLE SOURCE OF TRUTH (R4) ────────────────────────────
+var COLS = {
+  KURSPLANUNG: {
+    FIRST_DATA_ROW: 4,  // row 1 title, row 2 colors, row 3 headers
+    ISHA_CODE: 0,    // A
+    INSTANCE_ID: 1,  // B
+    MODUL_TYP: 2,    // C
+    KURSNAME: 3,     // D
+    MODUL: 4,        // E
+    SESSIONS: 5,     // F
+    STD_SESS: 6,     // G
+    DATUM: 7,        // H
+    UHRZEIT: 8,      // I
+    ORT: 9,          // J
+    MAX_TN: 10,      // K
+    EMPF_PREIS: 11,  // L
+    PREIS_TN: 12,    // M
+    ANGEMELDET: 13,  // N (AUTO)
+    WEBSITE: 14,     // O
+    UMSATZ: 15,      // P (AUTO)
+    AUSLASTUNG: 16,  // Q (AUTO)
+    SPRACHE: 17,     // R
+    TOTAL_STD: 18,   // S
+    HELPER: 19,      // T
+    STRIPE_TEST: 20, // U
+    STRIPE_LINK: 21, // V
+    FREIE_PLATZE: 22,// W (AUTO K-N)
+    BESCHREIBUNG: 23 // X
+  },
+  BUCHUNGEN: {
+    FIRST_DATA_ROW: 2,
+    DATUM: 0,        // A
+    NAME: 1,         // B
+    EMAIL: 2,        // C
+    TELEFON: 3,      // D
+    INSTANCE_ID: 4,  // E
+    KURSNAME: 5,     // F
+    RABATTCODE: 6,   // G
+    RABATT_PCT: 7,   // H
+    FREUNDE_PCT: 8,  // I
+    TOTAL_RABATT: 9, // J
+    FINAL_EUR: 10,   // K
+    PAYMENT_SENT: 11,// L
+    BEZAHLT: 12,     // M
+    INTAKE_SENT: 13, // N
+    FREUNDE_ANZ: 14, // O
+    FREUNDE_NAMEN: 15, // P
+    FREUNDE_VERIFIED: 16, // Q
+    REFERRED_BY: 17, // R
+    REFERRER_OK: 18, // S
+    BOOKING_ID: 19,  // T
+    STATUS: 20       // U  (NEW in v75: active / cancelled)
+  },
+  RABATTE: {
+    FIRST_DATA_ROW: 3,
+    CODE: 0, PCT: 1, DESC: 2, VALID_UNTIL: 3, ACTIVE: 4, USES: 5
+  },
+  SESSIONS: {
+    FIRST_DATA_ROW: 2,
+    INSTANCE_ID: 0, KURSNAME: 1, SESSION_NUM: 2, DATUM: 3,
+    START: 4, END: 5, ORT: 6, TN: 7, STATUS: 8, NOTIZEN: 9, CAL_EVENT_ID: 10
+  }
+};
+
+// ─── 0a. CONFIG ───────────────────────────────────────────────────────────────
 function getConfig() {
   var p = PropertiesService.getScriptProperties().getProperties();
   var testMode = (p.TEST_MODE || 'true').toString().toLowerCase() === 'true';
-  // Auto-select webhook secret based on TEST_MODE
   var webhookSecret = testMode
     ? (p.STRIPE_WEBHOOK_SECRET_TEST || p.STRIPE_WEBHOOK_SECRET || '')
     : (p.STRIPE_WEBHOOK_SECRET_LIVE || p.STRIPE_WEBHOOK_SECRET || '');
@@ -65,11 +126,14 @@ function getConfig() {
     INSTRUCTOR_EMAIL:      p.INSTRUCTOR_EMAIL      || Session.getActiveUser().getEmail(),
     STRIPE_WEBHOOK_SECRET: webhookSecret,
     INTAKE_FORM_URL:       p.INTAKE_FORM_URL       || 'https://innerevolutionyoga.life/intake',
+    API_TOKEN:             p.API_TOKEN             || '',  // R5
+    CANCELLATION_SECRET:   p.CANCELLATION_SECRET   || '',  // R8
+    WEB_APP_URL:           p.WEB_APP_URL           || '',  // used in cancel link
     TEST_MODE:             testMode
   };
 }
 
-// ─── SAFE ALERT (Bug #12 fix: trigger-safe UI helper) ─────────────────────────
+// ─── SAFE ALERT (trigger-safe UI helper) ──────────────────────────────────────
 function safeAlert(title, message, buttons) {
   try {
     var ui = SpreadsheetApp.getUi();
@@ -79,10 +143,71 @@ function safeAlert(title, message, buttons) {
   }
 }
 
-// ─── EMAIL VALIDATION (Bug #1 addition) ───────────────────────────────────────
+// ─── EMAIL VALIDATION ─────────────────────────────────────────────────────────
 function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email).trim());
 }
+
+// ─── HMAC-SHA256 HELPER (R8 — cancellation token signing) ─────────────────────
+function hmacSign(message, secret) {
+  var raw = Utilities.computeHmacSha256Signature(String(message), String(secret));
+  return raw.map(function(b) {
+    var v = (b < 0 ? b + 256 : b).toString(16);
+    return v.length === 1 ? '0' + v : v;
+  }).join('');
+}
+function constantTimeEquals(a, b) {
+  a = String(a); b = String(b);
+  if (a.length !== b.length) return false;
+  var r = 0;
+  for (var i = 0; i < a.length; i++) r |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return r === 0;
+}
+
+// ─── RATE LIMIT (R6) — global N-per-minute using CacheService ────────────────
+function checkRateLimit(bucket, maxPerMinute) {
+  try {
+    var cache = CacheService.getScriptCache();
+    var now = Math.floor(Date.now() / 1000);
+    var windowStart = now - (now % 60);
+    var key = 'RL:' + bucket + ':' + windowStart;
+    var cur = parseInt(cache.get(key) || '0');
+    if (cur >= maxPerMinute) return false;
+    cache.put(key, String(cur + 1), 70);
+    return true;
+  } catch (e) {
+    Logger.log('[RATELIMIT] cache error: ' + e.message);
+    return true; // fail open
+  }
+}
+
+// ─── ERROR LOG (R9) — persistent log sheet + optional email alert ────────────
+function logError(context, err, extra) {
+  try {
+    var cfg = getConfig();
+    var ss  = SpreadsheetApp.openById(cfg.SHEET_ID);
+    var sh  = ss.getSheetByName('📛 Error Log');
+    if (!sh) {
+      sh = ss.insertSheet('📛 Error Log');
+      sh.appendRow(['Timestamp', 'Context', 'Error', 'Stack', 'Data']);
+      sh.getRange(1, 1, 1, 5).setFontWeight('bold').setBackground('#5F1630').setFontColor('#ffffff');
+      sh.setFrozenRows(1);
+    }
+    var dataStr = '';
+    try { dataStr = extra ? JSON.stringify(extra).substring(0, 2000) : ''; } catch (e) { dataStr = String(extra); }
+    sh.appendRow([
+      new Date(),
+      String(context || ''),
+      String((err && err.message) || err || ''),
+      String((err && err.stack) || '').substring(0, 2000),
+      dataStr
+    ]);
+  } catch (e) {
+    Logger.log('[LOG_ERROR FAILED] ' + e.message);
+  }
+  Logger.log('[ERROR] ' + context + ': ' + ((err && err.message) || err));
+}
+
 
 // ─── 1. MENU ──────────────────────────────────────────────────────────────────
 function onOpen() {
@@ -106,102 +231,185 @@ function onOpen() {
 }
 
 // ─── 2. WEB APP ───────────────────────────────────────────────────────────────
-function doGet() {
-  return ContentService.createTextOutput('InneREvolution Booking API v4 — OK');
+function doGet(e) {
+  try {
+    var params = (e && e.parameter) ? e.parameter : {};
+    if (params.action === 'cancel' && params.id && params.t) {
+      return handleCancellation(params.id, params.t);
+    }
+    if (params.action === 'health') {
+      return jsonResponse({ ok: true, version: 'v75', ts: new Date().toISOString() });
+    }
+  } catch (err) {
+    logError('doGet', err, e && e.parameter);
+  }
+  return ContentService.createTextOutput('InneREvolution Booking API v75 — OK');
+}
+
+// ─── CANCELLATION (R8) — signed link handler ─────────────────────────────────
+function handleCancellation(bookingId, token) {
+  var cfg = getConfig();
+  if (!cfg.CANCELLATION_SECRET) {
+    return htmlPage('Cancellation is not configured. Please contact us.', '#5F1630');
+  }
+  var expected = hmacSign(bookingId, cfg.CANCELLATION_SECRET);
+  if (!constantTimeEquals(token, expected)) {
+    return htmlPage('Invalid or expired cancellation link.', '#5F1630');
+  }
+  var lock = LockService.getScriptLock();
+  try {
+    if (!lock.tryLock(10000)) return htmlPage('Server busy, please retry in a moment.', '#5F1630');
+    var ss = SpreadsheetApp.openById(cfg.SHEET_ID);
+    var book = ss.getSheetByName('📋 Buchungen') || ss.getSheetByName('Bookings');
+    if (!book) return htmlPage('Booking sheet not found.', '#5F1630');
+    var rows = book.getDataRange().getValues();
+    var B = COLS.BUCHUNGEN;
+    for (var r = 1; r < rows.length; r++) {
+      if (String(rows[r][B.BOOKING_ID]).trim() === String(bookingId).trim()) {
+        var currentStatus = String(rows[r][B.STATUS] || '').toLowerCase();
+        if (currentStatus === 'cancelled') {
+          return htmlPage('This booking is already cancelled.', '#826400');
+        }
+        // Write STATUS column (U = col 21, 1-based)
+        book.getRange(r + 1, B.STATUS + 1).setValue('cancelled');
+        try {
+          var name = rows[r][B.NAME] || 'Customer';
+          var email = rows[r][B.EMAIL];
+          var progName = rows[r][B.KURSNAME] || '';
+          if (cfg.INSTRUCTOR_EMAIL) {
+            GmailApp.sendEmail(cfg.INSTRUCTOR_EMAIL,
+              '[Cancellation] ' + name + ' — ' + progName,
+              'Booking ' + bookingId + ' (' + name + ' / ' + email + ') cancelled via self-service link at ' + new Date().toISOString(),
+              {});
+          }
+        } catch (em) { logError('handleCancellation:email', em, {id: bookingId}); }
+        return htmlPage('Your booking for <strong>' + (rows[r][B.KURSNAME] || '') + '</strong> has been cancelled.<br><br>If you change your mind, please contact us directly.', '#0A5A41');
+      }
+    }
+    return htmlPage('Booking not found.', '#5F1630');
+  } catch (err) {
+    logError('handleCancellation', err, {id: bookingId});
+    return htmlPage('An error occurred. Please contact us.', '#5F1630');
+  } finally {
+    try { lock.releaseLock(); } catch(e2) {}
+  }
+}
+function htmlPage(message, color) {
+  var html = '<!doctype html><html><head><meta charset="utf-8"><title>InneREvolution</title>'
+    + '<style>body{font-family:Helvetica,Arial,sans-serif;background:#f8f5ff;margin:0;padding:40px;color:#333}'
+    + '.box{max-width:520px;margin:0 auto;background:#fff;border-radius:12px;padding:40px;box-shadow:0 4px 24px rgba(0,0,0,.08);text-align:center}'
+    + '.hdr{background:' + (color || '#371964') + ';color:#fff;padding:20px;margin:-40px -40px 24px;border-radius:12px 12px 0 0;font-weight:bold}'
+    + '</style></head><body><div class="box"><div class="hdr">InneREvolution Yoga</div>'
+    + '<p style="font-size:16px;line-height:1.6">' + message + '</p>'
+    + '<p style="font-size:13px;color:#999;margin-top:32px">innerevolutionyoga.life</p>'
+    + '</div></body></html>';
+  return HtmlService.createHtmlOutput(html);
 }
 
 function doPost(e) {
   Logger.log('[REQUEST] doPost received');
   try {
     var data = JSON.parse(e.postData.contents);
-    Logger.log('[REQUEST] Parsed data: ' + JSON.stringify(data));
-    if (data.type && (data.type.indexOf('payment_intent') === 0 || data.type === 'checkout.session.completed')) {
+    Logger.log('[REQUEST] Parsed data keys: ' + Object.keys(data).join(','));
+
+    // Route: Stripe webhook events (authenticity re-verified inside)
+    if (data.type && (data.type.indexOf('payment_intent') === 0 ||
+                      data.type === 'checkout.session.completed' ||
+                      data.type.indexOf('charge.') === 0)) {
       Logger.log('[REQUEST] Routing to Stripe webhook handler');
       return handleStripeWebhook(data);
     }
+
+    // Bookings — protected path
+    // R6: rate limit — 30 bookings/min globally is plenty for a yoga business
+    if (!checkRateLimit('booking', 30)) {
+      Logger.log('[RATELIMIT] rejected booking');
+      return jsonResponse({ success: false, error: 'Too many requests. Please try again in a minute.' });
+    }
+    // R5: API token shared secret
+    var cfg = getConfig();
+    if (cfg.API_TOKEN) {
+      if (!data.apiToken || !constantTimeEquals(String(data.apiToken), String(cfg.API_TOKEN))) {
+        Logger.log('[AUTH] booking rejected: bad/missing apiToken');
+        return jsonResponse({ success: false, error: 'Unauthorized.' });
+      }
+    }
+
     Logger.log('[REQUEST] Routing to booking handler');
     return handleBooking(data);
   } catch (err) {
     Logger.log('[ERROR] doPost: ' + err.message + '\nStack: ' + err.stack);
+    logError('doPost', err, e ? e.postData : null);
     try { sendErrorAlert('doPost', err, e ? e.postData : null); } catch(e2) {}
     return jsonResponse({ success: false, error: err.message });
   }
 }
 
-// ─── HANDLE BOOKING (Bug #1: +LockService, +duplicate check, +email validation, -formula write) ──
 function handleBooking(data) {
   Logger.log('[BOOKING] === START === programId=' + data.programId + ' name=' + data.fullName + ' email=' + data.email);
 
-  // Email validation (Bug #1)
   if (data.email && !isValidEmail(data.email)) {
     Logger.log('[BOOKING] FAIL: invalid email: ' + data.email);
     return jsonResponse({ success: false, error: 'Invalid email address format.' });
   }
 
   var cfg = getConfig();
-  Logger.log('[BOOKING] Config SHEET_ID=' + cfg.SHEET_ID);
+  var K   = COLS.KURSPLANUNG;
+  var B   = COLS.BUCHUNGEN;
+  var D   = COLS.RABATTE;
   var ss   = SpreadsheetApp.openById(cfg.SHEET_ID);
   var prog = ss.getSheetByName('🧘 Kursplanung') || ss.getSheetByName('Programs');
   var disc = ss.getSheetByName('🏷 Rabatte')      || ss.getSheetByName('Discount Codes');
   var book = ss.getSheetByName('📋 Buchungen')     || ss.getSheetByName('Bookings');
-  Logger.log('[BOOKING] Tabs: prog=' + (prog ? prog.getName() : 'NULL') + ' disc=' + (disc ? disc.getName() : 'NULL') + ' book=' + (book ? book.getName() : 'NULL'));
 
-  if (!prog) { Logger.log('[BOOKING] FAIL: prog tab not found'); return jsonResponse({ success: false, error: 'Sheet tab not found: Kursplanung' }); }
-  if (!book) { Logger.log('[BOOKING] FAIL: book tab not found'); return jsonResponse({ success: false, error: 'Sheet tab not found: Buchungen' }); }
+  if (!prog) return jsonResponse({ success: false, error: 'Sheet tab not found: Kursplanung' });
+  if (!book) return jsonResponse({ success: false, error: 'Sheet tab not found: Buchungen' });
 
   var required = ['programId', 'fullName', 'email', 'phone'];
   for (var i = 0; i < required.length; i++) {
     if (!data[required[i]]) {
-      Logger.log('[BOOKING] FAIL: missing field ' + required[i]);
       return jsonResponse({ success: false, error: 'Missing: ' + required[i] });
     }
   }
 
-  // LockService for concurrency (Bug #1)
   var lock = LockService.getScriptLock();
   try {
     if (!lock.tryLock(10000)) {
-      Logger.log('[BOOKING] FAIL: could not acquire lock');
       return jsonResponse({ success: false, error: 'Server busy, please try again.' });
     }
 
     var progData = prog.getDataRange().getValues();
-    Logger.log('[BOOKING] Programs: ' + progData.length + ' rows, ' + (progData[0] ? progData[0].length : 0) + ' cols');
 
-    // Data starts at row 4 (index 3): row 1=title, row 2=colors, row 3=headers
-    // [1] = Instance ID (col B) — the booking lookup key
     var progRow = null, progRowIndex = -1;
-    for (var r = 3; r < progData.length; r++) {
-      var cellVal = String(progData[r][1]).trim();
-      Logger.log('[BOOKING] Scanning row ' + r + ' col[1]=\"' + cellVal + '\"');
+    for (var r = K.FIRST_DATA_ROW - 1; r < progData.length; r++) {
+      var cellVal = String(progData[r][K.INSTANCE_ID]).trim();
       if (cellVal === String(data.programId).trim()) { progRow = progData[r]; progRowIndex = r; break; }
     }
     if (!progRow) {
       Logger.log('[BOOKING] FAIL: program not found: ' + data.programId);
       return jsonResponse({ success: false, error: 'Program not found: ' + data.programId });
     }
-    Logger.log('[BOOKING] Found program at row ' + progRowIndex);
 
-    // Duplicate booking check (Bug #1): same email + same programId
+    // Duplicate booking check (exclude cancelled) + preload email index for M1
     var bookData = book.getDataRange().getValues();
+    var emailKey = String(data.email).toLowerCase().trim();
+    var pidKey   = String(data.programId).trim();
     for (var b = 1; b < bookData.length; b++) {
-      if (String(bookData[b][2]).toLowerCase().trim() === String(data.email).toLowerCase().trim() &&
-          String(bookData[b][4]).trim() === String(data.programId).trim()) {
-        Logger.log('[BOOKING] FAIL: duplicate booking for ' + data.email + ' / ' + data.programId);
+      var status = String(bookData[b][B.STATUS] || '').toLowerCase();
+      if (status === 'cancelled') continue;
+      if (String(bookData[b][B.EMAIL]).toLowerCase().trim() === emailKey &&
+          String(bookData[b][B.INSTANCE_ID]).trim() === pidKey) {
         return jsonResponse({ success: false, error: 'You are already registered for this program.' });
       }
     }
 
-    // Column mapping (🧘 Kursplanung):
-    // [1]=Instance ID, [3]=Kursname, [12]=Preis/TN, [21]=Stripe Link, [22]=Freie Plätze (AUTO)
-    var basePrice   = parseFloat(String(progRow[12]).replace(/[^0-9.,]/g, '').replace(',', '.')) || 0;
-    var spotsLeft   = parseInt(progRow[22]); // Freie Plätze (read-only formula K-N)
-    var programName = progRow[3];            // Kursname
-    var stripeLink  = progRow[21] || '';     // Stripe Link col V
-    Logger.log('[BOOKING] Data: price=' + basePrice + ' spots=' + spotsLeft + ' name=\"' + programName + '\" stripe=' + (stripeLink ? 'YES' : 'NONE'));
+    var basePrice   = parseFloat(String(progRow[K.PREIS_TN]).replace(/[^0-9.,]/g, '').replace(',', '.')) || 0;
+    var spotsLeft   = parseInt(progRow[K.FREIE_PLATZE]);
+    var programName = progRow[K.KURSNAME];
+    var stripeLink  = progRow[K.STRIPE_LINK] || '';
+    Logger.log('[BOOKING] Data: price=' + basePrice + ' spots=' + spotsLeft + ' name="' + programName + '" stripe=' + (stripeLink ? 'YES' : 'NONE'));
 
     if (!isNaN(spotsLeft) && spotsLeft <= 0) {
-      Logger.log('[BOOKING] FAIL: fully booked, spots=' + spotsLeft);
       return jsonResponse({ success: false, error: 'This program is fully booked.' });
     }
 
@@ -209,19 +417,16 @@ function handleBooking(data) {
     var codeDiscount = 0, usedCode = '';
     if (data.discountCode && disc) {
       var discData = disc.getDataRange().getValues();
-      Logger.log('[BOOKING] Discount codes: ' + discData.length + ' rows, looking for \"' + data.discountCode + '\"');
-      // Rabatte: row 0=title, row 1=headers, data from index 2
-      for (var d = 2; d < discData.length; d++) {
-        if (String(discData[d][0]).toUpperCase() === String(data.discountCode).toUpperCase()) {
-          var isActive = String(discData[d][4]).toUpperCase();
-          if (isActive === 'NO' || isActive === 'NEIN') { Logger.log('[BOOKING] Discount code inactive'); break; }
-          var expiryDate = discData[d][3];
-          if (expiryDate instanceof Date && expiryDate < new Date()) { Logger.log('[BOOKING] Discount code expired'); break; }
-          codeDiscount = parseFloat(discData[d][1]) || 0;
-          usedCode = discData[d][0];
-          Logger.log('[BOOKING] Discount found: code=' + usedCode + ' pct=' + codeDiscount);
-          var currentUses = parseInt(discData[d][5]) || 0;
-          disc.getRange(d + 1, 6).setValue(currentUses + 1);
+      for (var d = D.FIRST_DATA_ROW - 1; d < discData.length; d++) {
+        if (String(discData[d][D.CODE]).toUpperCase() === String(data.discountCode).toUpperCase()) {
+          var isActive = String(discData[d][D.ACTIVE]).toUpperCase();
+          if (isActive === 'NO' || isActive === 'NEIN') break;
+          var expiryDate = discData[d][D.VALID_UNTIL];
+          if (expiryDate instanceof Date && expiryDate < new Date()) break;
+          codeDiscount = parseFloat(discData[d][D.PCT]) || 0;
+          usedCode = discData[d][D.CODE];
+          var currentUses = parseInt(discData[d][D.USES]) || 0;
+          disc.getRange(d + 1, D.USES + 1).setValue(currentUses + 1);
           break;
         }
       }
@@ -230,46 +435,46 @@ function handleBooking(data) {
     var friendsPct = parseFloat(data.friendsDiscountPct) || 0;
     var totalDisc  = Math.min(codeDiscount + friendsPct, 50);
     var finalPrice = Math.round(basePrice * (1 - totalDisc / 100) * 100) / 100;
-    Logger.log('[BOOKING] Price: base=' + basePrice + ' disc=' + totalDisc + '% final=' + finalPrice);
 
-    // Generate booking ID
     var bookingId = 'BK-' + Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyyMMdd-HHmmss') + '-' + Math.random().toString(36).substr(2, 4).toUpperCase();
 
-    Logger.log('[BOOKING] Writing to Buchungen...');
     book.appendRow([
-      new Date(),              // [0]  A: Datum
-      data.fullName,           // [1]  B: Name
-      data.email,              // [2]  C: Email
-      data.phone,              // [3]  D: Telefon
-      data.programId,          // [4]  E: Instance ID
-      programName,             // [5]  F: Kursname
-      usedCode,                // [6]  G: Rabattcode
-      codeDiscount,            // [7]  H: % Rabatt
-      friendsPct,              // [8]  I: Freunde %
-      totalDisc,               // [9]  J: Total Rabatt %
-      finalPrice,              // [10] K: Final EUR
-      'YES',                   // [11] L: Payment Sent
-      'NO',                    // [12] M: Bezahlt
-      'NO',                    // [13] N: Intake gesendet
-      data.friendsCount || 0,  // [14] O: Freunde Anz.
-      data.friendNames  || '', // [15] P: Freunde Namen
-      'NO',                    // [16] Q: Freunde verifiziert
-      data.referredBy   || '', // [17] R: Empfehlung von
-      'NO',                    // [18] S: Empfehler bestätigt
-      bookingId                // [19] T: Booking ID
+      new Date(),              // A: Datum
+      data.fullName,           // B: Name
+      data.email,              // C: Email
+      data.phone,              // D: Telefon
+      data.programId,          // E: Instance ID
+      programName,             // F: Kursname
+      usedCode,                // G: Rabattcode
+      codeDiscount,            // H: % Rabatt
+      friendsPct,              // I: Freunde %
+      totalDisc,               // J: Total Rabatt %
+      finalPrice,              // K: Final EUR
+      'YES',                   // L: Payment Sent
+      'NO',                    // M: Bezahlt
+      'NO',                    // N: Intake gesendet
+      data.friendsCount || 0,  // O: Freunde Anz.
+      data.friendNames  || '', // P: Freunde Namen
+      'NO',                    // Q: Freunde verifiziert
+      data.referredBy   || '', // R: Empfehlung von
+      'NO',                    // S: Empfehler bestätigt
+      bookingId,               // T: Booking ID
+      'active'                 // U: Status (R8 — new column)
     ]);
     Logger.log('[BOOKING] Row written (ID: ' + bookingId + ')');
 
-    // Bug #1 FIX: Do NOT write to Freie Plätze (col W) — it is a formula (K-N)
-    // Angemeldet (col N) is also auto-calculated via COUNTIF from Buchungen
-    // Both update automatically when a new row is appended
-
+    // R3: append client_reference_id (=bookingId) + prefilled_email to pay URL
+    // so Stripe Checkout echoes bookingId back in webhook event.
     var payUrl = stripeLink;
-    if (stripeLink && data.email)
-      payUrl += (stripeLink.indexOf('?') >= 0 ? '&' : '?') + 'prefilled_email=' + encodeURIComponent(data.email);
+    if (payUrl) {
+      var sep = payUrl.indexOf('?') >= 0 ? '&' : '?';
+      payUrl += sep + 'client_reference_id=' + encodeURIComponent(bookingId);
+      if (data.email) payUrl += '&prefilled_email=' + encodeURIComponent(data.email);
+    }
 
     // Build formatted session list from Sessions tab for the confirmation email
     var sessionsStr = '';
+    var S = COLS.SESSIONS;
     var sessSheet   = ss.getSheetByName('📅 Sessions') || ss.getSheetByName('Sessions');
     if (sessSheet) {
       var DAYS_DE   = ['So','Mo','Di','Mi','Do','Fr','Sa'];
@@ -288,26 +493,26 @@ function handleBooking(data) {
       var sesLines = [];
       for (var si = 1; si < sessData.length; si++) {
         var sRow = sessData[si];
-        if (String(sRow[0]).trim() !== String(data.programId).trim()) continue;
-        var sd = sRow[3] instanceof Date ? sRow[3] : new Date(sRow[3]);
+        if (String(sRow[S.INSTANCE_ID]).trim() !== String(data.programId).trim()) continue;
+        var sd = sRow[S.DATUM] instanceof Date ? sRow[S.DATUM] : new Date(sRow[S.DATUM]);
         if (isNaN(sd.getTime())) continue;
-        var ts  = sRow[4] ? fmtTime(sRow[4]) : '';
-        var te  = sRow[5] ? fmtTime(sRow[5]) : '';
+        var ts  = sRow[S.START] ? fmtTime(sRow[S.START]) : '';
+        var te  = sRow[S.END] ? fmtTime(sRow[S.END]) : '';
         var timeStr = (ts && te) ? '<div style="color:#888;font-size:13px;margin-top:2px">' + ts + '\u2013' + te + '</div>' : '';
         sesLines.push('<div style="margin-bottom:6px"><strong>' + DAYS_DE[sd.getDay()] + ', ' + sd.getDate() + '. ' + MONTHS_DE[sd.getMonth()] + '</strong>' + timeStr + '</div>');
       }
       sessionsStr = sesLines.join('');
     }
 
-    try { sendClientConfirmation(data, programName, finalPrice, totalDisc, payUrl, sessionsStr, progRow[9]); Logger.log('[BOOKING] Client email sent'); }
-    catch (err) { Logger.log('[EMAIL ERR] Client: ' + err.message); try { sendErrorAlert('sendClientConfirmation', err, data); } catch(e2) {} }
+    try { sendClientConfirmation(data, programName, finalPrice, totalDisc, payUrl, sessionsStr, progRow[K.ORT]); Logger.log('[BOOKING] Client email sent'); }
+    catch (err) { logError('sendClientConfirmation', err, data); try { sendErrorAlert('sendClientConfirmation', err, data); } catch(e2) {} }
     try { sendInstructorNotification(data, programName, finalPrice, cfg.INSTRUCTOR_EMAIL); Logger.log('[BOOKING] Instructor email sent'); }
-    catch (err) { Logger.log('[EMAIL ERR] Instructor: ' + err.message); try { sendErrorAlert('sendInstructorNotification', err, data); } catch(e2) {} }
+    catch (err) { logError('sendInstructorNotification', err, data); try { sendErrorAlert('sendInstructorNotification', err, data); } catch(e2) {} }
 
     Logger.log('[BOOKING] === SUCCESS === ' + data.fullName + ' / ' + programName + ' EUR ' + finalPrice);
     return jsonResponse({ success: true, bookingId: bookingId, paymentUrl: payUrl, programName: programName, finalPrice: finalPrice });
   } finally {
-    lock.releaseLock();
+    try { lock.releaseLock(); } catch(e2) {}
   }
 }
 
@@ -513,28 +718,98 @@ function sendIntakeForm(name, email, programName) {
 // ─── STRIPE WEBHOOK (Bug #2 fix: defined ss variable properly) ────────────────
 function handleStripeWebhook(event) {
   try {
-    var obj   = event.data && event.data.object;
-    var email = obj && ((obj.customer_details && obj.customer_details.email) || obj.receipt_email || obj.customer_email);
-    if (email) {
-      var cfg  = getConfig();
-      var ss   = SpreadsheetApp.openById(cfg.SHEET_ID); // Bug #2 FIX: ss now defined
-      var book = ss.getSheetByName('📋 Buchungen') || ss.getSheetByName('Bookings');
-      var rows = book.getDataRange().getValues();
-      // Buchungen: [2]=Email, [12]=Bezahlt(M), [1]=Name, [5]=Kursname
-      for (var r = 1; r < rows.length; r++) {
-        if (String(rows[r][2]).toLowerCase() === email.toLowerCase() && String(rows[r][12]).toUpperCase() === 'NO') {
-          book.getRange(r + 1, 13).setValue('YES'); // col M: Bezahlt = YES
-          Logger.log('[PAID] ' + email);
-          try {
-            sendIntakeForm(rows[r][1], email, rows[r][5]);
-            book.getRange(r + 1, 14).setValue('YES'); // col N: Intake gesendet = YES
-          } catch (ie) { Logger.log('[INTAKE ERROR] ' + ie.message); }
-        }
-      }
+    var cfg = getConfig();
+
+    // R1: since Apps Script doPost can't read the Stripe-Signature header,
+    // re-fetch this event from Stripe's API to verify it actually exists
+    // and we're not being spoofed. This is the standard Apps Script pattern.
+    if (!cfg.STRIPE_KEY) {
+      Logger.log('[WEBHOOK] FAIL: no STRIPE_KEY configured — rejecting');
+      return jsonResponse({ received: false, error: 'not_configured' });
     }
-    return jsonResponse({ received: true });
+    if (!event || !event.id) {
+      Logger.log('[WEBHOOK] FAIL: event has no id');
+      return jsonResponse({ received: false, error: 'no_event_id' });
+    }
+    var verifyResp;
+    try {
+      verifyResp = UrlFetchApp.fetch('https://api.stripe.com/v1/events/' + encodeURIComponent(event.id), {
+        method: 'get',
+        headers: { Authorization: 'Bearer ' + cfg.STRIPE_KEY },
+        muteHttpExceptions: true
+      });
+    } catch (fe) {
+      logError('handleStripeWebhook:fetch', fe, {id: event.id});
+      return jsonResponse({ received: false, error: 'verify_failed' });
+    }
+    if (verifyResp.getResponseCode() !== 200) {
+      Logger.log('[WEBHOOK] FAIL: event not found in Stripe — possible spoof. id=' + event.id);
+      logError('handleStripeWebhook:spoof', new Error('event not in Stripe'), {id: event.id, code: verifyResp.getResponseCode()});
+      return jsonResponse({ received: false, error: 'event_not_found' });
+    }
+    var verified = JSON.parse(verifyResp.getContentText());
+    if (verified.type !== event.type) {
+      Logger.log('[WEBHOOK] FAIL: verified type mismatch (' + verified.type + ' vs ' + event.type + ')');
+      return jsonResponse({ received: false, error: 'type_mismatch' });
+    }
+    // Use the VERIFIED payload (not the posted one)
+    var obj = verified.data && verified.data.object;
+    if (!obj) {
+      return jsonResponse({ received: true, note: 'no object' });
+    }
+
+    // Only act on paid events
+    var eventType = verified.type;
+    var isPaid = (eventType === 'checkout.session.completed' && (obj.payment_status === 'paid' || obj.payment_status === 'no_payment_required'))
+              || (eventType === 'payment_intent.succeeded')
+              || (eventType === 'charge.succeeded' && obj.paid === true);
+    if (!isPaid) {
+      Logger.log('[WEBHOOK] Ignoring non-paid event: ' + eventType);
+      return jsonResponse({ received: true, note: 'ignored_non_paid' });
+    }
+
+    // R2: match by client_reference_id (= Booking ID) first; fall back to email
+    var clientRef = obj.client_reference_id || '';
+    var email = (obj.customer_details && obj.customer_details.email) || obj.receipt_email || obj.customer_email || '';
+
+    var ss   = SpreadsheetApp.openById(cfg.SHEET_ID);
+    var book = ss.getSheetByName('📋 Buchungen') || ss.getSheetByName('Bookings');
+    if (!book) return jsonResponse({ received: false, error: 'no_buchungen' });
+    var B = COLS.BUCHUNGEN;
+    var rows = book.getDataRange().getValues();
+
+    var matched = false;
+    for (var r = 1; r < rows.length; r++) {
+      var rowBookingId = String(rows[r][B.BOOKING_ID] || '').trim();
+      var rowEmail     = String(rows[r][B.EMAIL] || '').toLowerCase().trim();
+      var alreadyPaid  = String(rows[r][B.BEZAHLT] || '').toUpperCase() === 'YES';
+      var cancelled    = String(rows[r][B.STATUS] || '').toLowerCase() === 'cancelled';
+      if (cancelled) continue;
+      var match = false;
+      if (clientRef && rowBookingId === String(clientRef).trim()) match = true;
+      // Email fallback ONLY if no client_reference_id provided (backwards compat)
+      else if (!clientRef && email && rowEmail === String(email).toLowerCase() && !alreadyPaid) match = true;
+      if (!match) continue;
+      matched = true;
+      if (alreadyPaid) {
+        Logger.log('[PAID] Already marked paid, skipping: ' + rowBookingId);
+        break;
+      }
+      book.getRange(r + 1, B.BEZAHLT + 1).setValue('YES');
+      Logger.log('[PAID] ' + rowBookingId + ' / ' + rowEmail);
+      try {
+        sendIntakeForm(rows[r][B.NAME], rowEmail, rows[r][B.KURSNAME]);
+        book.getRange(r + 1, B.INTAKE_SENT + 1).setValue('YES');
+      } catch (ie) { logError('sendIntakeForm', ie, {bookingId: rowBookingId}); }
+      break; // matched exactly one booking
+    }
+    if (!matched) {
+      Logger.log('[WEBHOOK] No booking matched (client_ref=' + clientRef + ', email=' + email + ')');
+      logError('handleStripeWebhook:nomatch', new Error('no matching booking'), {client_ref: clientRef, email: email});
+    }
+    return jsonResponse({ received: true, matched: matched });
   } catch (err) {
-    Logger.log('[WEBHOOK ERROR] ' + err.message);
+    logError('handleStripeWebhook', err, event);
     return jsonResponse({ received: false });
   }
 }
@@ -676,24 +951,56 @@ function createStripePaymentLink(programName, priceInCents) {
   var cfg = getConfig();
   if (!cfg.STRIPE_KEY || priceInCents <= 0) return '';
   try {
-    var priceResp = UrlFetchApp.fetch('https://api.stripe.com/v1/prices', {
-      method: 'post',
-      headers: { Authorization: 'Bearer ' + cfg.STRIPE_KEY },
-      payload: { unit_amount: String(priceInCents), currency: 'eur', 'product_data[name]': programName },
-      muteHttpExceptions: true
-    });
-    var priceData = JSON.parse(priceResp.getContentText());
-    if (!priceData.id) { Logger.log('[STRIPE ERR] ' + priceResp.getContentText()); return ''; }
+    // R7: Cache product IDs per (mode|name) so re-edits reuse the same Stripe product.
+    // Price objects are cached per (mode|name|amount) so different price points create new prices but share the product.
+    var props = PropertiesService.getScriptProperties();
+    var mode = cfg.TEST_MODE ? 'test' : 'live';
+    var productCacheKey = 'STRIPE_PRODUCT_' + mode + '_' + programName;
+    var priceCacheKey   = 'STRIPE_PRICE_'   + mode + '_' + programName + '_' + priceInCents;
+
+    // 1) Get or create product
+    var productId = props.getProperty(productCacheKey);
+    if (!productId) {
+      var prodResp = UrlFetchApp.fetch('https://api.stripe.com/v1/products', {
+        method: 'post',
+        headers: { Authorization: 'Bearer ' + cfg.STRIPE_KEY },
+        payload: { name: programName },
+        muteHttpExceptions: true
+      });
+      var prodData = JSON.parse(prodResp.getContentText());
+      if (!prodData.id) { Logger.log('[STRIPE ERR product] ' + prodResp.getContentText()); return ''; }
+      productId = prodData.id;
+      props.setProperty(productCacheKey, productId);
+    }
+
+    // 2) Get or create price for this product+amount
+    var priceId = props.getProperty(priceCacheKey);
+    if (!priceId) {
+      var priceResp = UrlFetchApp.fetch('https://api.stripe.com/v1/prices', {
+        method: 'post',
+        headers: { Authorization: 'Bearer ' + cfg.STRIPE_KEY },
+        payload: { unit_amount: String(priceInCents), currency: 'eur', product: productId },
+        muteHttpExceptions: true
+      });
+      var priceData = JSON.parse(priceResp.getContentText());
+      if (!priceData.id) { Logger.log('[STRIPE ERR price] ' + priceResp.getContentText()); return ''; }
+      priceId = priceData.id;
+      props.setProperty(priceCacheKey, priceId);
+    }
+
+    // 3) Create payment link (no caching — user expects a working link each time;
+    //    Stripe will reuse logically identical ones internally)
     var linkResp = UrlFetchApp.fetch('https://api.stripe.com/v1/payment_links', {
       method: 'post',
       headers: { Authorization: 'Bearer ' + cfg.STRIPE_KEY },
-      payload: { 'line_items[0][price]': priceData.id, 'line_items[0][quantity]': '1' },
+      payload: { 'line_items[0][price]': priceId, 'line_items[0][quantity]': '1' },
       muteHttpExceptions: true
     });
     var linkData = JSON.parse(linkResp.getContentText());
     return linkData.url || '';
   } catch (e) {
     Logger.log('[STRIPE ERR] ' + e.message);
+    logError('createStripePaymentLink', e, {program: programName, price: priceInCents});
     return '';
   }
 }
@@ -1146,6 +1453,8 @@ function authorizeAndTest() {
   } else { ok.push('[--] Calendar: CALENDAR_ID not set (optional)'); }
   ok.push(cfg.STRIPE_KEY ? '[OK] Stripe key: set' : '[--] Stripe key: not set — add STRIPE_KEY to Script Properties');
   ok.push(cfg.STRIPE_WEBHOOK_SECRET ? '[OK] Webhook secret: set' : '[--] Webhook secret: not set');
+  ok.push(cfg.API_TOKEN ? '[OK] API_TOKEN: set (website must send it)' : '[!!] API_TOKEN: NOT set — anyone can POST bookings');
+  ok.push(cfg.CANCELLATION_SECRET ? '[OK] CANCELLATION_SECRET: set' : '[--] CANCELLATION_SECRET: not set — cancel links disabled');
   safeAlert('Authorization Test', ok.join('\n') + (errors.length ? '\n\n' + errors.join('\n') : ''));
 }
 

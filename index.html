@@ -1209,6 +1209,12 @@
   let logoWrap = null;
   let ticking = false;
 
+  // Cached DOM refs — queried once at init, reused every frame
+  let heroLogoNightEls = [];
+  let heroLogoDayEls = [];
+  let shootingStarEls = [];
+  let nightOpacitySet = false;
+
   function updateDawn() {
     if (!header) return;
     const heroH = window.innerHeight;
@@ -1225,21 +1231,24 @@
     }
       
       // Wordmark crossfade handled in CSS via --dawn
-    lockHeroLogoPosition();
 
-    // Force logo crossfade via JS (prevents CSS override conflicts)
-    const nightOpacity = 1; // keep mystic logo always visible
-    const dayOpacity   = Math.max(0, Math.min(1, dawn)); // nature logo rises with scroll
-    document.querySelectorAll('.hero-logo-night').forEach(el => {
-      el.style.setProperty('opacity', nightOpacity.toFixed(3), 'important');
-    });
-    document.querySelectorAll('.hero-logo-day').forEach(el => {
+    // Night logo opacity is always 1.0 — set once at init, never again
+    if (!nightOpacitySet && heroLogoNightEls.length) {
+      heroLogoNightEls.forEach(function(el) {
+        el.style.setProperty('opacity', '1.000', 'important');
+      });
+      nightOpacitySet = true;
+    }
+
+    // Day logo opacity rises with scroll
+    const dayOpacity = Math.max(0, Math.min(1, dawn));
+    heroLogoDayEls.forEach(function(el) {
       el.style.setProperty('opacity', dayOpacity.toFixed(3), 'important');
     });
 
-    // Hide shooting stars during day
+    // Shooting stars fade with dawn
     const shootOpacity = Math.max(0, 1 - dawn * 3);
-    document.querySelectorAll('.shooting-star').forEach(el => {
+    shootingStarEls.forEach(function(el) {
       el.style.opacity = shootOpacity;
     });
 
@@ -1268,6 +1277,11 @@
 
   // ── Mouse parallax ─────────────────────────────────────────────
   logoWrap    = document.querySelector('.hero-logo-wrap');
+
+  // Cache DOM refs — one query at init instead of every scroll frame
+  heroLogoNightEls = Array.from(document.querySelectorAll('.hero-logo-night'));
+  heroLogoDayEls = Array.from(document.querySelectorAll('.hero-logo-day'));
+  shootingStarEls = Array.from(document.querySelectorAll('.shooting-star'));
 
   // ── HARD LOCK: keep hero logos permanently fixed in one place ──
   function lockHeroLogoPosition() {
@@ -1500,15 +1514,21 @@
       createSideController('left', sacredSlots.left, randomBetween(300, 1700)),
       createSideController('right', sacredSlots.right, randomBetween(500, 2500))
     ];
+    let bloomRafId = 0;
 
     function bloomLoop(now) {
-      // Pause sacred geometry bloom when hero is scrolled out of view
-      if (!window._heroVisible) { requestAnimationFrame(bloomLoop); return; }
+      // Stop RAF when hero scrolled out of view — restarted by hero-visible event
+      if (!window._heroVisible) { bloomRafId = 0; return; }
       bloomControllers.forEach(function(controller) {
         updateBloom(controller, now);
       });
-      requestAnimationFrame(bloomLoop);
+      bloomRafId = requestAnimationFrame(bloomLoop);
     }
+
+    // Restart bloomLoop when hero re-enters viewport
+    window.addEventListener('hero-visible', function() {
+      if (!bloomRafId) { bloomRafId = requestAnimationFrame(bloomLoop); }
+    });
 
     document.addEventListener('visibilitychange', function() {
       if (!document.hidden) {
@@ -1519,10 +1539,12 @@
           controller.state = 'waiting';
           controller.nextAt = now + randomBetween(350, 1800);
         });
+        // Restart bloom loop after tab switch if hero visible
+        if (!bloomRafId && window._heroVisible) { bloomRafId = requestAnimationFrame(bloomLoop); }
       }
     });
 
-    requestAnimationFrame(bloomLoop);
+    bloomRafId = requestAnimationFrame(bloomLoop);
   }
 
 })();

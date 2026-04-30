@@ -424,9 +424,10 @@ updateActiveDot();
     var dpr = 1, width = 1, height = 1;
     var particles = [], raf = 0, running = false, last = 0;
     var sectionOffset = 0;
+    /* Scroll listener caches offset immediately — step() reads cached value.
+       IntersectionObserver stops off-screen canvases, so only 1-2 listeners active. */
     function updateSectionOffset() { sectionOffset = wrapper.getBoundingClientRect().top; }
     window.addEventListener('scroll', updateSectionOffset, { passive: true });
-
     function rand(min, max) { return Math.random() * (max - min) + min; }
 
     function particleCount() {
@@ -512,11 +513,9 @@ updateActiveDot();
       /* Ensure canvas has real dimensions before starting */
       var sz = getSize(wrapper);
       if (sz.w !== width || sz.h !== height || !particles.length) applySize(sz.w, sz.h);
-      updateSectionOffset();
       running = true; last = 0;
       raf = window.requestAnimationFrame(step);
     }
-
     function stop() {
       running = false;
       if (raf) { window.cancelAnimationFrame(raf); raf = 0; }
@@ -537,7 +536,7 @@ updateActiveDot();
 
     /* Re-measure on resize */
     window.addEventListener('resize', function () {
-      if (running) { resize(); updateSectionOffset(); }
+      if (running) resize();
     }, { passive: true });
 
     /* Ensure proper dimensions after full page load */
@@ -561,7 +560,6 @@ updateActiveDot();
       initSectionCanvas(wrappers[i]);
     }
   }
-
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initSharedParticles);
   } else {
@@ -990,6 +988,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (entry.isIntersecting) {
                 // Hero in view — resume everything
                 window._heroVisible = true;
+                window.dispatchEvent(new CustomEvent('hero-visible'));
                 if (svg) svg.unpauseAnimations();
                 if (windTrack) windTrack.classList.remove('paused');
                 if (header) header.classList.remove('hero-paused'); // resume dust motes via CSS
