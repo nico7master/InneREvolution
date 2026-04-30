@@ -32,12 +32,13 @@ jobs:
           SHEETS_API_KEY: ${{ secrets.SHEETS_API_KEY }}
           APPS_SCRIPT_URL: ${{ secrets.APPS_SCRIPT_URL }}
         run: |
-          printf 'const CONFIG = {
-  SHEET_ID:        "%s",
-  SHEETS_API_KEY:  "%s",
-  APPS_SCRIPT_URL: "%s"
-};
-'             "$SHEET_ID" "$SHEETS_API_KEY" "$APPS_SCRIPT_URL" > booking/config.js
+          cat > booking/config.js <<CFGEOF
+          const CONFIG = {
+            SHEET_ID:        "${SHEET_ID}",
+            SHEETS_API_KEY:  "${SHEETS_API_KEY}",
+            APPS_SCRIPT_URL: "${APPS_SCRIPT_URL}"
+          };
+          CFGEOF
           echo "--- config.js generated ---"
 
       - name: Compile main SCSS
@@ -50,7 +51,38 @@ jobs:
       - name: Prepare IPFS deploy directory
         run: |
           mkdir -p _ipfs_deploy
-          rsync -a             --exclude='.git'             --exclude='.github'             --exclude='node_modules'             --exclude='.a0proj'             --exclude='.tmp'             --exclude='.vscode'             --exclude='docs'             --exclude='scripts'             --exclude='*.bak'             --exclude='*.broken'             --exclude='*.map'             --exclude='*.revert_mistake'             --exclude='SHEETS_*'             --exclude='package.json'             --exclude='package-lock.json'             --exclude='fiveserver.config.js'             --exclude='agentzero.txt'             --exclude='.gitignore'             --exclude='.gitattributes'             --exclude='CNAME'             --exclude='*_ARCHITECTURE.promptinclude.md'             --exclude='images/NotUsed'             --exclude='images/UsedOriginal'             --exclude='images/Yoga/Original'             --exclude='SVGs/NotUsed'             --exclude='assets/sass'             --exclude='booking/booking.scss'             --exclude='booking/config.js.example'             --exclude='data/programs.schema.json'             --exclude='data/sheet-cache.json'             ./ _ipfs_deploy/
+          rsync -a \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='node_modules' \
+            --exclude='.a0proj' \
+            --exclude='.tmp' \
+            --exclude='.vscode' \
+            --exclude='docs' \
+            --exclude='scripts' \
+            --exclude='*.bak' \
+            --exclude='*.broken' \
+            --exclude='*.map' \
+            --exclude='*.revert_mistake' \
+            --exclude='SHEETS_*' \
+            --exclude='package.json' \
+            --exclude='package-lock.json' \
+            --exclude='fiveserver.config.js' \
+            --exclude='agentzero.txt' \
+            --exclude='.gitignore' \
+            --exclude='.gitattributes' \
+            --exclude='CNAME' \
+            --exclude='*_ARCHITECTURE.promptinclude.md' \
+            --exclude='images/NotUsed' \
+            --exclude='images/UsedOriginal' \
+            --exclude='images/Yoga/Original' \
+            --exclude='SVGs/NotUsed' \
+            --exclude='assets/sass' \
+            --exclude='booking/booking.scss' \
+            --exclude='booking/config.js.example' \
+            --exclude='data/programs.schema.json' \
+            --exclude='data/sheet-cache.json' \
+            ./ _ipfs_deploy/
 
           echo "--- IPFS deploy directory ---"
           du -sh _ipfs_deploy
@@ -71,7 +103,9 @@ jobs:
         run: |
           CID="${{ steps.pinata.outputs.hash }}"
           echo "Verifying deployment on Pinata gateway..."
-          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}"             --max-time 30             "https://gateway.pinata.cloud/ipfs/${CID}/")
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            --max-time 30 \
+            "https://gateway.pinata.cloud/ipfs/${CID}/")
           echo "Gateway HTTP status: $HTTP_STATUS"
           if [ "$HTTP_STATUS" = "200" ]; then
             echo "✅ Site is live on IPFS!"
