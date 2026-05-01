@@ -1,22 +1,21 @@
 #!/usr/bin/env node
 /**
- * Pin a directory to IPFS via Pinata using the modern JWT auth.
- * Run from CI:
- *   PINATA_JWT=... node scripts/pin-to-pinata.js ./_ipfs_deploy inneREvolution-website
+ * Pin a directory to IPFS via Pinata using JWT auth.
+ * Uses form-data's submit() which handles Content-Length & multipart correctly.
  *
- * Outputs the CID to stdout, and writes it to $GITHUB_OUTPUT (key: hash) and
- * $GITHUB_STEP_SUMMARY when those env vars are present.
+ *   PINATA_JWT=... node scripts/pin-to-pinata.js ./_ipfs_deploy inneREvolution-website
  */
 
 const fs = require('fs');
 const path = require('path');
+const FormData = require('form-data');
 
 const dir = process.argv[2] || './_ipfs_deploy';
 const pinName = process.argv[3] || 'inneREvolution-website';
-const jwt = process.env.PINATA_JWT;
+const jwt = (process.env.PINATA_JWT || '').trim();
 
 if (!jwt) {
-  console.error('❌ PINATA_JWT env var is missing');
+  console.error('❌ PINATA_JWT env var is missing or empty');
   process.exit(1);
 }
 if (!fs.existsSync(dir)) {
@@ -24,15 +23,13 @@ if (!fs.existsSync(dir)) {
   process.exit(1);
 }
 
-// Recursively collect all files relative to the parent of `dir`
-// so the IPFS root is the directory itself (e.g. _ipfs_deploy/index.html → _ipfs_deploy/index.html)
+console.log(`🔐 JWT length: ${jwt.length} chars (sanity check)`);
+
 function walk(current, baseParent, out = []) {
-  const entries = fs.readdirSync(current, { withFileTypes: true });
-  for (const entry of entries) {
+  for (const entry of fs.readdirSync(current, { withFileTypes: true })) {
     const full = path.join(current, entry.name);
-    if (entry.isDirectory()) {
-      walk(full, baseParent, out);
-    } else if (entry.isFile()) {
+    if (entry.isDirectory()) walk(full, baseParent, out);
+    else if (entry.isFile()) {
       out.push({
         absolute: full,
         relative: path.relative(baseParent, full).split(path.sep).join('/'),
@@ -42,80 +39,64 @@ function walk(current, baseParent, out = []) {
   return out;
 }
 
-async function main() {
-  const FormData = require('form-data');
+const absDir = path.resolve(dir);
+const baseParent = path.dirname(absDir);
+const rootName = path.basename(absDir);
+const files = walk(absDir, baseParent);
 
-  const baseParent = path.resolve(path.dirname(path.resolve(dir)));
-  const files = walk(path.resolve(dir), baseParent);
-  console.log(`📦 Pinning ${files.length} files from ${dir}/`);
+console.log(`📦 Pinning ${files.length} files; root folder = "${rootName}/"`);
 
-  const form = new FormData();
-  for (const f of files) {
-    form.append('file', fs.createReadStream(f.absolute), { filepath: f.relative });
-  }
-  form.append(
-    'pinataMetadata',
-    JSON.stringify({ name: pinName, keyvalues: { source: 'github-actions' } })
-  );
-  form.append('pinataOptions', JSON.stringify({ cidVersion: 1, wrapWithDirectory: false }));
-
-  // Pinata recommends pinFileToIPFS for directory uploads
-  const url = 'https://api.pinata.cloud/pinning/pinFileToIPFS';
-
-  // Use built-in fetch (Node 18+) with form-data's getBuffer/getHeaders
-  const headers = {
-    Authorization: `Bearer ${jwt}`,
-    ...form.getHeaders(),
-  };
-
-  // Stream upload via http(s) module to avoid loading everything in memory
-  const https = require('https');
-  const { URL } = require('url');
-  const u = new URL(url);
-
-  const responseBody = await new Promise((resolve, reject) => {
-    const req = https.request(
-      {
-        method: 'POST',
-        host: u.host,
-        path: u.pathname,
-        headers,
-      },
-      (res) => {
-        let data = '';
-        res.on('data', (c) => (data += c));
-        res.on('end', () => {
-          if (res.statusCode >= 200 && res.statusCode < 300) {
-            resolve(data);
-          } else {
-            reject(new Error(`Pinata HTTP ${res.statusCode}: ${data}`));
-          }
-        });
-      }
-    );
-    req.on('error', reject);
-    form.pipe(req);
-  });
-
-  const result = JSON.parse(responseBody);
-  const cid = result.IpfsHash;
-  if (!cid) {
-    console.error('❌ No IpfsHash in response:', result);
-    process.exit(1);
-  }
-
-  console.log(`✅ Pinned successfully`);
-  console.log(`CID: ${cid}`);
-  console.log(`PinSize: ${result.PinSize} bytes`);
-  console.log(`Timestamp: ${result.Timestamp}`);
-
-  // Expose CID to subsequent workflow steps
-  if (process.env.GITHUB_OUTPUT) {
-    fs.appendFileSync(process.env.GITHUB_OUTPUT, `hash=${cid}\n`);
-  }
+const form = new FormData();
+for (const f of files) {
+  // Pinata expects each part's filename to include the wrapping directory
+  form.append('file', fs.createReadStream(f.absolute), { filepath: f.relative });
 }
+form.append(
+  'pinataMetadata',
+  JSON.stringify({ name: pinName, keyvalues: { source: 'github-actions' } })
+);
+form.append('pinataOptions', JSON.stringify({ cidVersion: 1 }));
 
-main().catch((err) => {
-  console.error('❌ Pin failed:', err.message);
-  process.exit(1);
-});
+form.submit(
+  {
+    protocol: 'https:',
+    host: 'api.pinata.cloud',
+    path: '/pinning/pinFileToIPFS',
+    headers: { Authorization: `Bearer ${jwt}` },
+  },
+  (err, res) => {
+    if (err) {
+      console.error('❌ Network error:', err.message);
+      process.exit(1);
+    }
+    let body = '';
+    res.setEncoding('utf8');
+    res.on('data', (chunk) => (body += chunk));
+    res.on('end', () => {
+      if (res.statusCode < 200 || res.statusCode >= 300) {
+        console.error(`❌ Pinata HTTP ${res.statusCode}`);
+        console.error(body);
+        process.exit(1);
+      }
+      let result;
+      try {
+        result = JSON.parse(body);
+      } catch (e) {
+        console.error('❌ Invalid JSON response:', body);
+        process.exit(1);
+      }
+      const cid = result.IpfsHash;
+      if (!cid) {
+        console.error('❌ No IpfsHash in response:', result);
+        process.exit(1);
+      }
+      console.log('✅ Pinned successfully');
+      console.log(`CID: ${cid}`);
+      console.log(`PinSize: ${result.PinSize} bytes`);
+      console.log(`Timestamp: ${result.Timestamp}`);
+      if (process.env.GITHUB_OUTPUT) {
+        fs.appendFileSync(process.env.GITHUB_OUTPUT, `hash=${cid}\n`);
+      }
+    });
+  }
+);
