@@ -88,16 +88,15 @@ jobs:
           du -sh _ipfs_deploy
           find _ipfs_deploy -maxdepth 2 -type d | head -30
 
+      # Install only what the pin script needs (CI-scoped, never committed)
+      - name: Install Pinata uploader deps
+        run: npm install --no-save form-data
+
       - name: Pin to IPFS via Pinata
         id: pinata
-        uses: anantaramdas/ipfs-pinata-deploy-action@v1.6.4
-        with:
-          pin-name: 'inneREvolution-website'
-          path: './_ipfs_deploy'
-          pinata-api-key: ${{ secrets.PINATA_API_KEY }}
-          pinata-secret-api-key: ${{ secrets.PINATA_SECRET_API_KEY }}
-          remove-old: true
-          verbose: true
+        env:
+          PINATA_JWT: ${{ secrets.PINATA_JWT }}
+        run: node scripts/pin-to-pinata.js ./_ipfs_deploy inneREvolution-website
 
       - name: Verify IPFS deployment
         run: |
@@ -136,7 +135,7 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Field | Value |" >> $GITHUB_STEP_SUMMARY
           echo "|-------|-------|" >> $GITHUB_STEP_SUMMARY
-          echo "| CID | ${CID} |" >> $GITHUB_STEP_SUMMARY
+          echo "| CID | \`${CID}\` |" >> $GITHUB_STEP_SUMMARY
           echo "| Pinata Gateway | [Open site](https://gateway.pinata.cloud/ipfs/${CID}) |" >> $GITHUB_STEP_SUMMARY
-          echo "| IPFS URI | ipfs://${CID} |" >> $GITHUB_STEP_SUMMARY
-          echo "| UD Record | dweb.ipfs.hash = ${CID} |" >> $GITHUB_STEP_SUMMARY
+          echo "| IPFS URI | \`ipfs://${CID}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| UD Record | \`dweb.ipfs.hash = ${CID}\` |" >> $GITHUB_STEP_SUMMARY
