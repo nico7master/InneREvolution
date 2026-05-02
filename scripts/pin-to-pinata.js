@@ -1,9 +1,11 @@
 #!/usr/bin/env node
 /**
- * Pin a directory to IPFS via Pinata using JWT auth.
- * Uses form-data's submit() which handles Content-Length & multipart correctly.
+ * Pin a directory to IPFS via Pinata using legacy API key auth.
  *
- *   PINATA_JWT=... node scripts/pin-to-pinata.js ./_ipfs_deploy inneREvolution-website
+ *   PINATA_API_KEY=... PINATA_SECRET_API_KEY=... 
+ *     node scripts/pin-to-pinata.js ./_ipfs_deploy inneREvolution-website
+ *
+ * Outputs CID to GITHUB_OUTPUT when present.
  */
 
 const fs = require('fs');
@@ -12,10 +14,12 @@ const FormData = require('form-data');
 
 const dir = process.argv[2] || './_ipfs_deploy';
 const pinName = process.argv[3] || 'inneREvolution-website';
-const jwt = (process.env.PINATA_JWT || '').trim();
+const apiKey = (process.env.PINATA_API_KEY || '').trim();
+const apiSecret = (process.env.PINATA_SECRET_API_KEY || '').trim();
 
-if (!jwt) {
-  console.error('❌ PINATA_JWT env var is missing or empty');
+if (!apiKey || !apiSecret) {
+  console.error('❌ PINATA_API_KEY and/or PINATA_SECRET_API_KEY env vars are missing');
+  console.error(`   API key length: ${apiKey.length}, Secret length: ${apiSecret.length}`);
   process.exit(1);
 }
 if (!fs.existsSync(dir)) {
@@ -23,7 +27,7 @@ if (!fs.existsSync(dir)) {
   process.exit(1);
 }
 
-console.log(`🔐 JWT length: ${jwt.length} chars (sanity check)`);
+console.log(`🔑 API key: ${apiKey.slice(0, 8)}... (${apiKey.length} chars)`);
 
 function walk(current, baseParent, out = []) {
   for (const entry of fs.readdirSync(current, { withFileTypes: true })) {
@@ -48,7 +52,6 @@ console.log(`📦 Pinning ${files.length} files; root folder = "${rootName}/"`);
 
 const form = new FormData();
 for (const f of files) {
-  // Pinata expects each part's filename to include the wrapping directory
   form.append('file', fs.createReadStream(f.absolute), { filepath: f.relative });
 }
 form.append(
@@ -62,7 +65,10 @@ form.submit(
     protocol: 'https:',
     host: 'api.pinata.cloud',
     path: '/pinning/pinFileToIPFS',
-    headers: { Authorization: `Bearer ${jwt}` },
+    headers: {
+      pinata_api_key: apiKey,
+      pinata_secret_api_key: apiSecret,
+    },
   },
   (err, res) => {
     if (err) {

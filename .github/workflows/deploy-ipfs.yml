@@ -58,6 +58,7 @@ jobs:
             --exclude='.a0proj' \
             --exclude='.tmp' \
             --exclude='.vscode' \
+            --exclude='_ipfs_deploy' \
             --exclude='docs' \
             --exclude='scripts' \
             --exclude='*.bak' \
@@ -92,10 +93,37 @@ jobs:
       - name: Install Pinata uploader deps
         run: npm install --no-save form-data
 
+      # Remove old pins before uploading new one
+      - name: Unpin old deployments
+        env:
+          PINATA_API_KEY: ${{ secrets.PINATA_API_KEY }}
+          PINATA_SECRET_API_KEY: ${{ secrets.PINATA_SECRET_API_KEY }}
+        run: |
+          echo "Fetching old pins named 'inneREvolution-website'..."
+          RESPONSE=$(curl -s 'https://api.pinata.cloud/data/pinList?status=pinned&pageLimit=10' \
+            -H "pinata_api_key: $PINATA_API_KEY" \
+            -H "pinata_secret_api_key: $PINATA_SECRET_API_KEY")
+          echo "$RESPONSE" | python3 -c "
+          import json,sys
+          d=json.load(sys.stdin)
+          for row in d.get('rows', []):
+              cid = row.get('ipfs_pin_hash','')
+              name = row.get('metadata',{}).get('name','')
+              if name == 'inneREvolution-website' and cid:
+                  print(cid)
+          " | tail -n +2 | while read old_cid; do
+            echo "Unpinning old: $old_cid"
+            curl -s -X DELETE "https://api.pinata.cloud/pinning/unpin/$old_cid" \
+              -H "pinata_api_key: $PINATA_API_KEY" \
+              -H "pinata_secret_api_key: $PINATA_SECRET_API_KEY"
+          done
+          echo "Cleanup done"
+
       - name: Pin to IPFS via Pinata
         id: pinata
         env:
-          PINATA_JWT: ${{ secrets.PINATA_JWT }}
+          PINATA_API_KEY: ${{ secrets.PINATA_API_KEY }}
+          PINATA_SECRET_API_KEY: ${{ secrets.PINATA_SECRET_API_KEY }}
         run: node scripts/pin-to-pinata.js ./_ipfs_deploy inneREvolution-website
 
       - name: Verify IPFS deployment
