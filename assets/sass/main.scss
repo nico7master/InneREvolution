@@ -17553,7 +17553,6 @@ body.homepage .stars > .stars-fore::after {
   background-size: auto, auto, auto, auto, cover, 140% auto;
   background-position: 12% 16%, 82% 18%, 52% 86%, 72% 54%, center center, 56% 32%;
   background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat;
-  background-blend-mode: screen, screen, soft-light, soft-light, normal, multiply;
   padding: 7em 0;
   overflow: hidden;
 }
@@ -17578,8 +17577,7 @@ body.homepage .stars > .stars-fore::after {
   background-size: auto, auto, auto, 175% auto;
   background-position: 18% 22%, 78% 18%, 52% 82%, 42% 74%;
   background-repeat: no-repeat, no-repeat, no-repeat, no-repeat;
-  background-blend-mode: screen, soft-light, soft-light, multiply;
-  filter: saturate(0.94) contrast(1.03);
+
 }
 
 .hatha-yoga-wrapper::after {
@@ -17637,7 +17635,7 @@ body.homepage .stars > .stars-fore::after {
   aspect-ratio: 16 / 8.4;
   object-fit: cover;
   border-radius: 0.95rem;
-  filter: saturate(0.92) contrast(0.97) brightness(0.9);
+
 }
 
 #HathaYoga .image-overlay {
@@ -17689,7 +17687,6 @@ body.homepage .stars > .stars-fore::after {
   background-size: cover, auto, 185% auto;
   background-position: center center, 88% 22%, 64% 48%;
   background-repeat: no-repeat, no-repeat, no-repeat;
-  background-blend-mode: normal, soft-light, soft-light;
   box-shadow: 0 22px 44px rgba(24, 20, 16, 0.18);
 }
 
@@ -17979,7 +17976,6 @@ section#banner .quote-text h2 {
   background-size: auto, auto, auto, auto, cover, 140% auto;
   background-position: 12% 16%, 82% 18%, 52% 86%, 72% 54%, center center, 56% 32%;
   background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat;
-  background-blend-mode: screen, screen, soft-light, soft-light, normal, multiply;
   padding: 7em 0;
   overflow: hidden;
 }
@@ -18004,8 +18000,7 @@ section#banner .quote-text h2 {
   background-size: auto, auto, auto, 175% auto;
   background-position: 18% 22%, 78% 18%, 52% 82%, 42% 74%;
   background-repeat: no-repeat, no-repeat, no-repeat, no-repeat;
-  background-blend-mode: screen, soft-light, soft-light, multiply;
-  filter: saturate(0.94) contrast(1.03);
+
 }
 
 .hatha-yoga-wrapper::after {
@@ -18063,7 +18058,7 @@ section#banner .quote-text h2 {
   aspect-ratio: 16 / 8.4;
   object-fit: cover;
   border-radius: 0.95rem;
-  filter: saturate(0.92) contrast(0.97) brightness(0.9);
+
 }
 
 #HathaYoga .image-overlay {
@@ -18114,7 +18109,6 @@ section#banner .quote-text h2 {
   background-size: cover, auto, 185% auto;
   background-position: center center, 88% 22%, 64% 48%;
   background-repeat: no-repeat, no-repeat, no-repeat;
-  background-blend-mode: normal, soft-light, soft-light;
   box-shadow: 0 22px 44px rgba(24, 20, 16, 0.18);
 }
 
@@ -21153,7 +21147,7 @@ body.homepage #Bio::after,
 body.homepage .footer-banner,
 body.homepage .footer-banner::before,
 body.homepage .footer-banner::after {
-  background-attachment: fixed !important;
+  background-attachment: scroll !important;
   background-position: center center !important;
 }
 /* --- End global fixed section backgrounds --- */
@@ -21178,7 +21172,6 @@ body.homepage #banner.inner-revolution-banner::after {
 body.homepage .hatha-yoga-wrapper,
 body.homepage .hatha-yoga-wrapper::before,
 body.homepage .hatha-yoga-wrapper::after {
-  background-attachment: fixed !important;
   background-position: center center !important;
 }
 /* --- End hatha yoga wrapper fixed background --- */
@@ -21208,7 +21201,7 @@ body.homepage .sadhguru-wrapper::before {
     radial-gradient(circle at 52% 78%, rgba(60, 101, 214, 0.12), transparent 42%),
     url("../../images/programs/SadhguruPage1.webp") no-repeat center center !important;
   background-size: auto, auto, auto, cover !important;
-  background-attachment: scroll, scroll, scroll, fixed !important;
+  background-attachment: scroll, scroll, scroll, scroll !important;
 }
 
 /* Ancestors must not clip sticky */
@@ -21609,8 +21602,8 @@ body .readings-wrapper #Readings p {
 }
 
 /* === BIO SECTION FIXED BACKGROUND === */
-.bio-wrapper, .wrapper.style2.bio-wrapper { background-attachment: fixed !important; }
-.bio-wrapper::before, .wrapper.style2.bio-wrapper::before { background-attachment: fixed !important; }
+.bio-wrapper, .wrapper.style2.bio-wrapper { background-attachment: scroll !important; }
+.bio-wrapper::before, .wrapper.style2.bio-wrapper::before { background-attachment: scroll !important; }
 
 /* === Per-section particle canvases ===
  * Each .shared-particles section gets its own canvas, started/stopped
@@ -21643,8 +21636,8 @@ body .readings-wrapper #Readings p {
 #Readings > * { position: relative; z-index: 1; }
 
 /* === BIO SECTION FIXED BACKGROUND === */
-.bio-wrapper, .wrapper.style2.bio-wrapper { background-attachment: fixed !important; }
-.bio-wrapper::before, .wrapper.style2.bio-wrapper::before { background-attachment: fixed !important; }
+.bio-wrapper, .wrapper.style2.bio-wrapper { background-attachment: scroll !important; }
+.bio-wrapper::before, .wrapper.style2.bio-wrapper::before { background-attachment: scroll !important; }
 
 /* ============================================================
    BIO PORTRAIT — floating image shadow next to Namaskaram box
