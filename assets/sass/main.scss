@@ -11692,7 +11692,7 @@ body.homepage.is-preload #header:after {
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.3)); /* Overlay for readability */
+  background: transparent; /* No overlay — image shows through */
   z-index: 0;
 }
 .bio-wrapper > * {
@@ -12139,7 +12139,7 @@ body.homepage.is-preload #header:after {
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.3)); /* Overlay for readability */
+  background: transparent; /* No overlay — image shows through */
   z-index: 0;
 }
 .readings-wrapper > * {
@@ -13236,12 +13236,10 @@ section#banner .quote-text h2 {
 
 /* Give the contact block a subtle framed card feel */
 #footer .contact {
-  background: rgba(255, 255, 255, 0.55) !important;
+  background: rgba(255, 255, 255, 0.88) !important;
   border-radius: 1em !important;
   padding: 2em 2.5em !important;
   box-shadow: 0 4px 24px rgba(0,0,0,0.08) !important;
-  backdrop-filter: blur(4px) !important;
-  -webkit-backdrop-filter: blur(4px) !important;
 }
 
 /* Contact header text tighter */
@@ -13294,12 +13292,10 @@ section#banner.footer-banner > div#footer > .container {
 
 /* Card-style contact box */
 section#banner.footer-banner .contact {
-  background: rgba(255, 255, 255, 0.55) !important;
+  background: rgba(255, 255, 255, 0.90) !important;
   border-radius: 1em !important;
   padding: 2em 2.5em !important;
   box-shadow: 0 4px 24px rgba(0,0,0,0.08) !important;
-  backdrop-filter: blur(6px) !important;
-  -webkit-backdrop-filter: blur(6px) !important;
   text-align: center !important;
 }
 
@@ -17552,7 +17548,7 @@ body.homepage .stars > .stars-fore::after {
     radial-gradient(circle at 82% 18%, rgba(104, 150, 113, 0.22), transparent 30%),
     radial-gradient(circle at 52% 86%, rgba(121, 94, 62, 0.22), transparent 34%),
     radial-gradient(circle at 72% 54%, rgba(87, 117, 80, 0.2), transparent 30%),
-    linear-gradient(180deg, rgba(57, 80, 58, 0.94) 0%, rgba(63, 51, 40, 0.96) 100%),
+    linear-gradient(180deg, rgba(57, 80, 58, 0.35) 0%, rgba(63, 51, 40, 0.40) 100%),
     url("../../images/backgrounds/home-outreach-texture.webp");
   background-size: auto, auto, auto, auto, cover, 140% auto;
   background-position: 12% 16%, 82% 18%, 52% 86%, 72% 54%, center center, 56% 32%;
@@ -17573,11 +17569,11 @@ body.homepage .stars > .stars-fore::after {
 .hatha-yoga-wrapper::before {
   inset: -10% -8%;
   z-index: 0;
-  opacity: 0.36;
+  opacity: 0.22;
   background-image:
-    radial-gradient(circle at 18% 22%, rgba(210, 229, 197, 0.14), transparent 22%),
-    radial-gradient(circle at 78% 18%, rgba(166, 122, 85, 0.1), transparent 18%),
-    radial-gradient(circle at 52% 82%, rgba(124, 160, 116, 0.12), transparent 26%),
+    radial-gradient(circle at 18% 22%, rgba(210, 229, 197, 0.22), transparent 30%),
+    radial-gradient(circle at 78% 18%, rgba(166, 122, 85, 0.16), transparent 24%),
+    radial-gradient(circle at 52% 82%, rgba(124, 160, 116, 0.18), transparent 34%),
     url("../../images/backgrounds/home-outreach-texture.webp");
   background-size: auto, auto, auto, 175% auto;
   background-position: 18% 22%, 78% 18%, 52% 82%, 42% 74%;
@@ -17591,11 +17587,10 @@ body.homepage .stars > .stars-fore::after {
   z-index: 0;
   opacity: 0.88;
   background:
-    radial-gradient(circle at 18% 28%, rgba(116, 171, 120, 0.18), transparent 24%),
-    radial-gradient(circle at 82% 24%, rgba(164, 118, 74, 0.11), transparent 20%),
-    radial-gradient(circle at 48% 78%, rgba(88, 129, 90, 0.16), transparent 28%),
-    radial-gradient(circle at 62% 42%, rgba(121, 94, 63, 0.12), transparent 24%);
-  filter: blur(18px);
+    radial-gradient(circle at 18% 28%, rgba(116, 171, 120, 0.12), rgba(116, 171, 120, 0.04) 18%, transparent 42%),
+    radial-gradient(circle at 82% 24%, rgba(164, 118, 74, 0.08), rgba(164, 118, 74, 0.02) 16%, transparent 38%),
+    radial-gradient(circle at 48% 78%, rgba(88, 129, 90, 0.10), rgba(88, 129, 90, 0.03) 22%, transparent 48%),
+    radial-gradient(circle at 62% 42%, rgba(121, 94, 63, 0.08), rgba(121, 94, 63, 0.02) 18%, transparent 42%);
   animation: hatha-atmosphere-float 12s ease-in-out infinite alternate;
 }
 
@@ -17806,14 +17801,13 @@ body.homepage .stars > .stars-fore::after {
   padding: 1em 2.9em !important;
   border-radius: 999px !important;
   border: 1px solid rgba(247, 236, 215, 0.58) !important;
-  background: linear-gradient(180deg, rgba(57, 79, 63, 0.74), rgba(39, 52, 45, 0.82)) !important;
+  background: linear-gradient(180deg, rgba(57, 79, 63, 0.88), rgba(39, 52, 45, 0.94)) !important;
   color: #f8efe3 !important;
   font-size: 0.96em !important;
   font-weight: 400 !important;
   letter-spacing: 0.12em !important;
   text-transform: uppercase;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.07), 0 18px 34px rgba(24, 32, 38, 0.18);
-  backdrop-filter: blur(3px);
   transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease !important;
 }
 
@@ -17980,7 +17974,7 @@ section#banner .quote-text h2 {
     radial-gradient(circle at 82% 18%, rgba(104, 150, 113, 0.22), transparent 30%),
     radial-gradient(circle at 52% 86%, rgba(121, 94, 62, 0.22), transparent 34%),
     radial-gradient(circle at 72% 54%, rgba(87, 117, 80, 0.2), transparent 30%),
-    linear-gradient(180deg, rgba(57, 80, 58, 0.94) 0%, rgba(63, 51, 40, 0.96) 100%),
+    linear-gradient(180deg, rgba(57, 80, 58, 0.35) 0%, rgba(63, 51, 40, 0.40) 100%),
     url("../../images/backgrounds/home-outreach-texture.webp");
   background-size: auto, auto, auto, auto, cover, 140% auto;
   background-position: 12% 16%, 82% 18%, 52% 86%, 72% 54%, center center, 56% 32%;
@@ -18001,11 +17995,11 @@ section#banner .quote-text h2 {
 .hatha-yoga-wrapper::before {
   inset: -10% -8%;
   z-index: 0;
-  opacity: 0.36;
+  opacity: 0.22;
   background-image:
-    radial-gradient(circle at 18% 22%, rgba(210, 229, 197, 0.14), transparent 22%),
-    radial-gradient(circle at 78% 18%, rgba(166, 122, 85, 0.1), transparent 18%),
-    radial-gradient(circle at 52% 82%, rgba(124, 160, 116, 0.12), transparent 26%),
+    radial-gradient(circle at 18% 22%, rgba(210, 229, 197, 0.22), transparent 30%),
+    radial-gradient(circle at 78% 18%, rgba(166, 122, 85, 0.16), transparent 24%),
+    radial-gradient(circle at 52% 82%, rgba(124, 160, 116, 0.18), transparent 34%),
     url("../../images/backgrounds/home-outreach-texture.webp");
   background-size: auto, auto, auto, 175% auto;
   background-position: 18% 22%, 78% 18%, 52% 82%, 42% 74%;
@@ -18019,11 +18013,10 @@ section#banner .quote-text h2 {
   z-index: 0;
   opacity: 0.88;
   background:
-    radial-gradient(circle at 18% 28%, rgba(116, 171, 120, 0.18), transparent 24%),
-    radial-gradient(circle at 82% 24%, rgba(164, 118, 74, 0.11), transparent 20%),
-    radial-gradient(circle at 48% 78%, rgba(88, 129, 90, 0.16), transparent 28%),
-    radial-gradient(circle at 62% 42%, rgba(121, 94, 63, 0.12), transparent 24%);
-  filter: blur(18px);
+    radial-gradient(circle at 18% 28%, rgba(116, 171, 120, 0.12), rgba(116, 171, 120, 0.04) 18%, transparent 42%),
+    radial-gradient(circle at 82% 24%, rgba(164, 118, 74, 0.08), rgba(164, 118, 74, 0.02) 16%, transparent 38%),
+    radial-gradient(circle at 48% 78%, rgba(88, 129, 90, 0.10), rgba(88, 129, 90, 0.03) 22%, transparent 48%),
+    radial-gradient(circle at 62% 42%, rgba(121, 94, 63, 0.08), rgba(121, 94, 63, 0.02) 18%, transparent 42%);
   animation: hatha-atmosphere-float 12s ease-in-out infinite alternate;
 }
 
@@ -18225,14 +18218,13 @@ section#banner .quote-text h2 {
   padding: 1em 2.9em !important;
   border-radius: 999px !important;
   border: 1px solid rgba(247, 236, 215, 0.58) !important;
-  background: linear-gradient(180deg, rgba(57, 79, 63, 0.74), rgba(39, 52, 45, 0.82)) !important;
+  background: linear-gradient(180deg, rgba(57, 79, 63, 0.88), rgba(39, 52, 45, 0.94)) !important;
   color: #f8efe3 !important;
   font-size: 0.96em !important;
   font-weight: 400 !important;
   letter-spacing: 0.12em !important;
   text-transform: uppercase;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.07), 0 18px 34px rgba(24, 32, 38, 0.18);
-  backdrop-filter: blur(3px);
   transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease !important;
 }
 
@@ -18636,14 +18628,13 @@ section.carousel-shell > .inner,
   padding: 0.95rem 2.4rem !important;
   border-radius: 999px !important;
   border: 1px solid rgba(193, 209, 194, 0.55) !important;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.06)) !important;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.42)) !important;
   color: #f5efe3 !important;
   font-family: "FedraSansPro", sans-serif !important;
   font-size: 0.8rem !important;
   letter-spacing: 0.16em !important;
   text-transform: uppercase;
   box-shadow: 0 12px 30px rgba(4, 8, 4, 0.24) !important;
-  backdrop-filter: blur(4px);
 }
 
 #carousel footer .book-now-button:hover {
@@ -18749,7 +18740,7 @@ section.carousel-shell > .inner,
   padding: 0.95rem 2.55rem !important;
   border-radius: 999px !important;
   border: 1px solid rgba(231, 220, 198, 0.58) !important;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.06)) !important;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.42)) !important;
   color: #f8efe3 !important;
   font-family: "FedraSansPro", sans-serif !important;
   font-size: 0.95rem !important;
@@ -18759,8 +18750,6 @@ section.carousel-shell > .inner,
   text-transform: uppercase;
   text-decoration: none !important;
   box-shadow: 0 14px 32px rgba(18, 22, 18, 0.22) !important;
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
   transition: transform 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease, background 0.28s ease, color 0.28s ease !important;
 }
 
@@ -18869,7 +18858,7 @@ section#banner,
   overflow: hidden;
   background-color: #10243a !important;
   background-image:
-    linear-gradient(135deg, rgba(8, 23, 39, 0.84), rgba(8, 37, 63, 0.60) 48%, rgba(40, 136, 201, 0.42) 100%) !important;
+    linear-gradient(135deg, rgba(8, 23, 39, 0.25), rgba(8, 37, 63, 0.30) 48%, rgba(40, 136, 201, 0.20) 100%) !important;
   background-position: center center !important;
   background-repeat: no-repeat !important;
   background-size: cover !important;
@@ -18903,10 +18892,9 @@ section#banner,
 #Bio .bio-panel {
   padding: clamp(1.5rem, 2.7vw, 2.2rem);
   border-radius: 1.75rem;
-  background: linear-gradient(180deg, rgba(5, 19, 32, 0.44), rgba(8, 21, 35, 0.64));
+  background: linear-gradient(180deg, rgba(5, 19, 32, 0.85), rgba(8, 21, 35, 0.92));
   border: 1px solid rgba(141, 216, 255, 0.16);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 22px 40px rgba(7, 21, 34, 0.16);
-  backdrop-filter: blur(10px);
 }
 
 #Bio .bio-panel--vision {
@@ -18976,10 +18964,9 @@ section#banner,
   position: relative;
   padding: clamp(0.7rem, 1.4vw, 0.9rem);
   border-radius: 1.9rem;
-  background: linear-gradient(160deg, rgba(255, 255, 255, 0.20), rgba(83, 186, 255, 0.10));
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.45), rgba(83, 186, 255, 0.30));
   border: 1px solid rgba(158, 226, 255, 0.22);
   box-shadow: 0 26px 50px rgba(6, 20, 33, 0.28);
-  backdrop-filter: blur(12px);
 }
 
 #Bio .side-image {
@@ -19159,7 +19146,7 @@ section#Bio,
 #Bio {
   background-color: #10243a !important;
   background-image:
-    linear-gradient(135deg, rgba(8, 23, 39, 0.84), rgba(8, 37, 63, 0.60) 48%, rgba(40, 136, 201, 0.42) 100%),
+    linear-gradient(135deg, rgba(8, 23, 39, 0.25), rgba(8, 37, 63, 0.30) 48%, rgba(40, 136, 201, 0.20) 100%),
     url("../../images/backgrounds/wallpaper-411edited.webp") !important;
   background-position: center center !important;
   background-repeat: no-repeat !important;
@@ -19458,7 +19445,7 @@ section#Bio,
   padding: clamp(4.75rem, 7vw, 7rem) 0;
   min-height: auto;
   background:
-    linear-gradient(135deg, rgba(2, 8, 32, 0.92), rgba(9, 24, 71, 0.78)),
+    linear-gradient(135deg, rgba(2, 8, 32, 0.15), rgba(9, 24, 71, 0.25)),
     url("../../images/programs/SadhguruPage1.webp") no-repeat center center scroll; /* fixed moved to ::before */
   background-size: cover;
   background-position: center center !important;
@@ -19470,9 +19457,9 @@ section#Bio,
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 18% 22%, rgba(114, 160, 255, 0.2), transparent 28%),
-    radial-gradient(circle at 82% 18%, rgba(244, 216, 154, 0.12), transparent 24%),
-    radial-gradient(circle at 52% 78%, rgba(60, 101, 214, 0.18), transparent 34%);
+    radial-gradient(circle at 18% 22%, rgba(114, 160, 255, 0.14), transparent 36%),
+    radial-gradient(circle at 82% 18%, rgba(244, 216, 154, 0.08), transparent 32%),
+    radial-gradient(circle at 52% 78%, rgba(60, 101, 214, 0.12), transparent 42%);
   pointer-events: none;
 }
 
@@ -19480,7 +19467,7 @@ section#Bio,
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(3, 7, 20, 0.16), rgba(3, 7, 20, 0.55));
+  background: linear-gradient(180deg, rgba(3, 7, 20, 0.10), rgba(3, 7, 20, 0.30));
   pointer-events: none;
 }
 
@@ -19540,10 +19527,8 @@ section#Bio,
   overflow: hidden;
   border-radius: 1.9rem;
   border: 1px solid rgba(166, 195, 255, 0.18);
-  background: linear-gradient(180deg, rgba(12, 21, 61, 0.92), rgba(4, 12, 38, 0.78));
+  background: linear-gradient(180deg, rgba(12, 21, 61, 0.88), rgba(4, 12, 38, 0.85));
   box-shadow: 0 26px 70px rgba(1, 6, 25, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
 }
 
 #sadhguru .sadhguru-visual::before {
@@ -19609,13 +19594,11 @@ section#Bio,
   padding: clamp(1.5rem, 3vw, 2.15rem);
   border-radius: 1.6rem;
   border: 1px solid rgba(153, 182, 255, 0.16);
-  background: linear-gradient(165deg, rgba(8, 17, 54, 0.88), rgba(15, 33, 94, 0.62));
+  background: linear-gradient(165deg, rgba(8, 17, 54, 0.88), rgba(15, 33, 94, 0.82));
   box-shadow: 0 24px 55px rgba(2, 8, 30, 0.35);
   color: rgba(241, 246, 255, 0.88);
   text-align: left;
   text-shadow: none;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
 }
 
 #sadhguru .sadhguru-section::before {
@@ -19841,11 +19824,10 @@ section#Bio,
   padding: 2.5em 2.75em;
   border: 1px solid rgba(224, 190, 255, 0.28);
   border-radius: 1.75em;
-  background: linear-gradient(180deg, rgba(77, 40, 118, 0.58), rgba(40, 20, 64, 0.7));
+  background: linear-gradient(180deg, rgba(77, 40, 118, 0.85), rgba(40, 20, 64, 0.92));
   box-shadow:
     0 24px 60px rgba(8, 3, 20, 0.34),
     inset 0 1px 0 rgba(255, 255, 255, 0.14);
-  backdrop-filter: blur(10px);
 }
 
 #program-calendar h2 {
@@ -19890,11 +19872,10 @@ section#Bio,
   flex-direction: column;
   font-size: 19px;          /* pin to px — breaks em chain from body font-size scaling at breakpoints */
   padding: 1em 0.8em;      /* these em values now always = relative to 19px, not body */
-  background: rgba(25, 17, 12, 0.42);
+  background: rgba(25, 17, 12, 0.85);
   border: 1px solid rgba(255, 183, 101, 0.26);
   border-radius: 1.25em;
   box-shadow: 0 16px 36px rgba(0, 0, 0, 0.18);
-  backdrop-filter: blur(6px);
   transition: transform 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease;
 }
 
@@ -20099,10 +20080,9 @@ section#Bio,
 
 #program-calendar.programs-showcase .program-card {
   padding: 1em 0.8em;       /* matches base card padding */
-  background: linear-gradient(180deg, rgba(90, 68, 104, 0.36), rgba(31, 20, 40, 0.60)) !important;
+  background: linear-gradient(180deg, rgba(90, 68, 104, 0.78), rgba(31, 20, 40, 0.90)) !important;
   border: 1px solid rgba(241, 224, 255, 0.14);
   box-shadow: 0 18px 34px rgba(14, 5, 26, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.06);
-  backdrop-filter: blur(10px);
 }
 
 #program-calendar.programs-showcase .program-card h3 {
@@ -20331,14 +20311,14 @@ section#Bio,
   background:
     radial-gradient(circle at 16% 20%, rgba(255, 166, 84, 0.2), transparent 28%),
     radial-gradient(circle at 82% 18%, rgba(255, 117, 52, 0.14), transparent 24%),
-    linear-gradient(180deg, rgba(16, 0, 0, 0.2) 0%, rgba(39, 5, 5, 0.5) 100%);
+    linear-gradient(180deg, rgba(16, 0, 0, 0.15) 0%, rgba(39, 5, 5, 0.30) 100%);
   z-index: 0;
 }
 
 .readings-wrapper::after {
   background:
     radial-gradient(circle at 50% 0%, rgba(255, 184, 115, 0.1), transparent 34%),
-    linear-gradient(180deg, rgba(12, 1, 1, 0.02) 0%, rgba(24, 2, 2, 0.18) 100%);
+    linear-gradient(180deg, rgba(12, 1, 1, 0.05) 0%, rgba(24, 2, 2, 0.10) 100%);
   z-index: 0;
 }
 
@@ -20404,10 +20384,8 @@ section#Bio,
   overflow: hidden;
   border-radius: 1.55rem;
   border: 1px solid rgba(255, 163, 88, 0.2);
-  background: linear-gradient(180deg, rgba(87, 14, 14, 0.82), rgba(32, 4, 4, 0.9));
+  background: linear-gradient(180deg, rgba(87, 14, 14, 0.88), rgba(32, 4, 4, 0.94));
   box-shadow: 0 1.25rem 3.25rem rgba(0, 0, 0, 0.34);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
   transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
 }
 
@@ -21225,9 +21203,9 @@ body.homepage .sadhguru-wrapper {
 /* Fixed parallax image lives on ::before — merged with existing gradient light effects */
 body.homepage .sadhguru-wrapper::before {
   background:
-    radial-gradient(circle at 18% 22%, rgba(114, 160, 255, 0.2), transparent 28%),
-    radial-gradient(circle at 82% 18%, rgba(244, 216, 154, 0.12), transparent 24%),
-    radial-gradient(circle at 52% 78%, rgba(60, 101, 214, 0.18), transparent 34%),
+    radial-gradient(circle at 18% 22%, rgba(114, 160, 255, 0.14), transparent 36%),
+    radial-gradient(circle at 82% 18%, rgba(244, 216, 154, 0.08), transparent 32%),
+    radial-gradient(circle at 52% 78%, rgba(60, 101, 214, 0.12), transparent 42%),
     url("../../images/programs/SadhguruPage1.webp") no-repeat center center !important;
   background-size: auto, auto, auto, cover !important;
   background-attachment: scroll, scroll, scroll, fixed !important;
