@@ -727,8 +727,14 @@ updateActiveDot();
         slidesPerView: 'auto',
         spaceBetween: 16,
         grabCursor: true,
-        speed: 400,
+        speed: 300,
         centerInsufficientSlides: true,
+        resizeObserver: false,
+        passiveListeners: true,
+        touchAngle: 45,
+        threshold: 5,
+        longSwipesRatio: 0.25,
+        followFinger: true,
         pagination: { el: '.programs-pagination', clickable: true },
       });
     }, 80);
@@ -921,8 +927,14 @@ document.addEventListener('DOMContentLoaded', function () {
     slidesPerView: 'auto',      /* card width fixed in CSS */
     spaceBetween: 16,           /* breathing room between cards */
     grabCursor: true,
-    speed: 400,
+    speed: 300,
     centerInsufficientSlides: true, /* center when fewer cards than fill row */
+    resizeObserver: false,
+    passiveListeners: true,
+    touchAngle: 45,
+    threshold: 5,
+    longSwipesRatio: 0.25,
+    followFinger: true,
     pagination: { el: '.readings-pagination', clickable: true },
   });
 });

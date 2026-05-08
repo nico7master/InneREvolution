@@ -1100,7 +1100,7 @@
       <script src="../assets/js/util.js"></script>
       <script src="../assets/js/i18n.js"></script>
     <script src="../booking/config.js"></script>
-    <script src="../assets/js/main.js?v=20260506210337"></script>
+    <script src="../assets/js/main.js?v=20260508095722"></script>
     </div>
   <script src="../assets/js/swiper-bundle.min.js"></script>
 <!-- Swiper Initialization -->
@@ -1110,7 +1110,7 @@
     centeredSlides: true,
     slidesPerView: "auto",
     initialSlide: 2,
-    speed: 500,
+    speed: 350,          /* faster transition = less GPU time per slide */
     grabCursor: true,
     coverflowEffect: {
       rotate: 0,
@@ -1120,6 +1120,13 @@
       scale: 0.926,   /* 1/1.08 — inactive slides appear ~8% smaller */
       slideShadows: false,
     },
+    /* --- Mobile performance optimizations --- */
+    resizeObserver: false,        /* skip ResizeObserver — saves CPU on mobile */
+    passiveListeners: true,       /* passive touch listeners — non-blocking scroll */
+    touchAngle: 45,               /* only detect horizontal swipes */
+    threshold: 5,                 /* min distance before swipe starts — prevents micro-jank */
+    longSwipesRatio: 0.25,        /* shorter long-swipe detection */
+    followFinger: true,           /* immediate 1:1 touch tracking */
     pagination: {
       el: ".yoga-pagination",
       clickable: true,
