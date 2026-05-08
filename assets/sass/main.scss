@@ -18376,7 +18376,7 @@ section#banner .quote-text h2 {
     repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.012) 0 2px, transparent 2px 18px),
     repeating-linear-gradient(35deg, rgba(0, 0, 0, 0.028) 0 3px, transparent 3px 22px);
   opacity: 0.9;
-  mix-blend-mode: soft-light;
+  /* mix-blend-mode removed — GPU-expensive during Swiper transitions */
   pointer-events: none;
 }
 
@@ -18429,7 +18429,7 @@ section.carousel-shell > .inner,
 #carousel .yoga-divider {
   width: min(340px, 70vw);
   opacity: 0.6;
-  filter: sepia(0.35) saturate(0.85) brightness(0.96);
+  /* filter removed */
 }
 
 /* Swiper container */
@@ -18468,13 +18468,11 @@ section.carousel-shell > .inner,
   border-radius: 1.55rem; /* match article-content border-radius so dark bg clips cleanly */
   margin: 0 15px;
   overflow: hidden;
-  box-shadow:
-    0 16px 38px rgba(0, 0, 0, 0.28),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  box-shadow: 0 16px 38px rgba(0, 0, 0, 0.28); /* inset shadow removed — GPU-expensive during Swiper slides */
   transition:
-    box-shadow 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
     border-color 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
     background 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  /* box-shadow transition removed — GPU-expensive during Swiper slides */
 }
 
 .swiper-slide::before {
@@ -18500,10 +18498,7 @@ section.carousel-shell > .inner,
   background:
     linear-gradient(180deg, rgba(49, 63, 53, 0.99) 0%, rgba(28, 37, 32, 1) 100%);
   border-color: rgba(155, 176, 148, 0.24);
-  box-shadow:
-    0 26px 62px rgba(0, 0, 0, 0.42),
-    0 0 0 1px rgba(175, 194, 168, 0.07),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  box-shadow: 0 26px 62px rgba(0, 0, 0, 0.42); /* multi-layer + inset shadows removed — GPU-expensive during slide transitions */
   z-index: 10;
 }
 
@@ -18530,15 +18525,14 @@ section.carousel-shell > .inner,
   height: 100%;
   object-fit: cover;
   transform: scale(1.08);
-  filter: saturate(0.9) contrast(0.98) brightness(0.9);
-  transition:
-    transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-    filter 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  /* filter removed — GPU-expensive during Swiper transitions */
+  /* transform transition removed — let Swiper handle GPU-composited movement natively */
+
 }
 
 .swiper-slide.swiper-slide-active img {
   transform: scale(1);
-  filter: saturate(1.02) contrast(1.02) brightness(1.02);
+  /* filter removed */
 }
 
 .swiper-slide header {
@@ -19551,7 +19545,7 @@ section#Bio,
   object-fit: cover;
   object-position: 14% top;
   border-radius: 1.35rem;
-  filter: saturate(0.92) contrast(1.03) brightness(0.86);
+  /* filter removed — static, but still per-pixel GPU cost */
   box-shadow: 0 18px 40px rgba(0, 0, 0, 0.34);
 }
 
@@ -19761,6 +19755,7 @@ section#Bio,
   gap: 1em;
 }
 
+#program-calendar .programsSwiper { will-change: transform; }
 #program-calendar .programs-feed {
   max-width: 1120px;
   margin: 0 auto;
@@ -19846,7 +19841,6 @@ section#Bio,
   background: linear-gradient(135deg, rgba(255, 209, 149, 0.92), rgba(245, 170, 113, 0.92));
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.22);
 }
-
 #program-calendar .programs-feed {
   position: relative;
   z-index: 1;
@@ -20015,7 +20009,7 @@ section#Bio,
   z-index: 0;
   background: url("../../images/backgrounds/Ib_secion1bg2.webp") center center / 100% 100% no-repeat;
   opacity: 0.54;
-  filter: saturate(0.92) brightness(1) contrast(1.08);
+
 }
 
 #program-calendar.programs-showcase::after {
@@ -20076,7 +20070,7 @@ section#Bio,
   padding: 1em 0.8em;       /* matches base card padding */
   background: linear-gradient(180deg, rgba(90, 68, 104, 0.78), rgba(31, 20, 40, 0.90)) !important;
   border: 1px solid rgba(241, 224, 255, 0.14);
-  box-shadow: 0 18px 34px rgba(14, 5, 26, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  box-shadow: 0 18px 34px rgba(14, 5, 26, 0.18);
 }
 
 #program-calendar.programs-showcase .program-card h3 {
@@ -20323,7 +20317,7 @@ section#Bio,
 
 .readings-wrapper .shared-particle-canvas {
   opacity: 0.72;
-  mix-blend-mode: screen;
+  /* mix-blend-mode removed — GPU-expensive: screen blending forces per-pixel recomposite on every animation frame */
 }
 
 .readings-wrapper #Readings {
@@ -20400,12 +20394,12 @@ section#Bio,
   aspect-ratio: 1 / 0.72;
   object-fit: cover;
   transform: scale(1.001);
-  transition: transform 0.45s ease, filter 0.45s ease;
+  transition: transform 0.45s ease;
 }
 
 .readings-wrapper #Readings .article-content:hover .image.featured img {
   transform: scale(1.05);
-  filter: saturate(1.05) brightness(1.02);
+  /* filter removed — GPU-expensive hover transition */
 }
 
 .readings-wrapper #Readings .article-content > header,
@@ -21289,7 +21283,7 @@ body.homepage .sadhguru-wrapper > :not(.shared-particle-canvas) {
   z-index: 0 !important;
   opacity: 1 !important;
   pointer-events: none !important;
-  mix-blend-mode: screen;
+  /* mix-blend-mode removed — GPU-expensive: fixed canvas with screen blending forces per-pixel recomposite on every animation frame */
 }
 
 /* === STRONG PARTICLE RESTORE (After DOM insertBefore fix) ===
