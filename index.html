@@ -12,7 +12,7 @@
     />
     <link rel="preload" href="assets/webfonts/GrandifloraOne-Regular.ttf" as="font" type="font/ttf" crossorigin>
     <link rel="preload" href="assets/webfonts/DeliusSwashCaps-Regular.ttf" as="font" type="font/ttf" crossorigin>
-    <link rel="stylesheet" href="assets/css/main.css?v=20260508092127" />
+    <link rel="stylesheet" href="assets/css/main.css?v=20260508101816" />
     <link rel="stylesheet" href="assets/css/swiper-bundle.min.css" />
     
     <link rel="preload" href="images/backgrounds/wallpaper-1981.jpeg" as="image" />
@@ -1172,33 +1172,25 @@
       <script src="assets/js/util.js"></script>
       <script src="assets/js/i18n.js"></script>
     <script src="booking/config.js"></script>
-    <script src="assets/js/main.js?v=20260508095722"></script>
+    <script src="assets/js/main.js?v=20260508101816"></script>
     </div>
   <script src="assets/js/swiper-bundle.min.js"></script>
 <!-- Swiper Initialization -->
 <script>
   var swiper = new Swiper(".mySwiper", {
-    effect: "coverflow",
+    effect: "slide",            /* coverflow replaced — JS 3D transform math was causing mobile jank */
     centeredSlides: true,
     slidesPerView: "auto",
     initialSlide: 2,
-    speed: 350,          /* faster transition = less GPU time per slide */
+    speed: 350,
     grabCursor: true,
-    coverflowEffect: {
-      rotate: 0,
-      stretch: 0,
-      depth: 0,
-      modifier: 1,
-      scale: 0.926,   /* 1/1.08 — inactive slides appear ~8% smaller */
-      slideShadows: false,
-    },
-    /* --- Mobile performance optimizations --- */
-    resizeObserver: false,        /* skip ResizeObserver — saves CPU on mobile */
-    passiveListeners: true,       /* passive touch listeners — non-blocking scroll */
-    touchAngle: 45,               /* only detect horizontal swipes */
-    threshold: 5,                 /* min distance before swipe starts — prevents micro-jank */
-    longSwipesRatio: 0.25,        /* shorter long-swipe detection */
-    followFinger: true,           /* immediate 1:1 touch tracking */
+    /* Inactive slide scaling now done via CSS — zero JS overhead */
+    resizeObserver: false,
+    passiveListeners: true,
+    touchAngle: 45,
+    threshold: 5,
+    longSwipesRatio: 0.25,
+    followFinger: true,
     pagination: {
       el: ".yoga-pagination",
       clickable: true,
