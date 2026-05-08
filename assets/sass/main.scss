@@ -13336,7 +13336,7 @@ section#banner.footer-banner .copyright {
 .article-content {
   transition: transform 0.3s ease, box-shadow 0.3s ease !important;
   border-radius: 0.5em;
-  will-change: transform;
+  /* will-change removed — hover-only, browser auto-promotes */
 }
 
 .article-content:hover {
@@ -15298,7 +15298,7 @@ body.homepage #header:after {
   left: 0;
   border-radius: 50%;
   pointer-events: none;
-  will-change: transform, opacity;
+  /* will-change removed — permanently reserves GPU layer even when paused */
   mix-blend-mode: screen;
 }
 
@@ -15445,7 +15445,7 @@ body.homepage #header:after {
   background: radial-gradient(circle, rgba(255,250,226,0.98) 0%, rgba(255,219,145,0.72) 45%, rgba(255,219,145,0) 100%);
   filter: drop-shadow(0 0 10px rgba(255,223,145,0.55));
   opacity: 0;
-  will-change: transform, opacity;
+  /* will-change removed — permanently reserves GPU layer even when paused */
   animation: day-mote-drift-fore 8.8s ease-in-out infinite;
 }
 
@@ -15516,7 +15516,7 @@ html body.homepage #page-wrapper #header .sacred-pattern {
   background-size: contain;
   transform-origin: center;
   transform: translate3d(var(--bloom-x), var(--bloom-y), 0) rotate(var(--bloom-rotate)) scale(var(--bloom-scale));
-  will-change: transform, opacity;
+  /* will-change removed — permanently reserves GPU layer even when paused */
 }
 
 html body.homepage #page-wrapper #header .sacred-day-1,
@@ -15679,7 +15679,7 @@ body.homepage #header:after {
   width: 100%;
   height: auto;
   pointer-events: none;
-  will-change: opacity, filter;
+  /* will-change removed — filter was removed; opacity transition is cheap */
 }
 
 /* Night logo: visible at dawn=0, fades out as dawn rises */
@@ -16847,7 +16847,7 @@ body.homepage #header .hero-day-particles .cyan-wind-trail {
   z-index: 4;
   opacity: calc(var(--day-mote-visibility, 0) * 0.78);
   mix-blend-mode: screen;
-  will-change: transform, opacity;
+  /* will-change removed — permanently reserves GPU layer even when paused */
 }
 
 body.homepage #header .hero-day-particles .cyan-wind-trail svg {
@@ -17426,7 +17426,7 @@ body.homepage .stars > .stars-fore {
   width: 120vmax !important;
   height: 120vmax !important;
   transform-origin: 50% 50% !important;
-  will-change: transform !important;
+  /* will-change removed — permanently reserves large GPU texture even when paused */
 }
 
 /* Center star coordinates inside 120vmax overshoot field */
@@ -17507,7 +17507,7 @@ body.homepage .stars > .stars-fore::after {
 .hero-wordmark-night,
 .hero-wordmark-day {
   z-index: 100;
-  will-change: opacity;
+  /* will-change removed — opacity transition is cheap, browser auto-promotes */
 }
 
 /* Shared wordmark styling for both day and night text layers */
