@@ -43,31 +43,120 @@ hoverDelay: 350,
 hideDelay: 350
 });
 
-// Nav Panel.
+// ── Mobile Nav Overlay (full-screen mystic menu) ──
 
-// Button.
-$('<div id="navButton">' +
-'<a href="#navPanel" class="toggle"></a>' +
-'</div>')
-.appendTo($body);
+(function buildMobileNav() {
+// Toggle button (hamburger → ✕)
+var $toggle = $('<button id="mobileNavToggle" aria-label="Menu" aria-expanded="false">' +
+'<span class="hamburger-line"></span>' +
+'<span class="hamburger-line"></span>' +
+'<span class="hamburger-line"></span>' +
+'</button>').appendTo($body);
 
-// Panel.
-$('<div id="navPanel">' +
-'<nav>' +
-$('#nav').navList()
-+ '</nav>' +
-'</div>')
-.appendTo($body)
-.panel({
-delay: 500,
-hideOnClick: true,
-hideOnSwipe: true,
-resetScroll: true,
-resetForms: true,
-side: 'left',
-target: $body,
-visibleClass: 'navPanel-visible'
+// Build overlay HTML from #nav structure
+var $navSrc = $('#nav > ul');
+var overlayHTML = '<div id="mobileNav" aria-hidden="true">' +
+'<div class="mobileNav-inner">' +
+'<nav class="mobileNav-nav">';
+
+$navSrc.children('li').each(function () {
+var $li = $(this);
+var $submenu = $li.children('ul');
+var text = $li.children('a, span').first().text().trim();
+var href = $li.children('a').attr('href') || '#';
+var isParent = $submenu.length > 0;
+var isLang = $li.hasClass('lang-switch');
+
+if (isParent) {
+overlayHTML += '<div class="mobileNav-item mobileNav-parent">' +
+'<button class="mobileNav-link" aria-expanded="false">' + text +
+'<span class="mobileNav-arrow">&#9662;</span></button>' +
+'<div class="mobileNav-sub">';
+$submenu.children('li').each(function () {
+var subHref = $(this).children('a').attr('href') || '#';
+var subText = $(this).children('a, span').first().text().trim();
+overlayHTML += '<a class="mobileNav-sublink" href="' + subHref + '">' + subText + '</a>';
 });
+overlayHTML += '</div></div>';
+} else if (isLang) {
+var onclick = $li.children('a').attr('onclick') || '';
+overlayHTML += '<div class="mobileNav-item mobileNav-lang">' +
+'<a class="mobileNav-link" href="' + href + '"' +
+(onclick ? ' onclick="' + onclick + '"' : '') +
+'>' + text + '</a></div>';
+} else {
+overlayHTML += '<div class="mobileNav-item">' +
+'<a class="mobileNav-link" href="' + href + '">' + text + '</a></div>';
+}
+});
+
+overlayHTML += '</nav>' +
+'<div class="mobileNav-snake" aria-hidden="true"></div>' +
+'</div></div>';
+
+var $overlay = $(overlayHTML).appendTo($body);
+var $mobileNav = $('#mobileNav');
+
+// Toggle open/close
+function openNav() {
+$mobileNav.attr('aria-hidden', 'false').addClass('is-open');
+$toggle.attr('aria-expanded', 'true').addClass('is-open');
+$body.addClass('mobileNav-open');
+}
+function closeNav() {
+$mobileNav.attr('aria-hidden', 'true').removeClass('is-open');
+$toggle.attr('aria-expanded', 'false').removeClass('is-open');
+$body.removeClass('mobileNav-open');
+}
+
+$toggle.on('click', function () {
+if ($mobileNav.hasClass('is-open')) closeNav(); else openNav();
+});
+
+// Accordion submenus
+$mobileNav.find('.mobileNav-parent > .mobileNav-link').on('click', function () {
+var $btn = $(this);
+var $sub = $btn.next('.mobileNav-sub');
+var isOpen = $btn.attr('aria-expanded') === 'true';
+// Close all others first
+$mobileNav.find('.mobileNav-parent > .mobileNav-link[aria-expanded="true"]').not($btn).each(function () {
+$(this).attr('aria-expanded', 'false');
+$(this).next('.mobileNav-sub').removeClass('is-open');
+});
+$btn.attr('aria-expanded', !isOpen);
+$sub.toggleClass('is-open', !isOpen);
+});
+
+// Close on link click (sublinks and direct links)
+$mobileNav.find('.mobileNav-sublink, .mobileNav-item:not(.mobileNav-parent) .mobileNav-link').on('click', function () {
+closeNav();
+});
+
+// Close on ESC
+$(document).on('keydown', function (e) {
+if (e.key === 'Escape' && $mobileNav.hasClass('is-open')) closeNav();
+});
+
+// Close on swipe down
+var touchStartY = 0;
+$mobileNav[0].addEventListener('touchstart', function (e) {
+touchStartY = e.touches[0].clientY;
+}, { passive: true });
+$mobileNav[0].addEventListener('touchend', function (e) {
+var diff = e.changedTouches[0].clientY - touchStartY;
+if (diff > 80) closeNav();
+}, { passive: true });
+
+// Handle resize crossing 980px
+var lastWidth = window.innerWidth;
+$window.on('resize', function () {
+var w = window.innerWidth;
+if ((lastWidth <= 980 && w > 980) || (lastWidth > 980 && w <= 980)) {
+closeNav();
+}
+lastWidth = w;
+});
+})();
 
 // Carousels - DISABLED (Using Swiper.js instead)
 /* Original carousel code disabled - Swiper handles this now
