@@ -269,7 +269,7 @@ function buildCard(p) {
     : '';
 
   const descHtml = p.description
-    ? `<p class="program-card-description">${p.description}</p>`
+    ? `<p class="program-card-description">${p.description.replace(/\\n/g, '<br>').replace(/\n/g, '<br>')}</p>`
     : '';
 
   const infoHtml = [
