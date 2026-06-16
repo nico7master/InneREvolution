@@ -38,12 +38,12 @@ jobs:
       # !! Secrets are injected here — config.js is NEVER committed to git
       - name: Generate booking/config.js from secrets
         env:
-          SHEET_ID:        ${{ secrets.PROGRAMS_SHEET_ID }}
-          SHEETS_API_KEY:  ${{ secrets.SHEETS_API_KEY }}
-          APPS_SCRIPT_URL: ${{ secrets.APPS_SCRIPT_URL }}
+          SHEET_ID:         ${{ secrets.PROGRAMS_SHEET_ID }}
+          SHEETS_API_KEY:   ${{ secrets.SHEETS_API_KEY }}
+          DEFAULT_FORM_URL: ${{ secrets.DEFAULT_FORM_URL }}
         run: |
-          printf 'const CONFIG = {\n  SHEET_ID:        "%s",\n  SHEETS_API_KEY:  "%s",\n  APPS_SCRIPT_URL: "%s"\n};\n' \
-            "$SHEET_ID" "$SHEETS_API_KEY" "$APPS_SCRIPT_URL" > booking/config.js
+          printf 'const CONFIG = {\n  SHEET_ID:        "%s",\n  SHEETS_API_KEY:  "%s",\n  // APPS_SCRIPT_URL disabled — booking now uses external form links\n  DEFAULT_FORM_URL: "%s"\n};\n' \
+            "$SHEET_ID" "$SHEETS_API_KEY" "$DEFAULT_FORM_URL" > booking/config.js
           echo "--- config.js generated ---"
           cat booking/config.js
 

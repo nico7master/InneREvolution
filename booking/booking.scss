@@ -590,10 +590,18 @@ a {
     transform: none;
     box-shadow: none;
   }
+
+  // Link variant — looks like the button but is an <a> tag
+  &.btn-register-link {
+    display: inline-block;
+    text-decoration: none;
+    text-align: center;
+  }
 }
 
-// ─── Modal Overlay ────────────────────────────────────────────────────────────
+// ─── Modal Overlay — DISABLED (booking now uses external form links) ──────────
 .modal-overlay {
+  display: none !important;  // Force-hide: no modal can ever open
   position: fixed;
   inset: 0;
   background: rgba($color-darkest-gray, 0.85);

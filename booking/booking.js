@@ -11,7 +11,7 @@ var BOOKING_STRINGS = {
     heroTitle:          'Yoga Programs',
     heroTagline:        'Classical Hatha Yoga \u2014 Begin your journey',
     loading:            'Loading programs\u2026',
-    reserveNote:        'Reserve your spot \u2014 we\u2019ll send you a secure payment link to confirm',
+    reserveNote:        'Register to reserve your spot \u2014 payment details will follow by email',
     noPrograms:         'No programs are currently available.',
     checkBack:          'Check back soon or ',
     returnSiteLink:     'return to the site',
@@ -63,7 +63,7 @@ var BOOKING_STRINGS = {
     heroTitle:          'Yoga Programme',
     heroTagline:        'Klassisches Hatha Yoga \u2014 Beginne deine Reise',
     loading:            'Lade Programme\u2026',
-    reserveNote:        'Reserviere deinen Platz \u2014 wir senden dir einen sicheren Zahlungslink zur Best\u00e4tigung',
+    reserveNote:        'Melde dich an, um deinen Platz zu reservieren \u2014 Zahlungsdetails folgen per E-Mail',
     noPrograms:         'Derzeit sind keine Programme verf\u00fcgbar.',
     checkBack:          'Schau bald wieder vorbei oder ',
     returnSiteLink:     'kehre zur Website zur\u00fcck',
@@ -166,7 +166,7 @@ async function fetchPrograms() {
   //   F=Active, G=StartDate, H=Sessions, I=Std/Sess, J=TotalHours,
   //   K=Description, L=Location, M=Language
   // Row 1=title, Row 2=header(emoji), Row 3+=data
-  const rows = await fetchSheet('Programs!A3:M');
+  const rows = await fetchSheet('Programs!A3:N');  // A–M = program data, N = formUrl
   programs = rows.map(r => ({
     id:               (r[0] || '').toString().trim(),
     name:             r[1] || '',
@@ -183,6 +183,7 @@ async function fetchPrograms() {
     description:      r[10] || '',
     location:         r[11] || '',
     language:         r[12] || '',
+    formUrl:          r[13] || '',   // Column N — external registration form URL
     image:            '',
     format:           '',
   }));
@@ -313,12 +314,21 @@ function buildCard(p) {
         <span class="program-card-price">&euro;${p.price.toFixed(2)}</span>
         <div class="footer-right">
           ${spotsHtml}
-          <button
-            class="btn-register"
-            data-program-id="${p.id}"
-            ${isFull ? 'disabled aria-disabled="true"' : ''}>
-            ${isFull ? bs('soldOutBtn') : bs('registerBtn')}
-          </button>
+          ${isFull
+            ? `<button class="btn-register" disabled aria-disabled="true">${bs('soldOutBtn')}</button>`
+            : (() => {
+                const formUrl = p.formUrl || CONFIG.DEFAULT_FORM_URL || '';
+                if (formUrl) {
+                  // Append program name as query param for form pre-fill
+                  const separator = formUrl.includes('?') ? '&' : '?';
+                  const url = formUrl + separator + 'program=' + encodeURIComponent(p.name);
+                  return `<a href="${url}" target="_blank" rel="noopener" class="btn-register btn-register-link">${bs('registerBtn')}</a>`;
+                } else {
+                  // No form URL configured — show disabled button
+                  return `<button class="btn-register" disabled aria-disabled="true" title="${bs('alertNoConfig')}">${bs('registerBtn')}</button>`;
+                }
+              })()
+          }
         </div>
       </div>
     </article>`;
@@ -665,37 +675,38 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Apply language translations first
   applyStaticTranslations();
 
-  // Wire up modal close
-  document.getElementById('modal-close').addEventListener('click', closeModal);
-  document.getElementById('modal-overlay').addEventListener('click', e => {
-    if (e.target === e.currentTarget) closeModal();
-  });
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') closeModal();
-  });
+  // ── DISABLED: Modal, discount, friends, form submit — booking now uses external form links ──
+  // Modal close listeners
+  // document.getElementById('modal-close').addEventListener('click', closeModal);
+  // document.getElementById('modal-overlay').addEventListener('click', e => {
+  //   if (e.target === e.currentTarget) closeModal();
+  // });
+  // document.addEventListener('keydown', e => {
+  //   if (e.key === 'Escape') closeModal();
+  // });
 
-  // Wire up discount input
-  document.getElementById('field-discount').addEventListener('input', onDiscountInput);
+  // Discount input
+  // document.getElementById('field-discount').addEventListener('input', onDiscountInput);
 
   // Discount toggle button
-  document.getElementById('discount-toggle-btn').addEventListener('click', toggleDiscountField);
+  // document.getElementById('discount-toggle-btn').addEventListener('click', toggleDiscountField);
 
   // Friends radio buttons
-  document.querySelectorAll('input[name="bringingFriends"]').forEach(function(radio) {
-    radio.addEventListener('change', function() { toggleFriends(this.value === 'yes'); });
-  });
+  // document.querySelectorAll('input[name="bringingFriends"]').forEach(function(radio) {
+  //   radio.addEventListener('change', function() { toggleFriends(this.value === 'yes'); });
+  // });
 
   // Friends count input
-  document.getElementById('field-friends-count').addEventListener('input', onFriendsCountChange);
+  // document.getElementById('field-friends-count').addEventListener('input', onFriendsCountChange);
 
-  // Register buttons (delegated — cards are rendered dynamically)
-  document.getElementById('programs-grid').addEventListener('click', function(e) {
-    var btn = e.target.closest('.btn-register');
-    if (btn && !btn.disabled) openModal(btn.dataset.programId);
-  });
+  // Register buttons — no longer needed, buttons are now <a> links
+  // document.getElementById('programs-grid').addEventListener('click', function(e) {
+  //   var btn = e.target.closest('.btn-register');
+  //   if (btn && !btn.disabled) openModal(btn.dataset.programId);
+  // });
 
-  // Wire up form submit
-  document.getElementById('booking-form').addEventListener('submit', handleSubmit);
+  // Form submit
+  // document.getElementById('booking-form').addEventListener('submit', handleSubmit);
 
   // Local dev detection: Five Server, Live Server, file:// etc.
   // Skip Sheets API on local servers (blocked by API key domain restrictions / Brave Shields)
@@ -728,6 +739,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           description:      r[10] || '',
           location:         r[11] || '',
           language:         r[12] || '',
+          formUrl:          r[13] || '',   // Column N — external registration form URL
           image: '', format: '',
         }));
         sessions = sessRows.map(r => ({
@@ -750,7 +762,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         programs = [];
       }
     } else {
-      await Promise.all([ fetchPrograms(), fetchSessions(), fetchDiscountCodes().catch(() => []) ]);
+      // fetchDiscountCodes disabled — booking now uses external form links
+      // await Promise.all([ fetchPrograms(), fetchSessions(), fetchDiscountCodes().catch(() => []) ]);
+      await Promise.all([ fetchPrograms(), fetchSessions() ]);
     }
     renderPrograms();
     // Deep link: /booking/?program=SK-001 — scroll to and highlight the program card

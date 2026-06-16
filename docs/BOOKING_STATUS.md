@@ -1,77 +1,84 @@
 # InneREvolution Booking System — Status & Roadmap
 
-Last updated: 2026-04-15
+Last updated: 2026-06-16
 
 ---
 
-## ✅ WORKING (as of 2026-04-15)
+## ✅ WORKING — Form-Link Mode (current)
+
+The booking page now uses **external form links** instead of the Apps Script payment pipeline.
+Program cards are still loaded from Google Sheets, but the Register button opens an
+external Google Form (or any form URL) in a new tab.
 
 ### Frontend (Website — innerevolutionyoga.life)
-- [x] Programs load dynamically from Google Sheet 3 via Sheets API
+- [x] Programs load dynamically from Google Sheet via Sheets API
 - [x] Dates, spots, price, description, location per program
-- [x] Discount code validation (from Sheet 3 Discount Codes tab)
-- [x] Friends referral discount (10% × friends, max 50%)
-- [x] Multi-session display per program
-- [x] Terms checkbox required before submit
-- [x] Booking POST to Apps Script with proper CORS handling (redirect:follow)
-- [x] Real success/error feedback from API
-- [x] Success screen with payment link
+- [x] Register button → opens external form URL (column N in Programs sheet)
+- [x] Falls back to `CONFIG.DEFAULT_FORM_URL` if column N is empty
+- [x] Program name passed as `?program=` query param for form pre-fill
+- [x] Sold-out state: disabled button when spots = 0
+- [x] No form URL configured: disabled button with tooltip
 - [x] Deep-link: `/booking/?program=SK-2026-05-001`
 - [x] Localhost dev mode with `data/sheet-cache.json`
-- [x] `config.js` committed to git (not gitignored)
-- [x] GitHub Actions deploy workflow working
+- [x] i18n (EN/DE)
+- [x] GitHub Actions deploy workflow
 
-### Backend (Apps Script v70)
-- [x] Booking written to Sheet 4 📋 Buchungen tab
-- [x] Duplicate booking prevention (email + programId)
-- [x] LockService concurrency protection
-- [x] Structured Booking ID: `BK-YYYYMMDD-HHMMSS-XXXX`
-- [x] Confirmation email to customer
-- [x] Stripe test payment link generated
-- [x] Stripe webhook handler (marks booking Paid)
-- [x] Intake form sent after payment
-- [x] Payment reminders (2-day cooldown)
-- [x] Friends referral verification (daily 09:00)
-- [x] Calendar sync (syncSessionsToCalendar)
-- [x] Daily report email
-- [x] Auto-creates Stripe links on sheet edit (onEdit)
-- [x] safeAlert() helper (no UI crashes from triggers)
-
-### Active Programs
-| ID | Name | Price | Spots | Date | Location |
-|----|------|-------|-------|------|----------|
-| SK-2026-05-001 | Surya Kriya | €250 | 10 (8 left) | 2026-05-02 | Bad Tatzmannsdorf, Reduce |
-| UY-2026-05-001 | Isha Upa-yoga | €100 | 10 (10 left) | 2026-05-03 | Bad Tatzmannsdorf, Reduce |
+### Disabled (preserved, not deleted)
+- [~] Registration modal HTML (hidden with `display:none`)
+- [~] `openModal()`, `closeModal()` functions
+- [~] `handleSubmit()` Apps Script POST logic
+- [~] Discount code validation UI & logic
+- [~] Friends referral discount logic
+- [~] `fetchDiscountCodes()`
+- [~] All modal event listeners
+- [~] Apps Script URL in config (commented out)
 
 ---
 
-## 🔴 TODO — HIGH PRIORITY
+## 📋 Business Sheet Manager — Setup Checklist
 
-- [ ] **Switch Stripe to LIVE mode**: Script Properties → `TEST_MODE = false`
-- [ ] **Set live Stripe key**: `STRIPE_SECRET_REAL = sk_live_...`
-- [ ] **Set Stripe webhook secret**: `STRIPE_WEBHOOK_SECRET = whsec_...`
-- [ ] **Set intake form URL**: `INTAKE_FORM_URL = https://forms.gle/...`
-- [ ] **Verify confirmation email** template is correct in production
-- [ ] **Add cancellation flow**: no way for customers to cancel yet
+### Step 1: Add column N to Programs sheet
+In the **public Programs sheet** (`1hmzKORs…`), add a new column **N**:
+- Row 2 (header): `formUrl`
+- Row 3+ (data): paste the Google Form URL for each program
+- Leave empty to use `DEFAULT_FORM_URL` fallback
+
+### Step 2: Create a Google Form for the retreat
+Suggested fields:
+- Full Name (required)
+- Email (required)
+- Phone
+- Program (dropdown or short text — auto-filled via `?program=` param)
+- Discount code (if applicable)
+- Comments / Questions
+
+### Step 3: Set GitHub Secret
+In GitHub repo → Settings → Secrets and variables → Actions:
+- Add `DEFAULT_FORM_URL` = your default Google Form URL
+- (The old `APPS_SCRIPT_URL` secret can stay — it's no longer used)
+
+### Step 4: Add the retreat to the Programs sheet
+Add a new row with:
+- Column A: Program ID (e.g. `RT-2026-07-001`)
+- Column B: Program Name (e.g. "Retreat: Inner Engineering")
+- Columns C–M: price, spots, active, dates, sessions, description, location, language
+- Column N: Form URL (or leave empty for default)
+
+---
 
 ## 🟡 TODO — MEDIUM PRIORITY
 
+- [ ] **Switch to dedicated booking platform** (Calendly / Acuity) for regular classes
 - [ ] **Waiting list**: when spots = 0, offer to join waiting list
-- [ ] **Booking confirmation page**: `/booking/confirmation?id=BK-...`
 - [ ] **Admin dashboard**: quick view of bookings/payments/attendance
-- [ ] **Auto-refresh sheet-cache.json**: trigger on Sheet 4 changes
-- [ ] **Multi-language support**: booking form in EN (strings in bs() function)
-- [ ] **Coupon expiry dates**: discount codes have no expiry tracking
-- [ ] **Program images**: Sheet 3 has image column — website could show photos
+- [ ] **Multi-language support**: booking form in EN
+- [ ] **Program images**: Sheet column for image URLs
 
 ## 🟢 TODO — NICE TO HAVE
 
-- [ ] iCal download after booking (.ics file)
-- [ ] PDF booking confirmation
+- [ ] iCal download after registration (.ics file)
 - [ ] Attendance QR codes
-- [ ] SMS notifications (Twilio)
-- [ ] Referral tracking dashboard
-- [ ] Revenue charts in Sheet 4 dashboard
+- [ ] Revenue charts in Sheet dashboard
 
 ---
 
@@ -79,19 +86,19 @@ Last updated: 2026-04-15
 
 | File | Purpose |
 |------|---------|
-| `/a0/usr/projects/innerevolution_website/booking/booking.js` | Main booking form logic |
-| `/a0/usr/projects/innerevolution_website/booking/config.js` | API keys & URLs (committed to git) |
-| `/a0/usr/projects/innerevolution_website/data/sheet-cache.json` | Localhost dev data cache |
-| `/a0/usr/projects/innerevolution_website/docs/apps-script.js` | Apps Script source (v70) |
-| `/a0/usr/projects/innerevo_businesssheets/BOOKING_IMPLEMENTATION_GUIDE.md` | Full technical guide |
-| `/a0/usr/projects/innerevo_businesssheets/BOOKING_SYSTEM_ANALYSIS.md` | Bug analysis from April 2026 |
+| `/booking/booking.js` | Main booking page logic (form-link mode) |
+| `/booking/config.js` | API keys & URLs (gitignored, generated by CI) |
+| `/booking/config.js.example` | Template for local dev config |
+| `/booking/index.html` | Booking page HTML |
+| `/booking/booking.scss` | Booking page styles |
+| `/data/sheet-cache.json` | Localhost dev data cache |
+| `/docs/apps-script.js` | Apps Script source (preserved, disabled) |
+| `/.github/workflows/deploy.yml` | Deploy workflow (generates config.js from secrets) |
 
 ## 🔧 Key URLs & IDs
 
 | Item | Value |
 |------|-------|
-| Apps Script URL | `https://script.google.com/macros/s/AKfycbw3WLYvoodMPphob0cyNrny6m-JzuEV6xBZDHJXHmuDHpzprcnLASbm_s3y0JvW9vKJ/exec` |
-| Apps Script Editor | `https://script.google.com/home/projects/10ha96r1KDUAi_NfHU2QZb-R_Nd_fK9pv0jTc9I90KIvn9dk4_GOAa2Ak/edit` |
-| Sheet 3 (public) | `https://docs.google.com/spreadsheets/d/1hmzKORsPfch41f0J-q3w4Ybc8-vnZuGXC6FYyzbVkvU/` |
-| Sheet 4 (master) | `https://docs.google.com/spreadsheets/d/1fzXqhX-6B04Q-BMf0QNC3OWyGjIbU-CaqTLb3SwMHPU/` |
-| Website | `https://innerevolutionyoga.life/booking/` |
+| Public Programs sheet | `https://docs.google.com/spreadsheets/d/1hmzKORsPfch41f0J-q3w4Ybc8-vnZuGXC6FYyzbVkvU/` |
+| Website booking page | `https://innerevolutionyoga.life/booking/` |
+| Apps Script (disabled) | `https://script.google.com/macros/s/AKfycbw3WLYvoodMPphob0cyNrny6m-JzuEV6xBZDHJXHmuDHpzprcnLASbm_s3y0JvW9vKJ/exec` |
