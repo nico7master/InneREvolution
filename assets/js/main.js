@@ -737,8 +737,12 @@ updateActiveDot();
     if (program.location) { hasMeta = true; metaList.appendChild(createElement('li', 'program-card-location', program.location)); }
     if (hasMeta) card.appendChild(metaList);
 
-    /* Description */
-    if (program.description) card.appendChild(createElement('p', 'program-card-summary', program.description));
+    /* Description — convert literal \n and real newlines to <br> */
+    if (program.description) {
+      var descEl = createElement('p', 'program-card-summary');
+      descEl.innerHTML = program.description.replace(/\\n/g, '<br>').replace(/\n/g, '<br>');
+      card.appendChild(descEl);
+    }
 
     /* Footer: spots count only — CTA is the shared 'To Booking Page' button below all cards */
     var footer = createElement('div', 'program-card-actions');
