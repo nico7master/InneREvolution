@@ -712,7 +712,7 @@ updateActiveDot();
   }
 
   function buildProgramCard(program, sessions) {
-    var isFull   = program.spotsLeft <= 0;
+    var isFull   = program.spotsLeft !== null && program.spotsLeft <= 0;
     var card     = createElement('article', 'program-card swiper-slide' + (isFull ? ' is-full' : ''));
     var header   = createElement('div', 'program-card-header');
     var title    = createElement('h3', '', program.name || 'Upcoming program');
@@ -746,8 +746,10 @@ updateActiveDot();
 
     /* Footer: spots count only — CTA is the shared 'To Booking Page' button below all cards */
     var footer = createElement('div', 'program-card-actions');
-    footer.appendChild(createElement('span', 'program-card-note',
-      isFull ? 'Sold out' : program.spotsLeft + ' spot' + (program.spotsLeft === 1 ? '' : 's') + ' left'));
+    if (program.spotsLeft !== null) {
+      footer.appendChild(createElement('span', 'program-card-note',
+        isFull ? 'Sold out' : program.spotsLeft + ' spot' + (program.spotsLeft === 1 ? '' : 's') + ' left'));
+    }
     card.appendChild(footer);
     return card;
   }
@@ -765,8 +767,8 @@ updateActiveDot();
         id:          (r[0]  || '').toString().trim(),
         name:        r[1]  || '',
         price:       parseFloat(r[2]) || 0,
-        spotsTotal:  parseInt(r[3])   || 0,
-        spotsLeft:   parseInt(r[4])   || 0,
+        spotsTotal:  r[3] !== '' && r[3] !== undefined && r[3] !== null ? parseInt(r[3]) : null,
+        spotsLeft:   r[4] !== '' && r[4] !== undefined && r[4] !== null ? parseInt(r[4]) : null,
         active:      ['TRUE','YES','1'].indexOf((r[5]  || '').toString().toUpperCase().trim()) !== -1,
         startDate:   serialToISO(r[6]  || ''),
         sessionCount: parseInt(r[7]) || 0,

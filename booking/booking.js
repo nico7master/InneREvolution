@@ -171,8 +171,8 @@ async function fetchPrograms() {
     id:               (r[0] || '').toString().trim(),
     name:             r[1] || '',
     price:            parseFloat(r[2]) || 0,
-    spotsTotal:       parseInt(r[3]) || 0,
-    spotsLeft:        parseInt(r[4]) || 0,
+    spotsTotal:       r[3] !== '' && r[3] !== undefined && r[3] !== null ? parseInt(r[3]) : null,
+    spotsLeft:        r[4] !== '' && r[4] !== undefined && r[4] !== null ? parseInt(r[4]) : null,
     active:           ['TRUE','YES','1'].includes((r[5] || '').toString().toUpperCase().trim()),
     startDate:        serialToISO(r[6] || ''),
     endDate:          '',
@@ -255,10 +255,12 @@ function renderPrograms() {
 }
 
 function buildCard(p) {
-  const isFull       = p.spotsLeft <= 0;
+  const isFull       = p.spotsLeft !== null && p.spotsLeft <= 0;
   const cardSessions = sessions.filter(s => s.programId === p.id);
 
-  const spotsHtml = isFull
+  const spotsHtml = p.spotsLeft === null
+    ? ''
+    : isFull
     ? `<span class="spots-full">${bs('soldOutSpots')}</span>`
     : `<span class="spots-available">${bs('spotsLeft')(p.spotsLeft)}</span>`;
 
@@ -727,8 +729,8 @@ document.addEventListener('DOMContentLoaded', async () => {
           id:               (r[0] || '').toString().trim(),
           name:             r[1] || '',
           price:            parseFloat(r[2]) || 0,
-          spotsTotal:       parseInt(r[3]) || 0,
-          spotsLeft:        parseInt(r[4]) || 0,
+          spotsTotal:       r[3] !== '' && r[3] !== undefined && r[3] !== null ? parseInt(r[3]) : null,
+          spotsLeft:        r[4] !== '' && r[4] !== undefined && r[4] !== null ? parseInt(r[4]) : null,
           active:           ['TRUE','YES','1'].includes((r[5] || '').toString().toUpperCase().trim()),
           startDate:        serialToISO(r[6] || ''),
           endDate:          '',
