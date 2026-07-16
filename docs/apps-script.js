@@ -48,6 +48,11 @@
  *   CANCELLATION_SECRET (HMAC key for cancel URLs)
  */
 
+// ─── MANUAL MODE — Set to true to disable ALL automations (emails, Stripe, triggers) ──
+// When true: onEdit, doPost, doGet, all triggers are short-circuited.
+// Set to false to re-enable full automation.
+var MANUAL_MODE = true;
+
 // ─── 0. COLUMN MAPS — SINGLE SOURCE OF TRUTH (R4) ────────────────────────────
 var COLS = {
   KURSPLANUNG: {
@@ -232,6 +237,7 @@ function onOpen() {
 
 // ─── 2. WEB APP ───────────────────────────────────────────────────────────────
 function doGet(e) {
+  if (MANUAL_MODE) { return ContentService.createTextOutput('InneREvolution — MANUAL MODE (automations disabled)'); }
   try {
     var params = (e && e.parameter) ? e.parameter : {};
     if (params.action === 'cancel' && params.id && params.t) {
@@ -307,6 +313,7 @@ function htmlPage(message, color) {
 }
 
 function doPost(e) {
+  if (MANUAL_MODE) { Logger.log('[MANUAL_MODE] doPost blocked'); return jsonResponse({ success: false, error: 'Booking system is in manual mode. Please contact us directly.' }); }
   Logger.log('[REQUEST] doPost received');
   try {
     var data = JSON.parse(e.postData.contents);
@@ -820,6 +827,7 @@ function jsonResponse(obj) {
 
 // ─── 4. STRIPE AUTO-CREATION (Bug #3 fix: correct sheet name + column mapping) ─
 function onEdit(e) {
+  if (MANUAL_MODE) return;
   try {
     var sheet = e.source.getActiveSheet();
     var sheetName = sheet.getName();
@@ -1280,6 +1288,7 @@ function buildDashboard() {
 
 // ─── 9. FRIEND REFERRAL CHECK (Bug #8 fix: verified indices + safeAlert) ──────
 function checkFriendReferrals() {
+  if (MANUAL_MODE) return;
   var cfg  = getConfig();
   var ss   = SpreadsheetApp.openById(cfg.SHEET_ID);
   var book = ss.getSheetByName('📋 Buchungen') || ss.getSheetByName('Bookings');
@@ -1315,6 +1324,7 @@ function checkFriendReferrals() {
 
 // ─── 10. PAYMENT REMINDERS (Bug #9 fix: correct column mapping + safeAlert) ───
 function sendPaymentReminders() {
+  if (MANUAL_MODE) return;
   var cfg  = getConfig();
   var ss   = SpreadsheetApp.openById(cfg.SHEET_ID);
   var book = ss.getSheetByName('📋 Buchungen')   || ss.getSheetByName('Bookings');
@@ -1358,6 +1368,7 @@ function sendPaymentReminders() {
 
 // ─── 11. DAILY REPORT (Bug #10 fix: correct sheet/column references + safeAlert) ─
 function sendDailyReport() {
+  if (MANUAL_MODE) return;
   var cfg = getConfig();
   if (!cfg.INSTRUCTOR_EMAIL) { safeAlert('InneREvolution', 'Set INSTRUCTOR_EMAIL in Script Properties first.'); return; }
   var ss   = SpreadsheetApp.openById(cfg.SHEET_ID);
@@ -1460,6 +1471,7 @@ function authorizeAndTest() {
 
 // ─── 14. CALENDAR SYNC (Bug #11 fix: correct column mapping + safeAlert) ─────
 function syncSessionsToCalendar() {
+  if (MANUAL_MODE) return;
   var cfg = getConfig();
   if (!cfg.CALENDAR_ID) { safeAlert('InneREvolution', 'CALENDAR_ID not set in Script Properties.'); return; }
   var ss      = SpreadsheetApp.openById(cfg.SHEET_ID);
