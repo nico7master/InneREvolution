@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+
+  <!-- English Homepage -->
+  <url>
+    <loc>https://innerevolutionyoga.life/</loc>
+    <lastmod>2026-08-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://innerevolutionyoga.life/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://innerevolutionyoga.life/de/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://innerevolutionyoga.life/" />
+  </url>
+
+  <!-- German Homepage -->
+  <url>
+    <loc>https://innerevolutionyoga.life/de/</loc>
+    <lastmod>2026-08-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://innerevolutionyoga.life/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://innerevolutionyoga.life/de/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://innerevolutionyoga.life/" />
+  </url>
+
+  <!-- Booking Page -->
+  <url>
+    <loc>https://innerevolutionyoga.life/booking/</loc>
+    <lastmod>2026-08-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+</urlset>
