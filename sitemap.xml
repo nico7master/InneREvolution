@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
 
   <!-- English Homepage -->
@@ -11,6 +12,43 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://innerevolutionyoga.life/" />
     <xhtml:link rel="alternate" hreflang="de" href="https://innerevolutionyoga.life/de/" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://innerevolutionyoga.life/" />
+    <image:image>
+      <image:loc>https://innerevolutionyoga.life/images/profile/NicoSchlagerYoga.webp</image:loc>
+      <image:title>Nico Schlager practicing classical Hatha Yoga</image:title>
+      <image:caption>Nico Schlager, certified Isha Hatha Yoga teacher</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://innerevolutionyoga.life/images/Yoga/HathaYoga.webp</image:loc>
+      <image:title>Hatha Yoga</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://innerevolutionyoga.life/images/Yoga/UpaYoga.webp</image:loc>
+      <image:title>Upa Yoga</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://innerevolutionyoga.life/images/Yoga/SuryaShakti.webp</image:loc>
+      <image:title>Surya Shakti</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://innerevolutionyoga.life/images/Yoga/SuryaKriya3.webp</image:loc>
+      <image:title>Surya Kriya</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://innerevolutionyoga.life/images/Yoga/Yogasanas.webp</image:loc>
+      <image:title>Yogasanas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://innerevolutionyoga.life/images/Yoga/Angamardana.webp</image:loc>
+      <image:title>Angamardana</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://innerevolutionyoga.life/images/Yoga/BhutaShuddhi.webp</image:loc>
+      <image:title>Bhuta Shuddhi</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://innerevolutionyoga.life/images/sadhguru/meditating-sadhguru-header-s9gmt8qk5d8ar5uj-950969017.webp</image:loc>
+      <image:title>Sadhguru meditating</image:title>
+    </image:image>
   </url>
 
   <!-- German Homepage -->
@@ -22,6 +60,38 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://innerevolutionyoga.life/" />
     <xhtml:link rel="alternate" hreflang="de" href="https://innerevolutionyoga.life/de/" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://innerevolutionyoga.life/" />
+    <image:image>
+      <image:loc>https://innerevolutionyoga.life/images/profile/NicoSchlagerYoga.webp</image:loc>
+      <image:title>Nico Schlager practicing classical Hatha Yoga</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://innerevolutionyoga.life/images/Yoga/HathaYoga.webp</image:loc>
+      <image:title>Hatha Yoga</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://innerevolutionyoga.life/images/Yoga/UpaYoga.webp</image:loc>
+      <image:title>Upa Yoga</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://innerevolutionyoga.life/images/Yoga/SuryaShakti.webp</image:loc>
+      <image:title>Surya Shakti</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://innerevolutionyoga.life/images/Yoga/SuryaKriya3.webp</image:loc>
+      <image:title>Surya Kriya</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://innerevolutionyoga.life/images/Yoga/Yogasanas.webp</image:loc>
+      <image:title>Yogasanas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://innerevolutionyoga.life/images/Yoga/Angamardana.webp</image:loc>
+      <image:title>Angamardana</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://innerevolutionyoga.life/images/Yoga/BhutaShuddhi.webp</image:loc>
+      <image:title>Bhuta Shuddhi</image:title>
+    </image:image>
   </url>
 
   <!-- Booking Page -->
@@ -30,6 +100,10 @@
     <lastmod>2026-08-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://innerevolutionyoga.life/images/profile/NicoSchlagerYoga.webp</image:loc>
+      <image:title>Nico Schlager, Hatha Yoga teacher</image:title>
+    </image:image>
   </url>
 
 </urlset>

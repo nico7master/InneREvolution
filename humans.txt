@@ -1,0 +1,12 @@
+# InneREvolution Yoga — innerevolutionyoga.life
+
+# Development
+Nico Schlager — Owner & Yoga Teacher
+Agent Zero — Development Assistant
+
+# Stack
+HTML5 / SCSS / JavaScript
+GitHub Pages
+
+# Last Updated
+2026-08-15
