@@ -20323,9 +20323,19 @@ section#Bio,
 .readings-wrapper #Readings {
   position: relative;
   z-index: 2;
-  max-width: min(1280px, calc(100% - 2rem));
+  width: 100% !important;      /* defeat template .container fixed width so the slider bleeds edge-to-edge */
+  max-width: none !important;
   padding: 0;
 }
+
+/* Header content stays centered like the rest of the site */
+.readings-wrapper #Readings > header {
+  max-width: min(1280px, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 
 .readings-wrapper #Readings header {
   margin-bottom: clamp(2.2rem, 4vw, 3rem);
@@ -21706,18 +21716,14 @@ body .readings-wrapper #Readings p {
 
 /* ─── Readings (Interesting reads) Swiper ─── */
 .readings-wrapper .readingsSwiper {
+  /* Full-bleed: the section container is widened to full viewport width below,
+     so the swiper simply fills it - no 100vw hacks (they skew Swiper's centering
+     math by the scrollbar width). Cards now cut exactly at the viewport edge. */
   width: 100%;
-  max-width: 1400px;   /* match site .container so cards align with centered content */
-  margin: 0 auto;      /* center the swiper itself */
+  max-width: none;
   overflow: hidden;
-  padding: 0 0.75rem 2.75rem; /* comfortable side padding */ /* side padding for breathing room + space for pagination dots */
+  padding: 0 0 2.75rem; /* bottom space for pagination dots; no side padding - bleed to edges */
   box-sizing: border-box;
-}
-
-@media screen and (max-width: 1680px) {
-  .readings-wrapper .readingsSwiper {
-    max-width: 1200px; /* match container at <=wide breakpoint */
-  }
 }
 
 /* Reset template grid row — zero out gutter margins/padding so Swiper takes over */
@@ -21725,7 +21731,7 @@ body .readings-wrapper #Readings p {
   /* Swiper sets display:flex itself — kill all grid overrides */
   overflow: visible !important;
   padding: 0 !important;       /* kill gutter padding: 40px 0 0 40px */
-  margin-top: 0 !important;    /* kill negative margin-top from gutter */
+  margin: 0 !important;        /* kill ALL gutter margins - the base .row negative left margin (-2.5em = -40px) displaced the whole strip left of Swiper's centering math */
   flex-wrap: nowrap !important;
   align-items: stretch !important;
   gap: 0 !important;           /* Swiper uses spaceBetween instead */
@@ -21741,7 +21747,12 @@ body .readings-wrapper #Readings p {
   max-width: 340px !important;
   min-width: 340px !important;
   height: 695px !important;          /* uniform card height */
-  /* Only reset top/bottom/left — Swiper sets margin-right via spaceBetween */
+  /* Kill the base template's static .swiper-slide margin (0 15px): if it is
+     active when Swiper first measures slides, Swiper adds it into its grid
+     (size 340+15=355) and then applies its own inline spaceBetween margin —
+     the 15px/slide mismatch is exactly the off-center drift. This rule must
+     stay NON-important so Swiper's inline spaceBetween margin still applies. */
+  margin: 0;
   margin-top: 0 !important;
   margin-bottom: 0 !important;
   margin-left: 0 !important;
@@ -21771,7 +21782,7 @@ body .readings-wrapper #Readings p {
 
 @media screen and (max-width: 736px) {
   .readings-wrapper .readingsSwiper {
-    padding: 0 0.75rem 2.25rem; /* narrower side padding on mobile */
+    padding: 0 0 2.25rem; /* full-bleed on mobile too */
   }
   /* Card width stays 340px fixed — no vw scaling, same as desktop */
 }
@@ -22491,3 +22502,5 @@ body.low-fps {
   }
 }
 /* === END LOW-FPS BACKGROUND FIX === */
+
+

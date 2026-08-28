@@ -1017,13 +1017,17 @@ updateActiveDot();
   })();
 
 /* ─── Readings (Interesting reads) Swiper ─── */
-document.addEventListener('DOMContentLoaded', function () {
-  new Swiper('.readingsSwiper', {
+function initReadingsSwiper() {
+  /* destroy + recreate so slide measurements reflect final CSS layout -
+     same proven pattern as the programs slider; prevents off-center drift */
+  if (window._readingsSwiper) { window._readingsSwiper.destroy(true, true); window._readingsSwiper = null; }
+  window._readingsSwiper = new Swiper('.readingsSwiper', {
     slidesPerView: 'auto',      /* card width fixed in CSS */
     spaceBetween: 16,           /* breathing room between cards */
     grabCursor: true,
     speed: 300,
-    centerInsufficientSlides: true, /* center when fewer cards than fill row */
+    centeredSlides: true,       /* active card always perfectly centered - like Yoga Programs slider */
+    initialSlide: 4,            /* start on the middle card (9 cards) - avoids blank left edge at load */
     resizeObserver: true,       /* recompute translate on viewport changes - prevents off-center drift */
     watchOverflow: true,
     passiveListeners: true,
@@ -1033,7 +1037,37 @@ document.addEventListener('DOMContentLoaded', function () {
     followFinger: true,
     pagination: { el: '.readings-pagination', clickable: true },
   });
+}
+document.addEventListener('DOMContentLoaded', function () {
+  initReadingsSwiper();
+  setTimeout(initReadingsSwiper, 150); /* re-measure after layout/fonts settle - fixes centering drift */
 });
+/* Re-measure and re-pin the active card to its exact snap position after
+   every late layout change (fonts, scrollbar, images). Guarantees the
+   centered-slide math can never drift regardless of load order. */
+function pinReadingsCenter() {
+  /* One-shot, event-free safety check. Runs a few times per page load only.
+     NEVER call translateTo() here: it fires a transition -> transitionEnd
+     -> if any listener re-pins, that is an infinite loop = site-wide lag.
+     Direct style write + state sync only, and only when actually off. */
+  var s = window._readingsSwiper;
+  if (!s || !s.slides || !s.slides.length || !s.slides[s.activeIndex]) return;
+  s.update();
+  var slide = s.slides[s.activeIndex];
+  var target = Math.round(-slide.offsetLeft + (s.size - slide.offsetWidth) / 2);
+  var m = (s.wrapperEl.style.transform || '').match(/translate3d\((-?\d+(?:\.\d+)?)px/);
+  var cur = m ? parseFloat(m[1]) : s.translate;
+  if (Math.abs(cur - target) > 2) {           /* act only when genuinely off */
+    s.wrapperEl.style.transform = 'translate3d(' + target + 'px, 0, 0)';
+    s.translate = target;                      /* sync state without events */
+  }
+}
+window.addEventListener('load', pinReadingsCenter);
+if (document.fonts && document.fonts.ready) {
+  document.fonts.ready.then(function () { setTimeout(pinReadingsCenter, 50); });
+}
+setTimeout(pinReadingsCenter, 400);
+
 
 /* ============================================================
    NAVBAR v7 — scroll-up show / scroll-down hide
@@ -1173,3 +1207,4 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   })();
 })();
+
