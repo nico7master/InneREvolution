@@ -106,4 +106,142 @@
     </image:image>
   </url>
 
-</urlset>
+
+  <!-- Wisdom Library overview -->
+  <url>
+    <loc>https://innerevolutionyoga.life/wisdom/</loc>
+    <lastmod>2026-08-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://innerevolutionyoga.life/wisdom/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://innerevolutionyoga.life/de/wisdom/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://innerevolutionyoga.life/wisdom/" />
+    <image:image>
+      <image:loc>https://innerevolutionyoga.life/images/wisdom/alternative-to-drugs-card.webp</image:loc>
+      <image:title>The Alternative to Drugs</image:title>
+      <image:caption>Wisdom Library — writings on yoga, consciousness and inner wellbeing</image:caption>
+    </image:image>
+  </url>
+
+  <!-- Article EN -->
+  <url>
+    <loc>https://innerevolutionyoga.life/wisdom/alternative-to-drugs/</loc>
+    <lastmod>2026-08-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://innerevolutionyoga.life/wisdom/alternative-to-drugs/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://innerevolutionyoga.life/de/wisdom/alternative-to-drugs/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://innerevolutionyoga.life/wisdom/alternative-to-drugs/" />
+    <image:image>
+      <image:loc>https://innerevolutionyoga.life/images/wisdom/alternative-to-drugs-card.webp</image:loc>
+      <image:title>The Alternative to Drugs</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://innerevolutionyoga.life/wisdom/technology-and-yoga/</loc>
+    <lastmod>2026-08-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://innerevolutionyoga.life/wisdom/technology-and-yoga/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://innerevolutionyoga.life/de/wisdom/technology-and-yoga/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://innerevolutionyoga.life/wisdom/technology-and-yoga/" />
+    <image:image>
+      <image:loc>https://innerevolutionyoga.life/images/wisdom/technology-and-yoga-card.jpg</image:loc>
+      <image:title>Technology and Yoga</image:title>
+    </image:image>
+  </url>
+
+  <!-- Wisdom Library overview DE -->
+  <url>
+    <loc>https://innerevolutionyoga.life/de/wisdom/</loc>
+    <lastmod>2026-08-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://innerevolutionyoga.life/wisdom/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://innerevolutionyoga.life/de/wisdom/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://innerevolutionyoga.life/wisdom/" />
+  </url>
+
+  <!-- Artikel DE -->
+  <url>
+    <loc>https://innerevolutionyoga.life/de/wisdom/alternative-to-drugs/</loc>
+    <lastmod>2026-08-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://innerevolutionyoga.life/wisdom/alternative-to-drugs/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://innerevolutionyoga.life/de/wisdom/alternative-to-drugs/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://innerevolutionyoga.life/wisdom/alternative-to-drugs/" />
+    <image:image>
+      <image:loc>https://innerevolutionyoga.life/images/wisdom/alternative-to-drugs-card.webp</image:loc>
+      <image:title>Die Alternative zu Drogen</image:title>
+    </image:image>
+  </url>
+
+<url>
+  <loc>https://innerevolutionyoga.life/wisdom/the-silent-revolution/</loc>
+  <xhtml:link rel="alternate" hreflang="en" href="https://innerevolutionyoga.life/wisdom/the-silent-revolution/" />
+  <xhtml:link rel="alternate" hreflang="de" href="https://innerevolutionyoga.life/de/wisdom/the-silent-revolution/" />
+  <lastmod>2026-08-26</lastmod>
+</url>
+<url>
+  <loc>https://innerevolutionyoga.life/de/wisdom/the-silent-revolution/</loc>
+  <xhtml:link rel="alternate" hreflang="en" href="https://innerevolutionyoga.life/wisdom/the-silent-revolution/" />
+  <xhtml:link rel="alternate" hreflang="de" href="https://innerevolutionyoga.life/de/wisdom/the-silent-revolution/" />
+  <lastmod>2026-08-26</lastmod>
+</url>
+
+  <url>
+    <loc>https://innerevolutionyoga.life/wisdom/the-body-remembers/</loc>
+    <lastmod>2026-09-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://innerevolutionyoga.life/wisdom/the-body-remembers/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://innerevolutionyoga.life/de/wisdom/the-body-remembers/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://innerevolutionyoga.life/wisdom/the-body-remembers/"/>
+  </url>
+    <url>
+    <loc>https://innerevolutionyoga.life/wisdom/success-without-stress/</loc>
+    <lastmod>2026-09-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://innerevolutionyoga.life/wisdom/success-without-stress/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://innerevolutionyoga.life/de/wisdom/success-without-stress/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://innerevolutionyoga.life/wisdom/success-without-stress/"/>
+  </url>
+    <url>
+    <loc>https://innerevolutionyoga.life/de/wisdom/why-your-body-loves-routine/</loc>
+    <lastmod>2026-09-16</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://innerevolutionyoga.life/wisdom/why-your-body-loves-routine/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://innerevolutionyoga.life/de/wisdom/why-your-body-loves-routine/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://innerevolutionyoga.life/wisdom/why-your-body-loves-routine/"/>
+  </url>
+    <url>
+    <loc>https://innerevolutionyoga.life/wisdom/why-your-body-loves-routine/</loc>
+    <lastmod>2026-09-16</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://innerevolutionyoga.life/wisdom/why-your-body-loves-routine/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://innerevolutionyoga.life/de/wisdom/why-your-body-loves-routine/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://innerevolutionyoga.life/wisdom/why-your-body-loves-routine/"/>
+  </url>
+    <url>
+    <loc>https://innerevolutionyoga.life/de/wisdom/success-without-stress/</loc>
+    <lastmod>2026-09-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://innerevolutionyoga.life/wisdom/success-without-stress/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://innerevolutionyoga.life/de/wisdom/success-without-stress/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://innerevolutionyoga.life/wisdom/success-without-stress/"/>
+  </url>
+  <url>
+    <loc>https://innerevolutionyoga.life/de/wisdom/the-body-remembers/</loc>
+    <lastmod>2026-09-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://innerevolutionyoga.life/wisdom/the-body-remembers/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://innerevolutionyoga.life/de/wisdom/the-body-remembers/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://innerevolutionyoga.life/wisdom/the-body-remembers/"/>
+  </url>
+  </urlset>

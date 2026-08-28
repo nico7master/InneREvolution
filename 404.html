@@ -6,30 +6,74 @@
     <title>404 — Page Not Found | InneREvolution Yoga</title>
     <meta name="description" content="The page you were looking for could not be found. Return to InneREvolution Yoga to explore classical Hatha Yoga programs." />
     <meta name="robots" content="noindex, follow" />
-    <meta http-equiv="Content-Language" content="en" />
     <link rel="canonical" href="https://innerevolutionyoga.life/" />
-    <link rel="stylesheet" href="assets/css/main.css?v=20260512134715" />
-    <link rel="icon" type="image/png" href="images/favicon/favicon-96x96.png" sizes="96x96" />
-    <link rel="icon" type="image/svg+xml" href="images/favicon/favicon.svg" />
-    <link rel="shortcut icon" href="images/favicon/favicon.ico" />
+    <!-- Fonts shared with the Wisdom Library design -->
+    <link rel="stylesheet" href="/assets/css/wisdom.css?v=202608280" />
+    <link rel="icon" type="image/png" href="/images/favicon/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/images/favicon/favicon.svg" />
+    <link rel="shortcut icon" href="/images/favicon/favicon.ico" />
     <style>
-      body { margin: 0; background: #0a0a0a; color: #e8e0d8; font-family: 'Delius Swash Caps', serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; text-align: center; }
-      .error-wrap { max-width: 500px; padding: 2rem; }
-      .error-code { font-size: 6rem; font-family: 'GrandifloraOne', serif; color: #d4a574; margin: 0; line-height: 1; }
-      .error-msg { font-size: 1.4rem; margin: 1rem 0 2rem; opacity: 0.8; }
-      .error-links { display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap; }
-      .error-links a { color: #d4a574; text-decoration: none; border: 1px solid #d4a5745a; padding: 0.6rem 1.4rem; border-radius: 999px; transition: background 0.2s; }
-      .error-links a:hover { background: #d4a5741a; }
+      /* 404 page — InneREvolution ink-wash design. Absolute paths only:
+         GitHub Pages serves this file at ANY broken URL depth. */
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        background-color: #f6f0e7;
+        background-image: url('/images/backgrounds/homeCardBg1.webp');
+        background-position: center top;
+        background-repeat: repeat-y;
+        background-size: 100% auto;
+        color: #3c3325;
+        font-family: 'FedraSansPro', sans-serif;
+        font-weight: 300;
+        line-height: 1.6;
+      }
+      .error-wrap { max-width: 34em; padding: 3em 1.5em; }
+      .error-art { width: min(420px, 78vw); height: auto; margin: 0 auto 1.2em; display: block; }
+      .error-msg {
+        margin: 0 auto 2.2em;
+        max-width: 26em;
+        font-family: 'FedraSerifAPro', serif;
+        font-style: italic;
+        font-size: clamp(1.05rem, 2.2vw, 1.3rem);
+        line-height: 1.7;
+        color: #7a5e3a;
+      }
+      .error-divider { width: min(320px, 70vw); height: auto; margin: 0 auto 2.4em; opacity: 0.9; }
+      .error-links { display: flex; gap: 1em; justify-content: center; flex-wrap: wrap; }
+      .error-links a {
+        font-family: 'FedraSansPro', sans-serif;
+        font-size: 0.95rem;
+        letter-spacing: 0.05em;
+        color: #da782e;
+        text-decoration: none;
+        border: 1px solid rgba(218, 120, 46, 0.45);
+        background: rgba(255, 253, 247, 0.85);
+        padding: 0.7em 1.7em;
+        border-radius: 999px;
+        transition: background 0.25s ease, transform 0.3s ease, box-shadow 0.3s ease;
+      }
+      .error-links a:hover {
+        background: #fffdf7;
+        transform: translateY(-3px);
+        box-shadow: 0 8px 22px rgba(80, 50, 20, 0.16);
+      }
     </style>
   </head>
   <body>
-    <div class="error-wrap">
-      <p class="error-code">404</p>
-      <p class="error-msg">This page has drifted like a leaf in the wind.</p>
-      <div class="error-links">
+    <main class="error-wrap">
+      <img src="/images/ui/404.png" alt="404 — a figure meditating between the digits" class="error-art" />
+      <p class="error-msg">This page has drifted off the path — like a thought let go in meditation.</p>
+      <img src="/SVGs/1684481897-flower-divider-horizontal-orange.svg" alt="" class="error-divider" loading="lazy" decoding="async" />
+      <nav class="error-links">
         <a href="/">← Back to Home</a>
+        <a href="/wisdom/">Wisdom Library</a>
         <a href="/booking/">Yoga Programs</a>
-      </div>
-    </div>
+      </nav>
+    </main>
   </body>
 </html>

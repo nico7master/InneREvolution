@@ -1,0 +1,671 @@
+// assets/sass/wisdom.scss
+// Compiled to assets/css/wisdom.css — Wisdom Library pages (overview + articles).
+// Never edit wisdom.css directly — edit this file.
+
+@use "sass:color";
+@use "libs/vars" as *;
+@use "libs/breakpoints" as *;
+
+@include breakpoints((
+  wide:     (1281px, 1680px),
+  normal:   (961px,  1280px),
+  narrow:   (841px,  960px),
+  narrower: (737px,  840px),
+  mobile:   (null,   736px),
+));
+
+// ─── Fonts ────────────────────────────────────────────────────────────────────
+@font-face {
+  font-family: 'FedraSansPro';
+  src: url('../webfonts/fedrasanspro-book-webfont.woff2') format('woff2'),
+       url('../webfonts/fedrasanspro-book-webfont.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'FedraSansPro';
+  src: url('../webfonts/fedrasanspro-light-webfont.woff2') format('woff2'),
+       url('../webfonts/fedrasanspro-light-webfont.woff') format('woff');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'FedraSansPro';
+  src: url('../webfonts/fedrasanspro-lightitalic-webfont.woff2') format('woff2'),
+       url('../webfonts/fedrasanspro-lightitalic-webfont.woff') format('woff');
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'FedraSerifAPro';
+  src: url('../webfonts/fedra-serif-a-pro-book-webfont.woff2') format('woff2'),
+       url('../webfonts/fedra-serif-a-pro-book-webfont.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'FedraSerifAPro';
+  src: url('../webfonts/fedra-serif-a-pro-book-italic-webfont.woff2') format('woff2'),
+       url('../webfonts/fedra-serif-a-pro-book-italic-webfont.woff') format('woff');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'FedraSerifAPro';
+  src: url('../webfonts/fedra-serif-a-pro-bold-webfont.woff2') format('woff2'),
+       url('../webfonts/fedra-serif-a-pro-bold-webfont.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'GrandifloraOne';
+  src: url('../webfonts/GrandifloraOne-Regular.woff2') format('woff2'),
+       url('../webfonts/GrandifloraOne-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}
+
+// ─── Base ─────────────────────────────────────────────────────────────────────
+body.wisdom-page {
+  margin: 0;
+  padding: 0 0 4.5em;   // empty background space after the last card/backlink
+  // The hero's ink-wash flows through the whole page — no hard seam,
+  // content floats on the texture like sheets of paper
+  background-color: #f6f0e7;
+  background-image: url('../../images/backgrounds/homeCardBg1.webp');
+  background-position: center top;
+  background-repeat: repeat-y;
+  background-size: 100% auto;
+  color: #3c3325;
+  font-family: 'FedraSansPro', sans-serif;
+  font-weight: 300;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+.wisdom-page img {
+  max-width: 100%;
+  height: auto;
+}
+
+// ─── Hero header (mirrors .inner-revolution-banner) ──────────────────────────
+.wisdom-hero {
+  padding-top: 3.4em;      // clear the fixed topbar
+  padding-bottom: 0.6em;   // breathing room so the divider is not clipped
+  // Same cream texture as the main page quote banners
+  background-color: #f6f0e7 !important;
+  background-image: url('../../images/backgrounds/homeCardBg1.webp') !important;
+  background-position: center top !important;
+  background-repeat: repeat-y !important;
+  background-size: 100% auto !important;
+  text-align: center;
+}
+
+.wisdom-topbar {
+  // Fixed to the viewport like the homepage navbar — always visible while scrolling
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.9em clamp(1.2em, 4vw, 2.5em);
+  // Fully transparent — like the homepage navbar
+
+  a {
+    color: #7a5e3a;
+    text-decoration: none;
+    font-size: $font-size-sm;
+    letter-spacing: 0.04em;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: $color-primary-orange;
+    }
+  }
+}
+
+.wisdom-hero-inner {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: clamp(2.5em, 6vw, 4.5em) 1.5em clamp(1.2em, 3vw, 2em);
+}
+
+.wisdom-kicker {
+  margin: 0 0 0.9em;
+  font-family: 'GrandifloraOne', serif;
+  font-size: clamp(1.4rem, 3vw, 2rem);        // larger wordmark presence like main page logo
+  letter-spacing: 0.14em;
+  color: #7a5e3a;
+  text-shadow: 0 1px 3px rgba(92, 70, 40, 0.22);
+
+  // Raised ® after INNE, matching the hero wordmark treatment
+  // The (R) IS the capital R — same treatment as the main page hero wordmark
+  .wisdom-brand-reg {
+    display: inline-block;
+    font-size: 2.8em;
+    line-height: 1;
+    vertical-align: baseline;
+    transform: translateY(0.35em);
+    margin: 0 0.02em;
+  }
+
+  // Library kicker (R) on article pages: small, inline with the text
+  .wisdom-reg {
+    font-size: 0.6em;
+    vertical-align: 0.35em;
+    letter-spacing: 0;
+  }
+}
+
+.wisdom-title {
+  margin: 0;
+  font-family: 'GrandifloraOne', serif;
+  font-weight: 400;
+  font-size: clamp(2.2rem, 5.5vw, 3.6rem);
+  line-height: 1.2;
+  color: #3c2f1f;
+  // Warm shadow adds visual weight + depth to the light display serif
+  text-shadow: 0 2px 4px rgba(92, 70, 40, 0.45), 0 1px 2px rgba(92, 70, 40, 0.5);  // clearly visible depth
+}
+
+.wisdom-subtitle {
+  margin: 1.2em auto 0;
+  max-width: 42em;
+  font-family: 'FedraSerifAPro', serif;
+  font-style: italic;
+  font-size: clamp(1.05rem, 2.2vw, 1.3rem);
+  line-height: 1.7;
+  color: #7a5e3a;
+}
+
+
+.wisdom-byline {
+  margin: 1.6em 0 0;
+  font-size: $font-size-sm;
+  letter-spacing: 0.06em;
+  color: #8a7554;
+
+  .byline-dot {
+    margin: 0 0.6em;
+    opacity: 0.55;
+  }
+}
+
+.wisdom-hero-divider {
+  display: block;
+  width: 44%;
+  max-width: 310px;
+  height: auto;
+  margin: -0.2em auto 0;   // pulled tight against the subtitle
+  filter: drop-shadow(0 1px 2px rgba(122, 94, 58, 0.55));
+}
+
+// Casual brand (R) inside subtitles: slightly bigger, optically aligned with lowercase text
+.wisdom-subtitle .sub-reg {
+  font-size: 2.3em;
+  font-style: normal;
+  vertical-align: -0.4em;
+  margin: 0 -0.03em;   // almost no extra space, but a tiny breath next to the letters
+}
+
+// ─── Article body ───────────────────────────────────────────────────────────────────────────
+.article-wrap {
+  // Framed card panel — clear separation from the page background
+  max-width: 50rem;
+  margin: 2.5em auto 3.5em;   // space below the card = page background, not card padding
+  padding: clamp(2em, 4vw, 3.2em) clamp(1.6em, 5vw, 3.4em) clamp(1.2em, 2.5vw, 1.8em);
+  background: rgba(255, 253, 247, 0.88);   // texture breathes through subtly
+  border: 1px solid rgba(122, 94, 58, 0.22);
+  border-radius: 1.1em;
+  box-shadow: 0 8px 32px rgba(80, 50, 20, 0.09);
+
+  p {
+    margin: 0 0 1.4em;
+    font-family: 'FedraSerifAPro', serif;
+    font-size: 1.16rem;
+    line-height: 1.85;
+    color: #3c3325;
+  }
+
+  strong {
+    font-weight: 700;
+    color: #b35a10;
+  }
+
+  em {
+    font-style: italic;
+  }
+
+  ul {
+    margin: 0 0 1.6em;
+    padding-left: 1.4em;
+    list-style: none;
+
+    li {
+      position: relative;
+      margin-bottom: 1em;
+      padding-left: 1.2em;
+      font-family: 'FedraSerifAPro', serif;
+      font-size: 1.12rem;
+      line-height: 1.8;
+
+      // Small orange leaf-dot marker, matching the site's warm accents
+      &::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0.62em;
+        width: 0.45em;
+        height: 0.45em;
+        border-radius: 50%;
+        background: $color-primary-orange;
+        opacity: 0.85;
+      }
+    }
+  }
+
+  h2 {
+    margin: 2.2em 0 1.1em;
+    font-family: 'GrandifloraOne', serif;
+    font-weight: 400;
+    font-size: clamp(1.7rem, 3.5vw, 2.2rem);
+    line-height: 1.35;
+    color: #3c2f1f;
+    text-align: center;
+
+    // Thin warm rule under each section heading
+    &::after {
+      content: '';
+      display: block;
+      width: 72px;
+      height: 2px;
+      margin: 0.7em auto 0;
+      background: linear-gradient(90deg, rgba(255, 118, 13, 0), rgba(255, 118, 13, 0.65), rgba(255, 118, 13, 0));
+    }
+  }
+
+  // Sadhguru quotes as visual highlights, using the site's own quote marks
+  blockquote {
+    position: relative;
+    margin: 2.6em 0;
+    padding: 1.6em 4.2em 1.6em 4.2em;   // right padding clears the closing quote mark
+    background: rgba(255, 255, 255, 0.55);
+    border-left: 3px solid rgba(255, 118, 13, 0.55);
+    border-radius: 0 0.6em 0.6em 0;
+
+    p {
+      margin: 0;
+      font-family: 'FedraSerifAPro', serif;
+      font-style: italic;
+      font-size: 1.28rem;
+      line-height: 1.8;
+      color: #5d4a2f;
+    }
+
+    // Opening quote mark (same asset as the main-page banners)
+    &::before {
+      content: '';
+      position: absolute;
+      left: 1.1em;
+      top: 1.2em;
+      width: 2rem;
+      height: 2rem;
+      background: url('../../images/ui/quoteStart.webp') center / contain no-repeat;
+      opacity: 0.9;
+    }
+
+    // Closing quote mark, mirrored bottom-right
+    &::after {
+      content: '';
+      position: absolute;
+      right: 1.1em;
+      bottom: 1.2em;
+      width: 2rem;
+      height: 2rem;
+      background: url('../../images/ui/quoteEnd.webp') center / contain no-repeat;
+      opacity: 0.9;
+    }
+  }
+
+  hr {
+    border: 0;
+    height: 1px;
+    margin: 3em auto;
+    max-width: 60%;
+    background: linear-gradient(90deg, rgba(122, 94, 58, 0), rgba(122, 94, 58, 0.4), rgba(122, 94, 58, 0));
+  }
+}
+
+@include breakpoint('<=mobile') {
+  .article-wrap {
+    p { font-size: 1.05rem; }
+    li { font-size: 1.02rem; }
+    blockquote {
+      padding: 1.3em 2.6em 1.3em 3.2em;
+      p { font-size: 1.1rem; }
+      &::before { width: 1.5rem; height: 1.5rem; left: 0.8em; top: 1em; }
+      &::after { width: 1.5rem; height: 1.5rem; right: 0.8em; bottom: 1em; }
+    }
+  }
+}
+
+// ─── Sources & further reading ────────────────────────────────────────────────
+.article-sources {
+  // Match the article card frame so sources feel part of the same panel
+  max-width: 50rem;
+  margin: 2.2em auto 0;
+  padding: 1.4em clamp(1.6em, 5vw, 3.4em) 1.8em;
+  background: #fffdf7;
+  border: 1px solid rgba(122, 94, 58, 0.25);
+  border-radius: 1.1em;
+  box-shadow: 0 8px 32px rgba(80, 50, 20, 0.09);
+
+  h2 {
+    font-family: 'GrandifloraOne', serif;
+    font-weight: 400;
+    font-size: 1.6rem;
+    color: #3c2f1f;
+    text-align: center;
+    margin: 1.5em 0 1.2em;
+  }
+
+  ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: src;
+  }
+
+  li {
+    counter-increment: src;
+    position: relative;
+    margin-bottom: 1em;
+    padding: 0.9em 1.1em 0.9em 3.2em;
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(218, 120, 46, 0.18);
+    border-radius: 0.6em;
+    font-size: 0.92rem;
+    line-height: 1.65;
+    color: #5d4a2f;
+
+    // Numbered warm badge
+    &::before {
+      content: counter(src);
+      position: absolute;
+      left: 0.9em;
+      top: 0.9em;
+      width: 1.7em;
+      height: 1.7em;
+      border-radius: 50%;
+      background: rgba(255, 118, 13, 0.14);
+      color: #b35a10;
+      font-family: 'FedraSansPro', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 400;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    em { font-style: italic; }
+
+    a {
+      color: $color-accent-orange;
+      text-decoration: none;
+      border-bottom: 1px dotted rgba(218, 120, 46, 0.5);
+      transition: color 0.2s ease, border-color 0.2s ease;
+
+      &:hover {
+        color: $color-primary-orange;
+        border-color: $color-primary-orange;
+      }
+    }
+  }
+}
+
+.ai-note {
+  max-width: 46rem;
+  margin: 0.5em auto 0;
+  padding: 0 1.5em;
+  text-align: center;
+  font-size: 0.82rem;
+  font-style: italic;
+  color: #8a7554;
+}
+
+// ─── End-of-article actions ──────────────────────────────────────────────────
+.article-actions {
+  max-width: 46rem;
+  margin: 2.5em auto 0;
+  padding: 0 1.5em;
+  text-align: center;
+
+  .wisdom-button {
+    display: inline-block;
+    padding: 0.75em 2.4em;
+    background: $color-accent-orange;
+    color: #fff;
+    border-radius: 6px;
+    font-size: $font-size-md;
+    letter-spacing: 0.03em;
+    text-decoration: none;
+    transition: background 0.2s ease, transform 0.2s ease;
+
+    &:hover {
+      background: $color-secondary-orange;
+      transform: translateY(-2px);
+    }
+  }
+
+  .wisdom-backlink {
+    display: inline-block;
+    margin-top: 2.4em;
+    margin-bottom: 0;
+    padding: 0.5em 1.6em;
+    border: 1px solid rgba(122, 94, 58, 0.35);
+    border-radius: 6px;
+    color: #7a5e3a;
+    font-size: $font-size-sm;
+    text-decoration: none;
+    transition: border-color 0.2s ease, color 0.2s ease;
+
+    &:hover {
+      border-color: $color-primary-orange;
+      color: $color-primary-orange;
+    }
+  }
+}
+
+// ─── Footer ───────────────────────────────────────────────────────────────────
+.wisdom-footer {
+  margin-top: 4em;
+  padding: 2.5em 1.5em 3em;
+  // Deep warm brown — harmonizes with the cream/terracotta palette
+  background: #3a2d1c;
+  color: rgba(246, 238, 220, 0.82);
+  text-align: center;
+  font-size: 0.88rem;
+
+  .footer-logo {
+    width: 54px;
+    height: auto;
+    margin-bottom: 1em;
+    opacity: 0.9;
+  }
+
+  .footer-links {
+    margin: 0 0 1.2em;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1.6em;
+
+    a {
+      color: rgba(246, 238, 220, 0.9);
+      text-decoration: none;
+      transition: color 0.2s ease;
+
+      &:hover { color: $color-light-orange; }
+    }
+  }
+}
+
+// ─── Overview page: article cards (reuses the Readings card look) ────────────
+.wisdom-library {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 1.5em clamp(3em, 6vw, 5em);
+
+  .wisdom-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 2.2em 2.2em;      // column gap / row gap — more vertical space between rows
+    row-gap: 3.4em;        // extra breathing room between article rows
+    align-items: start;    // cards keep their natural height — no stretching
+  }
+
+  article {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .article-card {
+    position: relative;   // anchor for the inner frame + hover hint
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    height: 100%;
+    padding: 1.1em 1.6em 2em;
+    // Parchment: the site's own paper texture under a warm cream wash
+    background: #fbf6ea url('../../images/backgrounds/homeCardBg1.webp') center / cover;
+    background-blend-mode: soft-light;
+    background-color: #fbf6ea;   // fallback while texture loads
+    border: 1px solid rgba(122, 94, 58, 0.28);
+    border-radius: 1.1em;
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.6) inset,   // top edge catch-light
+      0 6px 24px rgba(80, 50, 20, 0.1);
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+
+    // Inner hairline frame: book-plate feel, inset from the card edge
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0.55em;
+      border: 1px solid rgba(122, 94, 58, 0.18);
+      border-radius: 0.65em;
+      pointer-events: none;
+      transition: border-color 0.3s ease;
+    }
+
+    // Hover affordance: 'Read →' hint slides in bottom-right
+    &::after {
+      content: 'Read →';
+      position: absolute;
+      right: 1.7em;
+      bottom: 1.2em;
+      font-family: 'FedraSansPro', sans-serif;
+      font-size: 0.85rem;
+      letter-spacing: 0.06em;
+      color: #da782e;
+      opacity: 0;
+      transform: translateX(-6px);
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+
+    &:hover {
+      transform: translateY(-7px);
+      border-color: rgba(218, 120, 46, 0.55);
+      box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.6) inset,
+        0 14px 38px rgba(80, 50, 20, 0.2),
+        0 4px 12px rgba(0, 0, 0, 0.1);
+
+      &::before { border-color: rgba(218, 120, 46, 0.35); }
+      &::after {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+  }
+
+  .image.featured {
+    // Mounted-print mat: hairline frame + deep shadow behind the artwork
+    margin: 0 0 1.4em;
+    overflow: hidden;
+    border-radius: 0.4em;
+    border: 1px solid rgba(60, 40, 20, 0.2);
+    box-shadow: 0 3px 10px rgba(40, 25, 10, 0.25);
+
+    img {
+      display: block;
+      transition: transform 0.5s ease;
+    }
+
+    .article-card:hover & img {
+      transform: scale(1.045);
+    }
+  }
+
+  header {
+    margin: 0 0 0.75em;
+    padding-bottom: 0.55em;
+    border-bottom: 1px solid rgba(218, 120, 46, 0.35);   // terracotta rule under title
+  }
+
+  h3 {
+    margin: 0 0 0.5em;
+    font-family: 'GrandifloraOne', serif;
+    font-weight: 400;
+    font-size: 1.75rem;
+    line-height: 1.35;
+    color: #3c2f1f;
+  }
+
+  .card-meta {
+    margin: 0;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    white-space: nowrap;   // keep the date/author line on one line
+    color: #a08355;
+
+    .byline-dot { margin: 0 0.5em; }   // breathing room around the separator
+  }
+
+  .card-teaser {
+    margin: 0.9em 0 0;
+    font-family: 'FedraSerifAPro', serif;
+    font-size: 1rem;
+    line-height: 1.7;
+    color: #5d4a2f;
+  }
+}
+
+@include breakpoint('<=narrow') {
+  .wisdom-library {
+    .wisdom-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2em; }
+  }
+}
+
+@include breakpoint('<=mobile') {
+  .wisdom-library {
+    .wisdom-grid { grid-template-columns: 1fr; gap: 1.8em; }
+    article { flex: 1 1 100%; max-width: 100%; }
+    .wisdom-hero-divider { width: 80%; max-width: 220px; }
+  }
+  .wisdom-title { font-size: clamp(1.9rem, 8vw, 2.4rem); }
+}
