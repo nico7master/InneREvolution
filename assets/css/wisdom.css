@@ -100,6 +100,22 @@ body.wisdom-page {
 .wisdom-topbar a:hover {
   color: #FF760D;
 }
+.wisdom-topbar .topbar-home,
+.wisdom-topbar .topbar-lang {
+  padding: 0.45em 1.3em;
+  background: rgba(255, 253, 247, 0.85);
+  border: 1px solid rgba(122, 94, 58, 0.32);
+  border-radius: 2em;
+  box-shadow: 0 2px 8px rgba(80, 50, 20, 0.1);
+  transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+.wisdom-topbar .topbar-home:hover,
+.wisdom-topbar .topbar-lang:hover {
+  color: #FF760D;
+  border-color: rgba(218, 120, 46, 0.55);
+  background: rgba(255, 253, 247, 0.97);
+  transform: translateY(-1px);
+}
 
 .wisdom-hero-inner {
   max-width: 900px;
@@ -386,44 +402,6 @@ body.wisdom-page {
   color: #8a7554;
 }
 
-.article-actions {
-  max-width: 46rem;
-  margin: 2.5em auto 0;
-  padding: 0 1.5em;
-  text-align: center;
-}
-.article-actions .wisdom-button {
-  display: inline-block;
-  padding: 0.75em 2.4em;
-  background: #DA782E;
-  color: #fff;
-  border-radius: 6px;
-  font-size: 1em;
-  letter-spacing: 0.03em;
-  text-decoration: none;
-  transition: background 0.2s ease, transform 0.2s ease;
-}
-.article-actions .wisdom-button:hover {
-  background: #FF6600;
-  transform: translateY(-2px);
-}
-.article-actions .wisdom-backlink {
-  display: inline-block;
-  margin-top: 2.4em;
-  margin-bottom: 0;
-  padding: 0.5em 1.6em;
-  border: 1px solid rgba(122, 94, 58, 0.35);
-  border-radius: 6px;
-  color: #7a5e3a;
-  font-size: 0.875em;
-  text-decoration: none;
-  transition: border-color 0.2s ease, color 0.2s ease;
-}
-.article-actions .wisdom-backlink:hover {
-  border-color: #FF760D;
-  color: #FF760D;
-}
-
 .wisdom-footer {
   margin-top: 4em;
   padding: 2.5em 1.5em 3em;
@@ -591,10 +569,10 @@ body.wisdom-page {
     font-size: clamp(1.9rem, 8vw, 2.4rem);
   }
 }
-/* ─── Prev/Next article navigation ─── */
+/* ─── End-of-article navigation: prev | all writings | next ─── */
 .article-prevnext {
   max-width: 50rem;
-  margin: 0 auto 1em;
+  margin: 3.5em auto 1em;
   padding: 0 1.5em;
   display: flex;
   gap: 1em;
@@ -633,9 +611,51 @@ body.wisdom-page {
 .article-prevnext .next {
   text-align: right;
 }
+.article-prevnext {
+  /* visual order: prev | center | next */
+}
+.article-prevnext .pn.prev {
+  order: 1;
+}
+.article-prevnext .pn.home {
+  order: 2;
+}
+.article-prevnext .pn.next {
+  order: 3;
+}
+.article-prevnext {
+  /* center link: same family, slimmer, vertically centered between the cards */
+}
+.article-prevnext .pn.home {
+  flex: 0 0 auto;
+  align-self: center;
+  flex-direction: row;
+  gap: 0;
+  padding: 0.55em 1.4em;
+  border-radius: 2em;
+  background: rgba(255, 253, 247, 0.7);
+}
+.article-prevnext .pn.home .pn-label {
+  font-size: 0.8rem;
+}
+.article-prevnext .pn.home:hover {
+  background: rgba(255, 253, 247, 0.95);
+}
+.article-prevnext .pn.home:hover .pn-label {
+  color: #b35f1a;
+}
 
 @media screen and (max-width: 736px) {
   .article-prevnext {
     flex-direction: column;
+    align-items: center;
   }
+  .article-prevnext .pn {
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .article-prevnext .pn.home {
+    width: auto;
+    order: -1;
+  } /* center link on top on mobile */
 }

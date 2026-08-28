@@ -132,6 +132,24 @@ body.wisdom-page {
       color: $color-primary-orange;
     }
   }
+
+  // Home + language buttons as parchment pills — clearly visible over the ink-wash texture
+  .topbar-home,
+  .topbar-lang {
+    padding: 0.45em 1.3em;
+    background: rgba(255, 253, 247, 0.85);
+    border: 1px solid rgba(122, 94, 58, 0.32);
+    border-radius: 2em;
+    box-shadow: 0 2px 8px rgba(80, 50, 20, 0.1);
+    transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+
+    &:hover {
+      color: $color-primary-orange;
+      border-color: rgba(218, 120, 46, 0.55);
+      background: rgba(255, 253, 247, 0.97);
+      transform: translateY(-1px);
+    }
+  }
 }
 
 .wisdom-hero-inner {
@@ -443,48 +461,6 @@ body.wisdom-page {
   color: #8a7554;
 }
 
-// ─── End-of-article actions ──────────────────────────────────────────────────
-.article-actions {
-  max-width: 46rem;
-  margin: 2.5em auto 0;
-  padding: 0 1.5em;
-  text-align: center;
-
-  .wisdom-button {
-    display: inline-block;
-    padding: 0.75em 2.4em;
-    background: $color-accent-orange;
-    color: #fff;
-    border-radius: 6px;
-    font-size: $font-size-md;
-    letter-spacing: 0.03em;
-    text-decoration: none;
-    transition: background 0.2s ease, transform 0.2s ease;
-
-    &:hover {
-      background: $color-secondary-orange;
-      transform: translateY(-2px);
-    }
-  }
-
-  .wisdom-backlink {
-    display: inline-block;
-    margin-top: 2.4em;
-    margin-bottom: 0;
-    padding: 0.5em 1.6em;
-    border: 1px solid rgba(122, 94, 58, 0.35);
-    border-radius: 6px;
-    color: #7a5e3a;
-    font-size: $font-size-sm;
-    text-decoration: none;
-    transition: border-color 0.2s ease, color 0.2s ease;
-
-    &:hover {
-      border-color: $color-primary-orange;
-      color: $color-primary-orange;
-    }
-  }
-}
 
 // ─── Footer ───────────────────────────────────────────────────────────────────
 .wisdom-footer {
@@ -670,10 +646,10 @@ body.wisdom-page {
   .wisdom-title { font-size: clamp(1.9rem, 8vw, 2.4rem); }
 }
 
-/* ─── Prev/Next article navigation ─── */
+/* ─── End-of-article navigation: prev | all writings | next ─── */
 .article-prevnext {
   max-width: 50rem;
-  margin: 0 auto 1em;
+  margin: 3.5em auto 1em;
   padding: 0 1.5em;
   display: flex;
   gap: 1em;
@@ -712,8 +688,35 @@ body.wisdom-page {
   }
 
   .next { text-align: right; }
+
+  /* visual order: prev | center | next */
+  .pn.prev { order: 1; }
+  .pn.home { order: 2; }
+  .pn.next { order: 3; }
+
+  /* center link: same family, slimmer, vertically centered between the cards */
+  .pn.home {
+    flex: 0 0 auto;
+    align-self: center;
+    flex-direction: row;
+    gap: 0;
+    padding: .55em 1.4em;
+    border-radius: 2em;
+    background: rgba(255,253,247,.7);
+
+    .pn-label { font-size: .8rem; }
+    &:hover {
+      background: rgba(255,253,247,.95);
+      .pn-label { color: #b35f1a; }
+    }
+  }
 }
 
 @media screen and (max-width: 736px) {
-  .article-prevnext { flex-direction: column; }
+  .article-prevnext {
+    flex-direction: column;
+    align-items: center;
+  }
+  .article-prevnext .pn { width: 100%; box-sizing: border-box; }
+  .article-prevnext .pn.home { width: auto; order: -1; }  /* center link on top on mobile */
 }
