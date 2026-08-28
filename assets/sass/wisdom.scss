@@ -109,7 +109,8 @@ body.wisdom-page {
 }
 
 .wisdom-topbar {
-  // Fixed to the viewport like the homepage navbar — always visible while scrolling
+  // Fixed to the viewport like the homepage navbar — hides on scroll down,
+  // reappears on scroll up (same system as the homepage navbar v7)
   position: fixed;
   top: 0;
   left: 0;
@@ -120,6 +121,16 @@ body.wisdom-page {
   align-items: center;
   padding: 0.9em clamp(1.2em, 4vw, 2.5em);
   // Fully transparent — like the homepage navbar
+
+  // Scroll hide/show: slide up out of view; pointer-events off while hidden
+  transform: translateY(0);
+  transition: transform 0.35s ease;
+  will-change: transform;
+
+  &.topbar-hidden {
+    transform: translateY(-120%);
+    pointer-events: none;
+  }
 
   a {
     color: #7a5e3a;

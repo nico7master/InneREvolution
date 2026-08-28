@@ -89,6 +89,13 @@ body.wisdom-page {
   justify-content: space-between;
   align-items: center;
   padding: 0.9em clamp(1.2em, 4vw, 2.5em);
+  transform: translateY(0);
+  transition: transform 0.35s ease;
+  will-change: transform;
+}
+.wisdom-topbar.topbar-hidden {
+  transform: translateY(-120%);
+  pointer-events: none;
 }
 .wisdom-topbar a {
   color: #7a5e3a;
