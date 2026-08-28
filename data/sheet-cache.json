@@ -82,32 +82,5 @@
       0.7916666666678793,
       0.8541666666666666
     ]
-  ],
-  "discountCodes": [
-    [
-      "FRIEND10",
-      "10",
-      "Friend referral"
-    ],
-    [
-      "VIP15",
-      "15",
-      "Loyal client"
-    ],
-    [
-      "STUDENT10",
-      "20",
-      "Student"
-    ],
-    [
-      "EARLY20",
-      "20",
-      "Early bird"
-    ],
-    [
-      "FAMILY30",
-      "30",
-      "Family and close Friends"
-    ]
   ]
 }

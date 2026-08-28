@@ -74,3 +74,8 @@ docs/.clasp.json
 
 # Project context notes — keep local
 *.promptinclude.md
+
+# unused assets kept locally only
+images/NotUsed/
+SVGs/NotUsed/
+images/UsedOriginal/

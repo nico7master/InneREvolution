@@ -21707,9 +21707,17 @@ body .readings-wrapper #Readings p {
 /* ─── Readings (Interesting reads) Swiper ─── */
 .readings-wrapper .readingsSwiper {
   width: 100%;
+  max-width: 1400px;   /* match site .container so cards align with centered content */
+  margin: 0 auto;      /* center the swiper itself */
   overflow: hidden;
   padding: 0 0.75rem 2.75rem; /* comfortable side padding */ /* side padding for breathing room + space for pagination dots */
   box-sizing: border-box;
+}
+
+@media screen and (max-width: 1680px) {
+  .readings-wrapper .readingsSwiper {
+    max-width: 1200px; /* match container at <=wide breakpoint */
+  }
 }
 
 /* Reset template grid row — zero out gutter margins/padding so Swiper takes over */

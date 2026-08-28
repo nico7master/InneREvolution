@@ -1024,7 +1024,8 @@ document.addEventListener('DOMContentLoaded', function () {
     grabCursor: true,
     speed: 300,
     centerInsufficientSlides: true, /* center when fewer cards than fill row */
-    resizeObserver: false,
+    resizeObserver: true,       /* recompute translate on viewport changes - prevents off-center drift */
+    watchOverflow: true,
     passiveListeners: true,
     touchAngle: 45,
     threshold: 5,
