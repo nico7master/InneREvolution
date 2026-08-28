@@ -1043,24 +1043,45 @@ a {
   &:hover { color: $color-primary-orange; }
 }
 
-// "To Website" minimal text button — top-left corner of hero image
+// "Home" pill — fixed top-left, identical parchment style to the Wisdom
+// topbar pills. Hides on scroll down, reappears on scroll up
+// (assets/js/topbar-scroll.js — same system as homepage navbar)
 .booking-tosite-btn {
-  position: absolute;
-  top: $spacing-md;
-  left: $padding-lg;  // moved to left corner
-  z-index: 3;
-  color: rgba($color-white, 0.9);
+  position: fixed;
+  top: 0.9em;
+  left: clamp(1.2em, 4vw, 2.5em);
+  z-index: $z-index-dropdown;
+  display: inline-block;
+  padding: 0.45em 1.3em;
+  background: rgba(255, 253, 247, 0.85);
+  border: 1px solid rgba(122, 94, 58, 0.32);
+  border-radius: 2em;
+  box-shadow: 0 2px 8px rgba(80, 50, 20, 0.1);
+  color: #7a5e3a;
   font-family: $font-family-primary;
   font-size: $font-size-sm;
   font-weight: $font-weight-medium;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.04em;
   text-decoration: none;
-  text-shadow: 0 1px 8px rgba(0,0,0,0.8);
-  transition: color 0.2s ease, letter-spacing 0.2s ease;
+  text-shadow: none;
+  transform: translateY(0);
+  transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease,
+              box-shadow 0.2s ease, transform 0.35s ease;
+  will-change: transform;
 
   &:hover {
-    color: $color-white;
-    letter-spacing: 0.1em;
+    color: $color-primary-orange;
+    border-color: rgba(218, 120, 46, 0.55);
+    background: rgba(255, 253, 247, 0.97);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(80, 50, 20, 0.16);
+  }
+
+  // Scroll hide state — slides out of view, clicks pass through
+  &.topbar-hidden,
+  &.topbar-hidden:hover {
+    transform: translateY(-120%);
+    pointer-events: none;
   }
 
   @include breakpoint('<=mobile') {

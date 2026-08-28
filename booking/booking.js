@@ -7,7 +7,11 @@
 // ─── Booking i18n ─────────────────────────────────────────────────────────────
 var BOOKING_STRINGS = {
   en: {
-    toSite:             '\u2190 To Website',
+    toSite:             '\u2190 Home',
+    footerReturn:       'Return to website',
+    sessionsLabel:     function (n) { return n + (n === 1 ? ' session' : ' sessions'); },
+    hrsLabel:          ' hrs',
+    titleTag:          'Yoga Programs — InneREvolution Yoga',
     heroTitle:          'Yoga Programs',
     heroTagline:        'Classical Hatha Yoga \u2014 Begin your journey',
     loading:            'Loading programs\u2026',
@@ -59,7 +63,11 @@ var BOOKING_STRINGS = {
     dateLocale:         'en-GB',
   },
   de: {
-    toSite:             '\u2190 Zur Website',
+    toSite:             '\u2190 Home',
+    footerReturn:       'Zur Website zurück',
+    sessionsLabel:     function (n) { return n + (n === 1 ? ' Termin' : ' Termine'); },
+    hrsLabel:          ' Std.',
+    titleTag:          'Yoga Programme — InneREvolution Yoga',
     heroTitle:          'Yoga Programme',
     heroTagline:        'Klassisches Hatha Yoga \u2014 Beginne deine Reise',
     loading:            'Lade Programme\u2026',
@@ -275,8 +283,8 @@ function buildCard(p) {
     : '';
 
   const infoHtml = [
-    p.sessionCount ? `${p.sessionCount} session${p.sessionCount !== 1 ? 's' : ''}` : '',
-    p.totalHours   ? `${p.totalHours} hrs` : ''
+    p.sessionCount ? bs('sessionsLabel')(p.sessionCount) : '',
+    p.totalHours   ? `${p.totalHours}${bs('hrsLabel')}` : ''
   ].filter(Boolean).map(v => `<span class="program-card-badge program-card-info">${v}</span>`).join('');
 
   const metaHtml = [p.format, p.language, p.location].filter(Boolean)
@@ -341,8 +349,13 @@ function applyStaticTranslations() {
   var el;
   /* Set html lang attribute */
   document.documentElement.lang = window._bookingLang || 'en';
+  /* Localized page title */
+  document.title = bs('titleTag');
+  /* All return links lead back to the homepage in the ACTIVE language */
+  var homeHref = (window._bookingLang === 'de') ? '../de/' : '../';
   /* Header */
   el = document.querySelector('.booking-tosite-btn');              if (el) el.textContent = bs('toSite');
+  el = document.querySelector('.booking-tosite-btn');              if (el) el.href = homeHref;
   el = document.querySelector('.booking-hero-title');              if (el) el.textContent = bs('heroTitle');
   el = document.querySelector('.booking-hero-tagline');            if (el) el.textContent = bs('heroTagline');
   /* Loading / states */
@@ -350,7 +363,7 @@ function applyStaticTranslations() {
   el = document.querySelector('.programs-reserve-note');           if (el) el.textContent = bs('reserveNote');
   el = document.querySelector('#programs-empty p:first-of-type');  if (el) el.textContent = bs('noPrograms');
   el = document.querySelector('#programs-empty .empty-subtext');
-  if (el) el.innerHTML = bs('checkBack') + '<a href="../">' + bs('returnSiteLink') + '</a>.';
+  if (el) el.innerHTML = bs('checkBack') + '<a href="' + homeHref + '">' + bs('returnSiteLink') + '</a>.';
   /* Modal title */
   el = document.getElementById('modal-title');                     if (el) el.textContent = bs('modalTitle');
   /* Form labels — preserve child spans where needed */
@@ -382,6 +395,8 @@ function applyStaticTranslations() {
   el = document.querySelector('#form-success h3');                 if (el) el.textContent = bs('successTitle');
   el = document.getElementById('success-detail');                  if (el) el.textContent = bs('successDefault');
   el = document.querySelector('.btn-back-site');                   if (el) el.textContent = bs('returnSiteBtn');
+  el = document.querySelector('.booking-footer a');                if (el) { el.textContent = bs('footerReturn'); el.href = homeHref; }
+  el = document.querySelector('.btn-back-site');                   if (el) el.href = homeHref;
 }
 // ─── End static translations ──────────────────────────────────────────────────
 

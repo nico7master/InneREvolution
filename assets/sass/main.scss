@@ -22504,3 +22504,53 @@ body.low-fps {
 /* === END LOW-FPS BACKGROUND FIX === */
 
 
+
+
+/* ============================================================
+   LANGUAGE PILL — homepage top edge (DE/EN switch).
+   Same parchment family as the Wisdom/booking pills.
+   Visible only while at page top; topbar-scroll.js toggles
+   .lang-pill-hidden once you scroll away.
+   ============================================================ */
+.lang-pill {
+  position: fixed;
+  top: 0.9em;
+  right: clamp(1.2em, 4vw, 2.5em);
+  z-index: 1001;
+  display: inline-block;
+  padding: 0.45em 1.3em;
+  background: rgba(255, 253, 247, 0.85);
+  border: 1px solid rgba(122, 94, 58, 0.32);
+  border-radius: 2em;
+  box-shadow: 0 2px 8px rgba(80, 50, 20, 0.1);
+  color: #7a5e3a;
+  font-size: 0.9em;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  transform: translateY(0);
+  transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease,
+              box-shadow 0.2s ease, transform 0.35s ease;
+  will-change: transform;
+
+  &:hover {
+    color: #da782e;
+    border-color: rgba(218, 120, 46, 0.55);
+    background: rgba(255, 253, 247, 0.97);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(80, 50, 20, 0.16);
+  }
+
+  // Off-top state — slides out of view, clicks pass through
+  &.lang-pill-hidden,
+  &.lang-pill-hidden:hover {
+    transform: translateY(-120%);
+    pointer-events: none;
+  }
+
+  // Mobile: hamburger owns the top-right corner — pill moves top-left
+  @media screen and (max-width: 980px) {
+    right: auto;
+    left: 1.2rem;
+    top: 1rem;
+  }
+}
