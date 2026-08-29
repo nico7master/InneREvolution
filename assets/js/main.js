@@ -778,7 +778,7 @@ updateActiveDot();
         location:    r[11] || '',
         language:    r[12] || '',
       };
-    }).filter(function (p) { return p.active && p.id; }).slice(0, 6);
+    }).filter(function (p) { return p.active && p.id; });
 
     var sessions = sessRows.map(function (r) {
       return {
@@ -805,6 +805,17 @@ updateActiveDot();
         p.endDate = lastSessionDate[p.id];
       }
     });
+
+    /* Auto-expire: hide programs whose last date is before today.
+       Programs without any date are kept (cannot be judged). */
+    var _now = new Date();
+    var todayISO = _now.getFullYear() + '-' +
+      ('0' + (_now.getMonth() + 1)).slice(-2) + '-' +
+      ('0' + _now.getDate()).slice(-2);
+    programs = programs.filter(function (p) {
+      var lastDate = p.endDate || p.startDate;
+      return !lastDate || lastDate >= todayISO;
+    }).slice(0, 6);
 
     list.innerHTML = '';
     if (!programs.length) {

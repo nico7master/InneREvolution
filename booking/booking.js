@@ -252,7 +252,21 @@ function renderPrograms() {
 
   loading.style.display = 'none';
 
-  const active = programs.filter(p => p.active);
+  // Auto-expire: hide programs whose last date is before today.
+  // Programs without any date are kept (cannot be judged).
+  const _now = new Date();
+  const todayISO = `${_now.getFullYear()}-${String(_now.getMonth() + 1).padStart(2, '0')}-${String(_now.getDate()).padStart(2, '0')}`;
+  const lastDates = {};
+  sessions.forEach(s => {
+    if (s.programId && s.date) {
+      if (!lastDates[s.programId] || s.date > lastDates[s.programId]) lastDates[s.programId] = s.date;
+    }
+  });
+  const active = programs.filter(p => {
+    if (!p.active) return false;
+    const lastDate = lastDates[p.id] || p.startDate;
+    return !lastDate || lastDate >= todayISO;
+  });
   if (active.length === 0) {
     empty.style.display = 'block';
     return;
