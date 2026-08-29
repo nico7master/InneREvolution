@@ -94,7 +94,7 @@ body.wisdom-page {
   will-change: transform;
 }
 .wisdom-topbar.topbar-hidden {
-  transform: translateY(-120%);
+  transform: translateY(calc(-100% - 3rem));
   pointer-events: none;
 }
 .wisdom-topbar a {

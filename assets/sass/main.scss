@@ -22540,10 +22540,12 @@ body.low-fps {
     box-shadow: 0 4px 12px rgba(80, 50, 20, 0.16);
   }
 
-  // Off-top state — slides out of view, clicks pass through
+  // Off-top state — slides fully out of view, clicks pass through
+  // calc(-100% - 3rem) clears the top offset — a plain -120% leaves a
+  // sliver visible on phones (top: 1rem + pill height > 120%)
   &.lang-pill-hidden,
   &.lang-pill-hidden:hover {
-    transform: translateY(-120%);
+    transform: translateY(calc(-100% - 3rem));
     pointer-events: none;
   }
 

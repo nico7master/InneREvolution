@@ -1080,7 +1080,8 @@ a {
   // Scroll hide state — slides out of view, clicks pass through
   &.topbar-hidden,
   &.topbar-hidden:hover {
-    transform: translateY(-120%);
+    // calc clears the top offset — plain -120% can leave a sliver on phones
+    transform: translateY(calc(-100% - 3rem));
     pointer-events: none;
   }
 

@@ -1034,7 +1034,7 @@ a:hover {
   box-shadow: 0 4px 12px rgba(80, 50, 20, 0.16);
 }
 .booking-tosite-btn.topbar-hidden, .booking-tosite-btn.topbar-hidden:hover {
-  transform: translateY(-120%);
+  transform: translateY(calc(-100% - 3rem));
   pointer-events: none;
 }
 @media screen and (max-width: 736px) {

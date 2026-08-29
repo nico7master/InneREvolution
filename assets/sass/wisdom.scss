@@ -128,7 +128,8 @@ body.wisdom-page {
   will-change: transform;
 
   &.topbar-hidden {
-    transform: translateY(-120%);
+    // calc clears the top padding — plain -120% can leave a sliver on phones
+    transform: translateY(calc(-100% - 3rem));
     pointer-events: none;
   }
 
