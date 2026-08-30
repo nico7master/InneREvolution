@@ -8271,7 +8271,7 @@ body.homepage.is-preload #header:after {
 }
 
 /* Banner */
-#banner {
+.banner {
   align-items: center;
   text-align: center;
   background: url("../../images/backgrounds/homeCardBg1.webp");
@@ -8284,60 +8284,60 @@ body.homepage.is-preload #header:after {
   left: 0 !important;
   transform: none !important;
 }
-#banner h1 {
+.banner h1 {
   font-family: "FedraSerifAPro", serif;
   vertical-align: middle;
   font-weight: 700;
 }
-#banner header > p {
+.banner header > p {
   margin-bottom: 0;
 }
-#banner .quote-container {
+.banner .quote-container {
   display: flex;
   align-items: center; /* Align items to the top */
   justify-content: center; /* Centers content horizontally */
   flex-wrap: nowrap; /* Prevents wrapping of quote images and text */
   margin-bottom: 1em; /* Space before divider */
 }
-#banner .banner-quote {
+.banner .banner-quote {
   width: clamp(1.4rem, 2.2vw, 2.4rem);
   height: auto; /* Match .quote-mark sizing */
   display: inline-block;
   margin-top: 0; /* Fine-tune vertical position to align with text top */
 }
-#banner .quote-start {
+.banner .quote-start {
   margin-right: 0; /* gap controlled by .quote-container gap */
 }
-#banner .quote-end {
+.banner .quote-end {
   margin-left: 0; /* gap controlled by .quote-container gap */
 }
-#banner .quote-text {
+.banner .quote-text {
   display: inline-block;
 }
-#banner .quote-text h4 {
+.banner .quote-text h4 {
   margin: 0; /* Remove default margin for tighter alignment */
   text-align: left;
 }
-#banner .banner-icon {
+.banner .banner-icon {
   width: 10em;
   vertical-align: middle;
   margin: 1em auto 0;
   display: block;
 }
 @media screen and (max-width: 736px) {
-  #banner .quote-container {
+  .banner .quote-container {
     flex-wrap: wrap; /* Allow wrapping if text is too long */
   }
-  #banner .banner-quote {
+  .banner .banner-quote {
     width: clamp(1.8rem, 7vw, 2.7rem); /* Match .quote-mark mobile sizing */
     height: auto;
     margin-top: 0.15em; /* Adjust for mobile */
   }
-  #banner .quote-text h2 {
+  .banner .quote-text h2 {
     font-size: 1.75em; /* Adjust text size for mobile */
   }
-  #banner .quote-start,
-  #banner .quote-end {
+  .banner .quote-start,
+  .banner .quote-end {
     margin: 0; /* gap controlled by .quote-container gap */
   }
 }
@@ -9560,7 +9560,7 @@ body.homepage.is-preload #header:after {
     padding-right: 2em;
   }
   /* Banner */
-  #banner {
+  .banner {
     padding-left: 2em;
     padding-right: 2em;
     position: relative;
@@ -9919,7 +9919,7 @@ body.homepage.is-preload #header:after {
     display: none;
   }
   /* Banner */
-  #banner {
+  .banner {
     z-index: 2;
     padding: 3em 2em 3em 2em;
   }
@@ -18412,7 +18412,7 @@ body.homepage.is-preload #header:after {
 }
 
 /* Banner */
-#banner {
+.banner {
   align-items: center;
   text-align: center;
   background: url("../../images/backgrounds/homeCardBg1.webp");
@@ -18426,17 +18426,17 @@ body.homepage.is-preload #header:after {
   transform: none !important;
 }
 
-#banner h1 {
+.banner h1 {
   font-family: "FedraSerifAPro", serif;
   vertical-align: middle;
   font-weight: 700;
 }
 
-#banner header > p {
+.banner header > p {
   margin-bottom: 0;
 }
 
-#banner .quote-container {
+.banner .quote-container {
   display: flex;
   align-items: center; /* Align items to the top */
   justify-content: center; /* Centers content horizontally */
@@ -18444,31 +18444,31 @@ body.homepage.is-preload #header:after {
   margin-bottom: 1em; /* Space before divider */
 }
 
-#banner .banner-quote {
+.banner .banner-quote {
   width: clamp(1.4rem, 2.2vw, 2.4rem);
   height: auto; /* Match .quote-mark sizing */
   display: inline-block;
   margin-top: 0; /* Fine-tune vertical position to align with text top */
 }
 
-#banner .quote-start {
+.banner .quote-start {
   margin-right: 0; /* gap controlled by .quote-container gap */
 }
 
-#banner .quote-end {
+.banner .quote-end {
   margin-left: 0; /* gap controlled by .quote-container gap */
 }
 
-#banner .quote-text {
+.banner .quote-text {
   display: inline-block;
 }
 
-#banner .quote-text h4 {
+.banner .quote-text h4 {
   margin: 0; /* Remove default margin for tighter alignment */
   text-align: left;
 }
 
-#banner .banner-icon {
+.banner .banner-icon {
   width: 10em;
   vertical-align: middle;
   margin: 1em auto 0;
@@ -18476,19 +18476,19 @@ body.homepage.is-preload #header:after {
 }
 
 @media screen and (max-width: 736px) {
-  #banner .quote-container {
+  .banner .quote-container {
     flex-wrap: wrap; /* Allow wrapping if text is too long */
   }
-  #banner .banner-quote {
+  .banner .banner-quote {
     width: 1.5rem !important; /* Match .quote-mark mobile sizing */
     height: auto !important;
     margin-top: 0.15em; /* Adjust for mobile */
   }
-  #banner .quote-text h2 {
+  .banner .quote-text h2 {
     font-size: 1.75em; /* Adjust text size for mobile */
   }
-  #banner .quote-start,
-  #banner .quote-end {
+  .banner .quote-start,
+  .banner .quote-end {
     margin: 0; /* gap controlled by .quote-container gap */
   }
 }
@@ -19819,7 +19819,7 @@ body.homepage.is-preload #header:after {
     padding-right: 2em;
   }
   /* Banner */
-  #banner {
+  .banner {
     padding-left: 2em;
     padding-right: 2em;
     position: relative;
@@ -20176,7 +20176,7 @@ body.homepage.is-preload #header:after {
     display: none;
   }
   /* Banner */
-  #banner {
+  .banner {
     z-index: 2;
     padding: 3em 2em 3em 2em;
   }
@@ -20297,8 +20297,8 @@ body.homepage.is-preload #header:after {
 }
 
 /* --- Uniform Quote Text across both banner sections --- */
-#banner .quote-text h2,
-section#banner .quote-text h2 {
+.banner .quote-text h2,
+section.banner .quote-text h2 {
   font-size: 1.4em !important;
   line-height: 1.7em !important;
   font-weight: 400 !important;
@@ -20363,8 +20363,8 @@ section#banner .quote-text h2 {
    Fix: footer too wide/empty, quotes too small
    ============================================================ */
 /* --- QUOTES: restore to a readable, impactful size --- */
-#banner .quote-text h2,
-section#banner .quote-text h2 {
+.banner .quote-text h2,
+section.banner .quote-text h2 {
   font-size: 1.75em !important;
   line-height: 1.65em !important;
   font-weight: 400 !important;
@@ -20372,8 +20372,8 @@ section#banner .quote-text h2 {
 }
 
 @media screen and (max-width: 736px) {
-  #banner .quote-text h2,
-  section#banner .quote-text h2 {
+  .banner .quote-text h2,
+  section.banner .quote-text h2 {
     font-size: 1.2rem !important; /* reduced for mobile readability */
     line-height: 1.6em !important;
   }
@@ -20435,20 +20435,20 @@ section#banner .quote-text h2 {
    Targets only the footer banner via .footer-banner class
    ============================================================ */
 /* Override the banner section wrapping the footer */
-section#banner.footer-banner {
+section.banner.footer-banner {
   padding: 3em 1em !important;
   min-height: 0 !important;
   background-attachment: scroll !important;
 }
 
 /* Constrain the inner content to a centered card */
-section#banner.footer-banner > div#footer > .container {
+section.banner.footer-banner > div#footer > .container {
   max-width: 700px !important;
   margin: 0 auto !important;
 }
 
 /* Card-style contact box */
-section#banner.footer-banner .contact {
+section.banner.footer-banner .contact {
   background: rgba(255, 255, 255, 0.9) !important;
   border-radius: 1em !important;
   padding: 2em 2.5em !important;
@@ -20457,17 +20457,17 @@ section#banner.footer-banner .contact {
 }
 
 /* Tighter typography inside footer contact */
-section#banner.footer-banner .contact header h3 {
+section.banner.footer-banner .contact header h3 {
   font-size: 1.1em !important;
   margin-bottom: 0.4em !important;
 }
 
-section#banner.footer-banner .contact p {
+section.banner.footer-banner .contact p {
   font-size: 0.9em !important;
   margin-bottom: 1em !important;
 }
 
-section#banner.footer-banner .copyright {
+section.banner.footer-banner .copyright {
   font-size: 0.75em !important;
   margin-top: 1.25em !important;
   opacity: 0.75 !important;
@@ -20475,10 +20475,10 @@ section#banner.footer-banner .copyright {
 }
 
 @media screen and (max-width: 736px) {
-  section#banner.footer-banner {
+  section.banner.footer-banner {
     padding: 2em 0.75em !important;
   }
-  section#banner.footer-banner .contact {
+  section.banner.footer-banner .contact {
     padding: 1.5em 1em !important;
   }
 }
@@ -21399,7 +21399,7 @@ body {
 }
 
 /* Content sections need solid backgrounds to cover hero */
-#banner {
+.banner {
   background-color: #5b5336 !important;
 }
 
@@ -21484,14 +21484,14 @@ body.homepage #header {
   height: 200vh !important;
 }
 
-#banner {
+.banner {
   position: relative !important;
   z-index: 1 !important;
   background-color: #5b5336 !important;
 }
 
 /* Only push the FIRST content banner below hero spacer */
-.hero-wrapper + #nav + #banner {
+.hero-wrapper + #nav + .banner {
   margin-top: 200vh !important;
 }
 
@@ -21590,7 +21590,7 @@ body.homepage .hero-wrapper {
   height: 300vh !important;
 }
 
-body.homepage .hero-wrapper + #nav + #banner {
+body.homepage .hero-wrapper + #nav + .banner {
   margin-top: 300vh !important;
 }
 
@@ -23944,8 +23944,8 @@ body.homepage .stars > .stars-fore::after {
 /* --- End Phase 3 SCSS migration: hero layer restored from pre-migration live CSS backup --- */
 /* --- Phase 1 SCSS migration: live quote + Hatha overrides from assets/css/main.css --- */
 /* Quote sizing parity for the pre-slider banner sections. */
-#banner .quote-text h2,
-section#banner .quote-text h2 {
+.banner .quote-text h2,
+section.banner .quote-text h2 {
   font-size: 1.75em !important;
   line-height: 1.65em !important;
   font-weight: 400 !important;
@@ -23953,8 +23953,8 @@ section#banner .quote-text h2 {
 }
 
 @media screen and (max-width: 736px) {
-  #banner .quote-text h2,
-  section#banner .quote-text h2 {
+  .banner .quote-text h2,
+  section.banner .quote-text h2 {
     font-size: 1.2rem !important; /* reduced for mobile readability */
     line-height: 1.6em !important;
   }
@@ -24698,8 +24698,8 @@ section.carousel-shell > .inner,
 }
 
 /* --- Final hard restore: quote banner + Nico Schlager background images --- */
-section#banner,
-#banner {
+section.banner,
+.banner {
   background-color: #f5eee4 !important;
   background-image: linear-gradient(rgba(245, 238, 228, 0.42), rgba(245, 238, 228, 0.42)), url("../../images/backgrounds/wallpaper-411editedLarge.jpeg") !important;
   background-position: center center !important;
@@ -24708,8 +24708,8 @@ section#banner,
 }
 
 /* --- Final hard fix: quote banners use white textured background; Nico stays on Bio only --- */
-section#banner,
-#banner {
+section.banner,
+.banner {
   background-color: #f6f0e7 !important;
   background-image: url("../../images/backgrounds/homeCardBg1.webp") !important;
   background-position: center top !important;
@@ -26582,17 +26582,17 @@ body.homepage #sadhguru .sadhguru-section {
   scroll-snap-align: start;
 }
 
-section#banner.footer-banner {
+section.banner.footer-banner {
   padding-top: 1rem !important;
   padding-bottom: 1rem !important;
 }
 
-section#banner.footer-banner #footer {
+section.banner.footer-banner #footer {
   padding-top: clamp(1.75rem, 3vw, 2.5rem) !important;
   padding-bottom: clamp(1.75rem, 3vw, 2.5rem) !important;
 }
 
-section#banner.footer-banner .contact p {
+section.banner.footer-banner .contact p {
   margin-bottom: 1.5rem !important;
 }
 
@@ -26608,7 +26608,7 @@ section#banner.footer-banner .contact p {
     width: min(84vw, 22rem) !important;
     max-width: min(84vw, 22rem) !important;
   }
-  section#banner.footer-banner #footer {
+  section.banner.footer-banner #footer {
     padding-top: 1.5rem !important;
     padding-bottom: 1.5rem !important;
   }
@@ -26705,7 +26705,7 @@ section#banner.footer-banner .contact p {
 }
 
 /* --- Professional footer contact refresh --- */
-section#banner.footer-banner #footer .contact.contact-professional {
+section.banner.footer-banner #footer .contact.contact-professional {
   max-width: 1120px;
   margin: 0 auto;
   padding: clamp(1.5rem, 3vw, 2.4rem);
@@ -26716,13 +26716,13 @@ section#banner.footer-banner #footer .contact.contact-professional {
   text-align: left;
 }
 
-section#banner.footer-banner #footer .contact.contact-professional .contact-header {
+section.banner.footer-banner #footer .contact.contact-professional .contact-header {
   max-width: 760px;
   margin: 0 auto 1.6rem;
   text-align: center;
 }
 
-section#banner.footer-banner #footer .contact.contact-professional .contact-kicker {
+section.banner.footer-banner #footer .contact.contact-professional .contact-kicker {
   margin: 0 0 0.6rem;
   color: rgba(255, 216, 181, 0.84);
   font-size: 0.76rem;
@@ -26731,7 +26731,7 @@ section#banner.footer-banner #footer .contact.contact-professional .contact-kick
   text-transform: uppercase;
 }
 
-section#banner.footer-banner #footer .contact.contact-professional h3 {
+section.banner.footer-banner #footer .contact.contact-professional h3 {
   margin: 0 0 0.75rem;
   color: #fff4ea;
   font-family: "Grandiflora One", serif;
@@ -26740,21 +26740,21 @@ section#banner.footer-banner #footer .contact.contact-professional h3 {
   line-height: 1.1;
 }
 
-section#banner.footer-banner #footer .contact.contact-professional .contact-intro {
+section.banner.footer-banner #footer .contact.contact-professional .contact-intro {
   margin: 0 auto;
   color: rgba(255, 234, 219, 0.84);
   font-size: 1.02rem;
   line-height: 1.8;
 }
 
-section#banner.footer-banner #footer .contact.contact-professional .contact-cards-grid {
+section.banner.footer-banner #footer .contact.contact-professional .contact-cards-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 1rem;
   margin-top: 1.6rem;
 }
 
-section#banner.footer-banner #footer .contact.contact-professional .contact-card {
+section.banner.footer-banner #footer .contact.contact-professional .contact-card {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -26770,20 +26770,20 @@ section#banner.footer-banner #footer .contact.contact-professional .contact-card
   transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease, background 0.22s ease;
 }
 
-section#banner.footer-banner #footer .contact.contact-professional .contact-card:hover,
-section#banner.footer-banner #footer .contact.contact-professional .contact-card:focus-visible {
+section.banner.footer-banner #footer .contact.contact-professional .contact-card:hover,
+section.banner.footer-banner #footer .contact.contact-professional .contact-card:focus-visible {
   transform: translateY(-4px);
   border-color: rgba(255, 224, 200, 0.3);
   background: linear-gradient(180deg, rgba(255, 248, 242, 0.085) 0%, rgba(255, 255, 255, 0.04) 100%);
   box-shadow: 0 20px 42px rgba(0, 0, 0, 0.24);
 }
 
-section#banner.footer-banner #footer .contact.contact-professional .contact-card-primary {
+section.banner.footer-banner #footer .contact.contact-professional .contact-card-primary {
   border-color: rgba(255, 224, 200, 0.24);
   background: linear-gradient(180deg, rgba(122, 66, 47, 0.38) 0%, rgba(58, 28, 23, 0.52) 100%);
 }
 
-section#banner.footer-banner #footer .contact.contact-professional .contact-card-icon {
+section.banner.footer-banner #footer .contact.contact-professional .contact-card-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -26795,7 +26795,7 @@ section#banner.footer-banner #footer .contact.contact-professional .contact-card
   font-size: 1rem;
 }
 
-section#banner.footer-banner #footer .contact.contact-professional .contact-card-label {
+section.banner.footer-banner #footer .contact.contact-professional .contact-card-label {
   color: rgba(255, 214, 180, 0.82);
   font-size: 0.8rem;
   font-weight: 700;
@@ -26803,19 +26803,19 @@ section#banner.footer-banner #footer .contact.contact-professional .contact-card
   text-transform: uppercase;
 }
 
-section#banner.footer-banner #footer .contact.contact-professional .contact-card strong {
+section.banner.footer-banner #footer .contact.contact-professional .contact-card strong {
   color: #fff7f2;
   font-size: 1.08rem;
   font-weight: 700;
   line-height: 1.45;
 }
 
-section#banner.footer-banner #footer .contact.contact-professional .contact-card-copy {
+section.banner.footer-banner #footer .contact.contact-professional .contact-card-copy {
   color: rgba(255, 233, 218, 0.78);
   line-height: 1.72;
 }
 
-section#banner.footer-banner #footer .contact.contact-professional .contact-secondary-actions {
+section.banner.footer-banner #footer .contact.contact-professional .contact-secondary-actions {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -26824,9 +26824,9 @@ section#banner.footer-banner #footer .contact.contact-professional .contact-seco
   margin-top: 1.35rem;
 }
 
-section#banner.footer-banner #footer .contact.contact-professional .contact-utility-btn,
-section#banner.footer-banner #footer .contact.contact-professional .contact-social-link,
-section#banner.footer-banner #footer .contact.contact-professional .copy-again-btn {
+section.banner.footer-banner #footer .contact.contact-professional .contact-utility-btn,
+section.banner.footer-banner #footer .contact.contact-professional .contact-social-link,
+section.banner.footer-banner #footer .contact.contact-professional .copy-again-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -26841,18 +26841,18 @@ section#banner.footer-banner #footer .contact.contact-professional .copy-again-b
   transition: background 0.22s ease, border-color 0.22s ease, transform 0.22s ease;
 }
 
-section#banner.footer-banner #footer .contact.contact-professional .contact-utility-btn:hover,
-section#banner.footer-banner #footer .contact.contact-professional .contact-social-link:hover,
-section#banner.footer-banner #footer .contact.contact-professional .copy-again-btn:hover,
-section#banner.footer-banner #footer .contact.contact-professional .contact-utility-btn:focus-visible,
-section#banner.footer-banner #footer .contact.contact-professional .contact-social-link:focus-visible,
-section#banner.footer-banner #footer .contact.contact-professional .copy-again-btn:focus-visible {
+section.banner.footer-banner #footer .contact.contact-professional .contact-utility-btn:hover,
+section.banner.footer-banner #footer .contact.contact-professional .contact-social-link:hover,
+section.banner.footer-banner #footer .contact.contact-professional .copy-again-btn:hover,
+section.banner.footer-banner #footer .contact.contact-professional .contact-utility-btn:focus-visible,
+section.banner.footer-banner #footer .contact.contact-professional .contact-social-link:focus-visible,
+section.banner.footer-banner #footer .contact.contact-professional .copy-again-btn:focus-visible {
   background: rgba(255, 248, 241, 0.1);
   border-color: rgba(255, 224, 200, 0.3);
   transform: translateY(-2px);
 }
 
-section#banner.footer-banner #footer .contact.contact-professional .email-copy-box {
+section.banner.footer-banner #footer .contact.contact-professional .email-copy-box {
   display: none;
   align-items: center;
   justify-content: space-between;
@@ -26866,38 +26866,38 @@ section#banner.footer-banner #footer .contact.contact-professional .email-copy-b
   background: rgba(255, 255, 255, 0.05);
 }
 
-section#banner.footer-banner #footer .contact.contact-professional .email-copy-box.visible {
+section.banner.footer-banner #footer .contact.contact-professional .email-copy-box.visible {
   display: flex;
 }
 
-section#banner.footer-banner #footer .contact.contact-professional #emailToCopy {
+section.banner.footer-banner #footer .contact.contact-professional #emailToCopy {
   color: #fff7f0;
   font-weight: 600;
   letter-spacing: 0.02em;
   word-break: break-word;
 }
 
-section#banner.footer-banner #footer .contact.contact-professional .icon-email-btn {
+section.banner.footer-banner #footer .contact.contact-professional .icon-email-btn {
   width: auto;
   height: auto;
 }
 
 @media screen and (max-width: 980px) {
-  section#banner.footer-banner #footer .contact.contact-professional .contact-cards-grid {
+  section.banner.footer-banner #footer .contact.contact-professional .contact-cards-grid {
     grid-template-columns: 1fr;
   }
-  section#banner.footer-banner #footer .contact.contact-professional {
+  section.banner.footer-banner #footer .contact.contact-professional {
     padding: 1.3rem 1rem;
     border-radius: 22px;
   }
 }
 /* --- End professional footer contact refresh --- */
 /* --- Contact social link icon spacing --- */
-section#banner.footer-banner #footer .contact.contact-professional .contact-social-link {
+section.banner.footer-banner #footer .contact.contact-professional .contact-social-link {
   gap: 0.55rem;
 }
 
-section#banner.footer-banner #footer .contact.contact-professional .contact-social-link .icon {
+section.banner.footer-banner #footer .contact.contact-professional .contact-social-link .icon {
   font-size: 1rem;
 }
 
@@ -26923,9 +26923,9 @@ body.homepage .footer-banner::after {
 body.homepage section.inner-revolution-banner,
 body.homepage section.inner-revolution-banner::before,
 body.homepage section.inner-revolution-banner::after,
-body.homepage #banner.inner-revolution-banner,
-body.homepage #banner.inner-revolution-banner::before,
-body.homepage #banner.inner-revolution-banner::after {
+body.homepage .banner.inner-revolution-banner,
+body.homepage .banner.inner-revolution-banner::before,
+body.homepage .banner.inner-revolution-banner::after {
   position: relative;
   z-index: 3;
   background-attachment: scroll !important;

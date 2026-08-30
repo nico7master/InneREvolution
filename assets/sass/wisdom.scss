@@ -732,3 +732,145 @@ body.wisdom-page {
   .article-prevnext .pn { width: 100%; box-sizing: border-box; }
   .article-prevnext .pn.home { width: auto; order: -1; }  /* center link on top on mobile */
 }
+
+/* ============================================================
+   Practices Library extensions (shared Wisdom design system)
+   ============================================================ */
+/* At-a-Glance table — parchment definition card */
+.glance-table {
+  width: 100%;
+  margin: 2em 0 2.2em;
+  border: 1px solid rgba(146, 106, 66, 0.22);
+  border-radius: 12px;
+  background: rgba(255, 253, 247, 0.6);
+  overflow: hidden;
+  box-shadow: 0 2px 14px rgba(61, 40, 21, 0.05);
+
+  tr + tr td { border-top: 1px solid rgba(146, 106, 66, 0.14); }
+
+  td {
+    padding: 0.95em 1.3em;
+    vertical-align: baseline;
+    border-bottom: none;
+  }
+
+  td.glance-label {
+    width: 1%;                      // hug content — labels never wrap
+    white-space: nowrap;
+    font-family: 'FedraSansPro', sans-serif;
+    font-size: 0.72em;
+    font-weight: 600;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: #b0722e;
+    padding-right: 1.8em;
+
+    strong {
+      font-weight: 600;
+      color: inherit;
+      font-family: inherit;
+    }
+  }
+
+  td:not(.glance-label) {
+    font-size: 0.97em;
+    color: #4a3826;
+  }
+
+  @media (max-width: 640px) {
+    td { display: block; width: 100% !important; padding: 0.35em 1.2em; }
+    td.glance-label {
+      white-space: normal;
+      padding-top: 0.95em;
+    }
+    td:not(.glance-label) { padding-bottom: 0.95em; }
+    tr + tr td.glance-label { border-top: 1px solid rgba(146, 106, 66, 0.14); }
+  }
+}
+
+
+/* Overview comparison table (has a real header row) */
+.article-wrap table:not(.glance-table) {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.6em 0 2em;
+  font-size: 0.92em;
+
+  th {
+    text-align: left;
+    padding: 0.6em 0.8em;
+    font-family: 'FedraSansPro', sans-serif;
+    font-size: 0.85em;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #b0722e;
+    border-bottom: 2px solid rgba(176, 114, 46, 0.35);
+  }
+
+  td {
+    padding: 0.6em 0.8em;
+    border-bottom: 1px solid rgba(146, 106, 66, 0.14);
+    vertical-align: top;
+  }
+
+  @media (max-width: 768px) {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Responsive YouTube embed */
+.video-embed {
+  position: relative;
+  width: 100%;
+  padding-bottom: 56.25%;
+  margin: 1.8em 0;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 6px 22px rgba(61, 40, 21, 0.16);
+
+  iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+}
+
+/* Italic "Watch / Ansehen" link notes */
+p.watch-note {
+  font-style: italic;
+  color: rgba(74, 56, 38, 0.85);
+  font-size: 0.95em;
+}
+
+/* 30-second chooser list — arrow answers stand out */
+ul.chooser-list {
+  li {
+    margin-bottom: 0.7em;
+  }
+
+  strong {
+    color: #b0722e;
+  }
+}
+
+/* The guide block on the overview sits slightly narrower */
+.article-wrap.guide {
+  max-width: 780px;
+}
+
+/* Benefits list as final row of the glance card —
+   bullet styling comes from the template's .article-wrap ul rules (one orange dot) */
+.glance-table {
+  td .benefits-list {
+    margin: 0;
+
+    li {
+      margin: 0.35em 0;
+    }
+  }
+}

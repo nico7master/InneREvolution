@@ -232,6 +232,9 @@ function onOpen() {
     .addSeparator()
     .addItem('Setup Automation Triggers',   'setupTriggers')
     .addItem('Authorize & Test',            'authorizeAndTest')
+    .addSeparator()
+    .addItem('Form Bridge: Setup Trigger',  'setupFormBridge')
+    .addItem('Form Bridge: Dry Run Check',  'testFormBridgeDryRun')
     .addToUi();
 }
 
@@ -1554,4 +1557,283 @@ function buildDateTime(base, timeVal) {
   } else { return d; }
   d.setHours(Math.floor(mins / 60), mins % 60, 0, 0);
   return d;
+}
+
+// ─── 14. GOOGLE FORMS BRIDGE (form-link mode — Option A) ─────────────────────
+// The website runs in "form-link mode": the Register button opens an external
+// Google Form, while the old payment pipeline (doPost) stays disabled via
+// MANUAL_MODE. This bridge imports every form response into 📋 Buchungen so
+// capacity (Freie Plätze), duplicate detection, reporting and the dashboard
+// stay consistent. It is INDEPENDENT of MANUAL_MODE and controlled only by
+// the FORM_BRIDGE flag below.
+//
+// Setup (one time):
+//   1. In your Google Form: Responses → ⋮ → "Link to Sheets" (creates the
+//      response sheet; its column A header is "Timestamp"/"Zeitstempel")
+//   2. If that response spreadsheet is DIFFERENT from the booking sheet, set
+//      the Script Property RESPONSE_SHEET_ID to the response spreadsheet ID.
+//   3. Menu InneREvolution → "Form Bridge: Setup Trigger"
+//   4. Optional: "Form Bridge: Dry Run Check" previews the column mapping.
+
+var FORM_BRIDGE = true; // master switch for the form→sheet bridge
+
+// Header keywords (lowercase substring match). Columns whose header contains
+// "freund"/"friend" are always ignored (friend-name fields).
+var FORM_FIELD_KEYWORDS = {
+  name:     ['vollständiger name', 'vollstaendiger name', 'name'],
+  email:    ['e-mail', 'email', 'mail'],
+  phone:    ['telefon', 'telefonnummer', 'phone', 'handynummer', 'mobile'],
+  program:  ['programm', 'program', 'kurs', 'workshop'],
+  comments: ['anmerkung', 'comment', 'nachricht', 'message', 'frage']
+};
+
+// Map response-sheet columns to fields by header text (leftmost match wins).
+function mapFormColumns(headers) {
+  var map = { name: -1, email: -1, phone: -1, program: -1, comments: -1 };
+  for (var c = 0; c < headers.length; c++) {
+    var h = String(headers[c] || '').toLowerCase().trim();
+    if (!h || h.indexOf('freund') >= 0 || h.indexOf('friend') >= 0) continue;
+    for (var field in FORM_FIELD_KEYWORDS) {
+      if (map[field] !== -1) continue;
+      var kws = FORM_FIELD_KEYWORDS[field];
+      for (var k = 0; k < kws.length; k++) {
+        if (h.indexOf(kws[k]) >= 0) { map[field] = c; break; }
+      }
+    }
+  }
+  return map;
+}
+
+// Auto-detect the form response sheet (column A header = Timestamp/Zeitstempel).
+function findResponseSheet_(ss) {
+  var sheets = ss.getSheets();
+  for (var i = 0; i < sheets.length; i++) {
+    var h = String(sheets[i].getRange(1, 1, 1, 1).getValue() || '').toLowerCase();
+    if (h.indexOf('zeitstempel') >= 0 || h.indexOf('timestamp') >= 0) return sheets[i];
+  }
+  return null;
+}
+
+// Match a form program value to a Kursplanung row (exact pass, then contains).
+// Returns { rowIndex, id, name, row } or null.
+function matchProgram_(progData, formProgram) {
+  if (!formProgram) return null;
+  var K = COLS.KURSPLANUNG;
+  var want = String(formProgram).toLowerCase().trim();
+  if (!want) return null;
+  for (var pass = 0; pass < 2; pass++) {
+    for (var r = K.FIRST_DATA_ROW - 1; r < progData.length; r++) {
+      var name = String(progData[r][K.KURSNAME] || '').toLowerCase().trim();
+      if (!name) continue;
+      var hit = (pass === 0) ? (name === want)
+                             : (name.indexOf(want) >= 0 || want.indexOf(name) >= 0);
+      if (hit) {
+        return { rowIndex: r,
+                 id: String(progData[r][K.INSTANCE_ID] || '').trim(),
+                 name: progData[r][K.KURSNAME],
+                 row: progData[r] };
+      }
+    }
+  }
+  return null;
+}
+
+// Increment ANGEMELDET / decrement FREIE_PLATZE only when they hold static
+// numbers. Formula cells (e.g. COUNTIF over Buchungen) recalc on their own.
+function updateCapacityAfterBooking_(prog, rowIndex) {
+  var K = COLS.KURSPLANUNG;
+  try {
+    var nCell = prog.getRange(rowIndex + 1, K.ANGEMELDET + 1);
+    if (!nCell.getFormula()) {
+      var n = parseInt(nCell.getValue());
+      if (!isNaN(n)) nCell.setValue(n + 1);
+    }
+    var wCell = prog.getRange(rowIndex + 1, K.FREIE_PLATZE + 1);
+    if (!wCell.getFormula()) {
+      var w = parseInt(wCell.getValue());
+      if (!isNaN(w)) wCell.setValue(Math.max(0, w - 1));
+    }
+  } catch (ex) { Logger.log('[BRIDGE] capacity update skipped: ' + ex.message); }
+}
+
+// Write import status next to the response row (adds the column on first use).
+function markResponseRow_(respSheet, row, text) {
+  try {
+    var lastCol = Math.max(respSheet.getLastColumn(), 1);
+    var headers = respSheet.getRange(1, 1, 1, lastCol).getValues()[0];
+    var col = -1;
+    for (var c = 0; c < lastCol; c++) {
+      if (String(headers[c] || '').toLowerCase() === 'bridge status') { col = c + 1; break; }
+    }
+    if (col === -1) {
+      col = lastCol + 1;
+      respSheet.getRange(1, col).setValue('Bridge Status');
+    }
+    respSheet.getRange(row, col).setValue(text);
+  } catch (ex) { Logger.log('[BRIDGE] status write failed: ' + ex.message); }
+}
+
+// One-time setup from the spreadsheet menu. Re-running replaces the trigger.
+function setupFormBridge() {
+  var props = PropertiesService.getScriptProperties();
+  var respSsId = props.getProperty('RESPONSE_SHEET_ID') || getConfig().SHEET_ID;
+  var ss = SpreadsheetApp.openById(respSsId);
+  if (!findResponseSheet_(ss)) {
+    safeAlert('Form Bridge',
+      'Keine Formular-Antworten-Tabelle gefunden (Spalte A = Zeitstempel).\n\n'
+      + '1) Google Form → Antworten → ⋮ → "Mit Sheets verknüpfen"\n'
+      + '   (oder Script Property RESPONSE_SHEET_ID setzen)\n'
+      + '2) Setup erneut ausführen');
+    return;
+  }
+  ScriptApp.getProjectTriggers().forEach(function(t) {
+    if (t.getHandlerFunction() === 'handleFormResponse') ScriptApp.deleteTrigger(t);
+  });
+  ScriptApp.newTrigger('handleFormResponse').forSpreadsheet(respSsId).onFormSubmit().create();
+  safeAlert('Form Bridge', 'Trigger installiert.\n\nJede neue Formular-Antwort wird jetzt automatisch in 📋 Buchungen importiert, Freie Plätze aktualisiert und du erhältst eine Benachrichtigungs-E-Mail.');
+}
+
+// Dry run: shows how the current response sheet would be mapped and parsed.
+function testFormBridgeDryRun() {
+  var props = PropertiesService.getScriptProperties();
+  var respSsId = props.getProperty('RESPONSE_SHEET_ID') || getConfig().SHEET_ID;
+  var ss = SpreadsheetApp.openById(respSsId);
+  var resp = findResponseSheet_(ss);
+  if (!resp) { safeAlert('Form Bridge', 'Keine Antworten-Tabelle gefunden.'); return; }
+  var lastCol = Math.max(resp.getLastColumn(), 1);
+  var headers = resp.getRange(1, 1, 1, lastCol).getValues()[0];
+  var map = mapFormColumns(headers);
+  var lines = ['Spalten-Zuordnung (' + resp.getName() + '):'];
+  for (var f in map) {
+    lines.push('  ' + f + ' → ' + (map[f] >= 0 ? headers[map[f]] : 'NICHT GEFUNDEN')); 
+  }
+  var lastRow = resp.getLastRow();
+  if (lastRow > 1) {
+    var rowVals = resp.getRange(lastRow, 1, 1, lastCol).getValues()[0];
+    lines.push('');
+    lines.push('Letzte Antwort (Zeile ' + lastRow + '):');
+    lines.push('  Name: ' + (map.name >= 0 ? rowVals[map.name] : '?'));
+    lines.push('  E-Mail: ' + (map.email >= 0 ? rowVals[map.email] : '?'));
+    lines.push('  Telefon: ' + (map.phone >= 0 ? rowVals[map.phone] : '?'));
+    lines.push('  Programm: ' + (map.program >= 0 ? rowVals[map.program] : '?'));
+  } else {
+    lines.push('');
+    lines.push('(Noch keine Antworten zum Testen vorhanden)');
+  }
+  safeAlert('Form Bridge — Dry Run', lines.join('\n'));
+}
+
+// Bridge handler — installable trigger, fires on every form submission.
+function handleFormResponse(e) {
+  if (!FORM_BRIDGE) return;
+  var lock = LockService.getScriptLock();
+  try {
+    if (!lock.tryLock(10000)) { Logger.log('[BRIDGE] lock busy — skipped'); return; }
+    var cfg = getConfig();
+    var K = COLS.KURSPLANUNG, B = COLS.BUCHUNGEN;
+    var respSheet = e && e.range ? e.range.getSheet() : null;
+    if (!respSheet) { Logger.log('[BRIDGE] no range in event'); return; }
+
+    var lastCol = Math.max(respSheet.getLastColumn(), 1);
+    var headers = respSheet.getRange(1, 1, 1, lastCol).getValues()[0];
+    var rowVals = respSheet.getRange(e.range.getRow(), 1, 1, lastCol).getValues()[0];
+    var map = mapFormColumns(headers);
+
+    var data = {
+      fullName: map.name     >= 0 ? String(rowVals[map.name]  || '').trim() : '',
+      email:    map.email    >= 0 ? String(rowVals[map.email] || '').trim() : '',
+      phone:    map.phone    >= 0 ? String(rowVals[map.phone] || '').trim() : '',
+      program:  map.program  >= 0 ? String(rowVals[map.program] || '').trim() : '',
+      comments: map.comments >= 0 ? String(rowVals[map.comments] || '').trim() : ''
+    };
+    Logger.log('[BRIDGE] response: ' + data.fullName + ' / ' + data.email + ' / program=' + data.program);
+
+    if (!data.email || !isValidEmail(data.email)) {
+      logError('handleFormResponse', new Error('no valid email in form response'), data);
+      sendErrorAlert('Form Bridge (ungültige E-Mail)', new Error('Antwort ohne gültige E-Mail — bitte manuell prüfen'), data);
+      markResponseRow_(respSheet, e.range.getRow(), 'Keine gültige E-Mail — manuell prüfen');
+      return;
+    }
+
+    var ss   = SpreadsheetApp.openById(cfg.SHEET_ID);
+    var prog = ss.getSheetByName('🧘 Kursplanung') || ss.getSheetByName('Programs');
+    var book = ss.getSheetByName('📋 Buchungen')  || ss.getSheetByName('Bookings');
+    if (!prog || !book) {
+      sendErrorAlert('Form Bridge', new Error('Tab 📋 Buchungen oder 🧘 Kursplanung fehlt'), data);
+      return;
+    }
+
+    var progData = prog.getDataRange().getValues();
+    var match = matchProgram_(progData, data.program);
+
+    // Capacity guard — same rule as the integrated pipeline (prevents overbooking)
+    if (match) {
+      var spotsLeft = parseInt(match.row[K.FREIE_PLATZE]);
+      if (!isNaN(spotsLeft) && spotsLeft <= 0) {
+        sendErrorAlert('Form Bridge — AUSGEBUCHT', new Error('"' + match.name + '" ist voll. Bitte das Formular schließen!'), data);
+        markResponseRow_(respSheet, e.range.getRow(), 'Ausgebucht — nicht importiert');
+        return;
+      }
+    }
+
+    // Duplicate guard (same email + program, not cancelled)
+    var bookData = book.getDataRange().getValues();
+    var emailKey = data.email.toLowerCase();
+    var wantName = String(match ? match.name : data.program).toLowerCase().trim();
+    for (var b = 1; b < bookData.length; b++) {
+      var st = String(bookData[b][B.STATUS] || '').toLowerCase();
+      if (st === 'cancelled') continue;
+      var sameEmail = String(bookData[b][B.EMAIL]).toLowerCase().trim() === emailKey;
+      var sameProg  = match
+        ? String(bookData[b][B.INSTANCE_ID]).trim() === String(match.id).trim()
+        : String(bookData[b][B.KURSNAME]).toLowerCase().trim() === wantName;
+      if (sameEmail && sameProg) {
+        Logger.log('[BRIDGE] duplicate skipped: ' + data.email);
+        markResponseRow_(respSheet, e.range.getRow(), 'Duplikat — übersprungen');
+        return;
+      }
+    }
+
+    var bookingId = 'BK-' + Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyyMMdd-HHmmss')
+                  + '-' + Utilities.getUuid().substring(0, 4).toUpperCase();
+    var basePrice = match
+      ? (parseFloat(String(match.row[K.PREIS_TN]).replace(/[^0-9.,]/g, '').replace(',', '.')) || 0)
+      : 0;
+
+    book.appendRow([
+      new Date(),              // A  Datum
+      data.fullName,           // B  Name
+      data.email,              // C  Email
+      data.phone,              // D  Telefon
+      match ? match.id : '',   // E  Instance ID
+      match ? match.name : (data.program || 'UNASSIGNED'), // F Kursname
+      '',                      // G  Rabattcode
+      0, 0, 0,                 // H/I/J Rabatt (form flow: payment outside the sheet)
+      basePrice,               // K  Final EUR (informational)
+      'MANUAL',                // L  Payment Sent (payment handled by form flow)
+      'NO',                    // M  Bezahlt
+      'NO',                    // N  Intake gesendet
+      0, '', 'NO', '', 'NO',   // O–S Freunde / Referral
+      bookingId,               // T  Booking ID
+      'active'                 // U  Status
+    ]);
+
+    if (match) updateCapacityAfterBooking_(prog, match.rowIndex);
+    markResponseRow_(respSheet, e.range.getRow(), 'Importiert als ' + bookingId);
+
+    // Instructor notification — reuses the existing email template
+    try {
+      var progLabel = match ? match.name : ((data.program || 'UNASSIGNED') + ' — Programm bitte zuordnen!');
+      sendInstructorNotification(
+        { fullName: data.fullName, email: data.email, phone: data.phone || '—', comments: data.comments },
+        progLabel, basePrice, cfg.INSTRUCTOR_EMAIL);
+    } catch (err) { logError('handleFormResponse:notify', err, data); }
+
+    Logger.log('[BRIDGE] imported ' + bookingId);
+  } catch (err) {
+    logError('handleFormResponse', err);
+    try { sendErrorAlert('Form Bridge', err, {}); } catch (e2) {}
+  } finally {
+    try { lock.releaseLock(); } catch (e2) {}
+  }
 }

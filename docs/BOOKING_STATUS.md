@@ -66,6 +66,29 @@ Add a new row with:
 
 ---
 
+## 🔗 FORM BRIDGE (v76 — Option A, current workflow)
+
+The Register button opens an external Google Form. The Apps Script bridge
+imports every form response into 📋 Buchungen automatically:
+
+- Column mapping by header keywords (DE + EN), friend columns ignored
+- Program matched by name (exact, then contains) against Kursplanung
+- Capacity guard (rejects when Freie Plätze = 0) + auto-updates counts
+  (only touches static number cells, never formulas)
+- Duplicate guard (same email + program, cancelled excluded)
+- Booking ID, instructor email, Bridge Status column in the response sheet
+
+Setup (one time, after `clasp push`):
+1. Google Form → Responses → ⋮ → "Link to Sheets" (if not already)
+2. If the response spreadsheet differs from the booking sheet, set Script
+   Property `RESPONSE_SHEET_ID` to the response spreadsheet ID
+3. In the booking spreadsheet: menu **InneREvolution → Form Bridge: Setup Trigger**
+4. Optional: **Form Bridge: Dry Run Check** previews the column mapping
+
+Independent of MANUAL_MODE — controlled by the `FORM_BRIDGE` flag in code.
+
+---
+
 ## 🟡 TODO — MEDIUM PRIORITY
 
 - [ ] **Switch to dedicated booking platform** (Calendly / Acuity) for regular classes

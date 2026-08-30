@@ -244,4 +244,182 @@
     <xhtml:link rel="alternate" hreflang="de" href="https://innerevolutionyoga.life/de/wisdom/the-body-remembers/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://innerevolutionyoga.life/wisdom/the-body-remembers/"/>
   </url>
-  </urlset>
+  
+  <!-- Practices Library (EN) -->
+  <url>
+    <loc>https://innerevolutionyoga.life/practices/</loc>
+    <lastmod>2026-08-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://innerevolutionyoga.life/practices/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://innerevolutionyoga.life/de/practices/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://innerevolutionyoga.life/practices/" />
+  </url>
+
+  <!-- Practices Library (DE) -->
+  <url>
+    <loc>https://innerevolutionyoga.life/de/practices/</loc>
+    <lastmod>2026-08-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://innerevolutionyoga.life/practices/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://innerevolutionyoga.life/de/practices/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://innerevolutionyoga.life/practices/" />
+  </url>
+
+  <!-- Practice: Upa Yoga (EN) -->
+  <url>
+    <loc>https://innerevolutionyoga.life/practices/upa-yoga/</loc>
+    <lastmod>2026-08-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://innerevolutionyoga.life/practices/upa-yoga/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://innerevolutionyoga.life/de/practices/upa-yoga/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://innerevolutionyoga.life/practices/upa-yoga/" />
+    <image:image>
+      <image:loc>https://innerevolutionyoga.life/images/Yoga/UpaYoga.jpg</image:loc>
+      <image:title>Upa Yoga</image:title>
+    </image:image>
+  </url>
+
+  <!-- Practice: Upa Yoga (DE) -->
+  <url>
+    <loc>https://innerevolutionyoga.life/de/practices/upa-yoga/</loc>
+    <lastmod>2026-08-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://innerevolutionyoga.life/practices/upa-yoga/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://innerevolutionyoga.life/de/practices/upa-yoga/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://innerevolutionyoga.life/practices/upa-yoga/" />
+  </url>
+
+  <!-- Practice: Surya Kriya (EN) -->
+  <url>
+    <loc>https://innerevolutionyoga.life/practices/surya-kriya/</loc>
+    <lastmod>2026-08-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://innerevolutionyoga.life/practices/surya-kriya/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://innerevolutionyoga.life/de/practices/surya-kriya/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://innerevolutionyoga.life/practices/surya-kriya/" />
+    <image:image>
+      <image:loc>https://innerevolutionyoga.life/images/Yoga/SuryaKriya2.jpg</image:loc>
+      <image:title>Surya Kriya</image:title>
+    </image:image>
+  </url>
+
+  <!-- Practice: Surya Kriya (DE) -->
+  <url>
+    <loc>https://innerevolutionyoga.life/de/practices/surya-kriya/</loc>
+    <lastmod>2026-08-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://innerevolutionyoga.life/practices/surya-kriya/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://innerevolutionyoga.life/de/practices/surya-kriya/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://innerevolutionyoga.life/practices/surya-kriya/" />
+  </url>
+
+  <!-- Practice: Surya Shakti (EN) -->
+  <url>
+    <loc>https://innerevolutionyoga.life/practices/surya-shakti/</loc>
+    <lastmod>2026-08-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://innerevolutionyoga.life/practices/surya-shakti/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://innerevolutionyoga.life/de/practices/surya-shakti/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://innerevolutionyoga.life/practices/surya-shakti/" />
+    <image:image>
+      <image:loc>https://innerevolutionyoga.life/images/Yoga/SuryaShakti.jpg</image:loc>
+      <image:title>Surya Shakti</image:title>
+    </image:image>
+  </url>
+
+  <!-- Practice: Surya Shakti (DE) -->
+  <url>
+    <loc>https://innerevolutionyoga.life/de/practices/surya-shakti/</loc>
+    <lastmod>2026-08-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://innerevolutionyoga.life/practices/surya-shakti/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://innerevolutionyoga.life/de/practices/surya-shakti/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://innerevolutionyoga.life/practices/surya-shakti/" />
+  </url>
+
+  <!-- Practice: Angamardana (EN) -->
+  <url>
+    <loc>https://innerevolutionyoga.life/practices/angamardana/</loc>
+    <lastmod>2026-08-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://innerevolutionyoga.life/practices/angamardana/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://innerevolutionyoga.life/de/practices/angamardana/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://innerevolutionyoga.life/practices/angamardana/" />
+    <image:image>
+      <image:loc>https://innerevolutionyoga.life/images/Yoga/Angamardana.jpg</image:loc>
+      <image:title>Angamardana</image:title>
+    </image:image>
+  </url>
+
+  <!-- Practice: Angamardana (DE) -->
+  <url>
+    <loc>https://innerevolutionyoga.life/de/practices/angamardana/</loc>
+    <lastmod>2026-08-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://innerevolutionyoga.life/practices/angamardana/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://innerevolutionyoga.life/de/practices/angamardana/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://innerevolutionyoga.life/practices/angamardana/" />
+  </url>
+
+  <!-- Practice: Yogasanas (EN) -->
+  <url>
+    <loc>https://innerevolutionyoga.life/practices/yogasanas/</loc>
+    <lastmod>2026-08-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://innerevolutionyoga.life/practices/yogasanas/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://innerevolutionyoga.life/de/practices/yogasanas/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://innerevolutionyoga.life/practices/yogasanas/" />
+    <image:image>
+      <image:loc>https://innerevolutionyoga.life/images/Yoga/Yogasanas.png</image:loc>
+      <image:title>Yogasanas</image:title>
+    </image:image>
+  </url>
+
+  <!-- Practice: Yogasanas (DE) -->
+  <url>
+    <loc>https://innerevolutionyoga.life/de/practices/yogasanas/</loc>
+    <lastmod>2026-08-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://innerevolutionyoga.life/practices/yogasanas/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://innerevolutionyoga.life/de/practices/yogasanas/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://innerevolutionyoga.life/practices/yogasanas/" />
+  </url>
+
+  <!-- Practice: Bhuta Shuddhi (EN) -->
+  <url>
+    <loc>https://innerevolutionyoga.life/practices/bhuta-shuddhi/</loc>
+    <lastmod>2026-08-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://innerevolutionyoga.life/practices/bhuta-shuddhi/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://innerevolutionyoga.life/de/practices/bhuta-shuddhi/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://innerevolutionyoga.life/practices/bhuta-shuddhi/" />
+    <image:image>
+      <image:loc>https://innerevolutionyoga.life/images/Yoga/BhutaShuddhi.png</image:loc>
+      <image:title>Bhuta Shuddhi</image:title>
+    </image:image>
+  </url>
+
+  <!-- Practice: Bhuta Shuddhi (DE) -->
+  <url>
+    <loc>https://innerevolutionyoga.life/de/practices/bhuta-shuddhi/</loc>
+    <lastmod>2026-08-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://innerevolutionyoga.life/practices/bhuta-shuddhi/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://innerevolutionyoga.life/de/practices/bhuta-shuddhi/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://innerevolutionyoga.life/practices/bhuta-shuddhi/" />
+  </url>
+</urlset>

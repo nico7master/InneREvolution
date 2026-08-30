@@ -345,7 +345,10 @@ function buildCard(p) {
                 if (formUrl) {
                   // Append program name as query param for form pre-fill
                   const separator = formUrl.includes('?') ? '&' : '?';
-                  const url = formUrl + separator + 'program=' + encodeURIComponent(p.name);
+                  // Google Forms prefill needs the real entry ID (CONFIG.FORM_PROGRAM_ENTRY, from
+                  // the form's "Get pre-filled link") - fall back to ?program= for other form providers
+                  const programParam = CONFIG.FORM_PROGRAM_ENTRY || 'program';
+                  const url = formUrl + separator + programParam + '=' + encodeURIComponent(p.name);
                   return `<a href="${url}" target="_blank" rel="noopener" class="btn-register btn-register-link">${bs('registerBtn')}</a>`;
                 } else {
                   // No form URL configured — show disabled button
