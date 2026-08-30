@@ -774,6 +774,18 @@ body.wisdom-page {
   border: 0;
 }
 
+/* Practice-name links inside the comparison table — house style, no browser blue */
+.compare-table a {
+  color: #7a4a1e;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(176, 114, 46, 0.35);
+  transition: color 0.25s ease, border-color 0.25s ease;
+}
+.compare-table a:hover {
+  color: #da782e;
+  border-bottom-color: #da782e;
+}
+
 /* Overview comparison table — stacks into cards on mobile */
 @media (max-width: 736px) {
   .compare-table {
@@ -849,6 +861,16 @@ p.watch-note {
   font-style: italic;
   color: rgba(74, 56, 38, 0.85);
   font-size: 0.95em;
+}
+p.watch-note a {
+  color: #7a4a1e;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(176, 114, 46, 0.35);
+  transition: color 0.25s ease, border-color 0.25s ease;
+}
+p.watch-note a:hover {
+  color: #da782e;
+  border-bottom-color: #da782e;
 }
 
 /* 30-second chooser list — arrow answers stand out */
