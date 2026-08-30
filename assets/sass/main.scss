@@ -18577,6 +18577,17 @@ section.carousel-shell > .inner,
   color: #c9d6c6;
 }
 
+/* Entire program card clickable — the title link stretches over the whole slide.
+   Scope: #carousel .mySwiper only (programs slider); the readings slider keeps
+   its own .article-card-link system. Slide is position:relative + overflow:hidden,
+   decorative overlays are pointer-events:none, so this overlay is the click target. */
+#carousel .mySwiper .swiper-slide h3 a::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+}
+
 .swiper-slide p {
   margin: 0;
   padding: 0;  /* removed — was adding extra left/bottom space inside cards */
