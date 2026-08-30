@@ -774,6 +774,52 @@ body.wisdom-page {
   border: 0;
 }
 
+/* Overview comparison table — stacks into cards on mobile */
+@media (max-width: 736px) {
+  .compare-table {
+    display: block;
+  }
+  .compare-table thead {
+    display: none;
+  }
+  .compare-table tbody {
+    display: block;
+  }
+  .compare-table tr {
+    display: block;
+    padding: 1em 0;
+    border-bottom: 1px solid rgba(146, 106, 66, 0.18);
+  }
+  .compare-table tr:last-child {
+    border-bottom: none;
+  }
+  .compare-table td {
+    display: block;
+    padding: 0.15em 0;
+    border-bottom: none;
+  }
+  .compare-table td[data-label]::before {
+    content: attr(data-label);
+    display: block;
+    font-family: "FedraSansPro", sans-serif;
+    font-size: 0.72em;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #b0722e;
+    margin: 0.7em 0 0.25em;
+  }
+  .compare-table td:first-child {
+    font-size: 1.05em;
+    padding-bottom: 0.2em;
+  }
+  .compare-table td:first-child::before {
+    display: none;
+  }
+  .compare-table td:last-child::after {
+    content: none;
+  }
+}
+
 /* Practice hero image — mounted plate at top of article panel */
 .practice-hero-media {
   margin: 0 0 2em;

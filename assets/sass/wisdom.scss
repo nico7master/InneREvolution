@@ -840,6 +840,53 @@ body.wisdom-page {
   }
 }
 
+/* Overview comparison table — stacks into cards on mobile */
+.compare-table {
+  @media (max-width: 736px) {
+    display: block;
+
+    thead { display: none; }
+
+    tbody {
+      display: block;
+    }
+
+    tr {
+      display: block;
+      padding: 1em 0;
+      border-bottom: 1px solid rgba(146, 106, 66, 0.18);
+
+      &:last-child { border-bottom: none; }
+    }
+
+    td {
+      display: block;
+      padding: 0.15em 0;
+      border-bottom: none;
+
+      &[data-label]::before {
+        content: attr(data-label);
+        display: block;
+        font-family: 'FedraSansPro', sans-serif;
+        font-size: 0.72em;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #b0722e;
+        margin: 0.7em 0 0.25em;
+      }
+
+      &:first-child {
+        font-size: 1.05em;
+        padding-bottom: 0.2em;
+
+        &::before { display: none; }
+      }
+
+      &:last-child::after { content: none; }
+    }
+  }
+}
+
 /* Practice hero image — mounted plate at top of article panel */
 .practice-hero-media {
   margin: 0 0 2em;
