@@ -774,6 +774,30 @@ body.wisdom-page {
   border: 0;
 }
 
+/* Practice hero image — mounted plate at top of article panel */
+.practice-hero-media {
+  margin: 0 0 2em;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(60, 40, 20, 0.2);
+  box-shadow: 0 6px 22px rgba(61, 40, 21, 0.16);
+  background: #fbf6ea;
+}
+.practice-hero-media img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.practice-hero-media figcaption {
+  font-family: "FedraSansPro", sans-serif;
+  font-style: italic;
+  font-size: 0.88em;
+  color: rgba(74, 56, 38, 0.8);
+  padding: 0.6em 1.1em;
+  border-top: 1px solid rgba(146, 106, 66, 0.16);
+  background: rgba(255, 253, 247, 0.9);
+}
+
 /* Italic "Watch / Ansehen" link notes */
 p.watch-note {
   font-style: italic;
