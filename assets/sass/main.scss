@@ -20196,9 +20196,11 @@ section#Bio,
   line-height: 1.2;
   letter-spacing: 0.01em;
   color: #3c2f1f;
-  /* Break only at explicit <br> tags — size to natural text width, cap at parent */
-  white-space: nowrap;
+  /* Break at explicit <br> tags, but allow wrapping when a segment is
+     wider than the container (prevents overflow at wide/short viewports) */
+  white-space: normal;
   max-width: 100%;
+  overflow-wrap: break-word;
 }
 
 .inner-revolution-banner .quote-text p {
@@ -22571,53 +22573,34 @@ body.low-fps {
   }
 }
 
-/* ─── Bio: perfect three-element alignment grid (desktop) ───
-   .bio-shell becomes the master 2-col grid; .bio-intro-grid dissolves via
-   display:contents. Statement box = column 1 row 1 (same width as the
-   Namaskaram panel below), portrait = column 2 spanning both rows,
-   Namaskaram panel stretches to meet the portrait's bottom edge exactly. */
+/* ─── Bio desktop: statement full-width on top; Namaskaram + portrait side by side, equal height ─── */
 @media screen and (min-width: 981px) {
-  #Bio .bio-shell {
-    display: grid;
-    grid-template-columns: minmax(0, 0.85fr) minmax(280px, 0.74fr);
-    grid-template-rows: auto 1fr;
-    gap: clamp(1rem, 2vw, 1.5rem) clamp(1.35rem, 2.8vw, 2rem) !important;
-    align-items: stretch;
-  }
-
+  /* Exact same height for box + image, no crop — MEASURED, not guessed:
+     text at 500px column = 779px natural height (pixel-measured on isolated page).
+     Image scales to that height: 779 / 2.032 (natural ratio 1641:3334) = 383px wide.
+     Row = 499(text) + 35(gap) + 383(image) = 917px → max-width 57.4rem.
+     Box and image BOTH locked to 48.7rem (779px) → identical heights, full picture. */
   #Bio .bio-intro-grid {
-    display: contents;
-  }
-
-  #Bio .bio-panel--vision {
-    grid-column: 1;
-    grid-row: 1;
-    margin-top: 0 !important; /* aligned to the grid's top edge like the portrait */
+    max-width: 57.4rem;
+    margin-left: auto;
+    margin-right: auto;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
   }
 
   #Bio .bio-panel--intro {
-    grid-column: 1;
-    grid-row: 2;
-    height: 100%; /* always exactly the portrait's height */
-  }
-
-  #Bio .bio-portrait {
-    grid-column: 2;
-    grid-row: 1 / span 2;
+    height: 48.7rem;
     display: flex;
     flex-direction: column;
-  }
-
-  #Bio .bio-portrait-frame {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
+    justify-content: center;
   }
 
   #Bio .bio-portrait-frame .side-image {
-    flex: 1;
-    height: 100%;
-    object-fit: cover;
+    height: 48.7rem !important;
+    width: auto !important;
+    max-height: none !important;
+    aspect-ratio: 1641 / 3334; /* full picture, scaled to the box height — never cropped */
+    object-fit: fill !important;
   }
 }
 
@@ -22639,3 +22622,27 @@ body.low-fps {
     padding-right: 0.45rem !important;
   }
 }
+
+/* ─── Bio desktop: tighten Namaskaram panel vertical rhythm ─── */
+@media screen and (min-width: 981px) {
+  #Bio .bio-panel--intro {
+    padding-top: 1.15rem !important;
+    padding-bottom: 1.15rem !important;
+  }
+
+  #Bio .bio-panel--intro h2 {
+    margin-bottom: 0.4rem !important;
+  }
+
+  #Bio .bio-panel--intro .bio-mantra-meaning {
+    margin: 0 0 0.9rem !important;
+  }
+
+  #Bio .bio-panel--intro p {
+    margin-bottom: 0.7rem !important;
+  }
+}
+
+
+
+
