@@ -18847,33 +18847,21 @@ section.banner,
   background: linear-gradient(180deg, #eef6fc 0%, #e4f0fa 45%, #edf4f9 100%);
 }
 
+/* Outer card removed — bio panels + portrait sit directly on the section
+   wallpaper; no box wrapping the whole group */
 #Bio {
   position: relative;
   isolation: isolate;
-  max-width: min(1120px, calc(100% - 2rem));
+  max-width: 100%;
   margin: 0 auto;
-  padding: clamp(2rem, 4vw, 3.25rem);
-  border-radius: 2.2rem;
+  padding: clamp(1.25rem, 3vw, 2rem) 0.25rem;
+  background: none !important;
+  box-shadow: none !important;
   overflow: hidden;
-  background-color: #10243a !important;
-  background-image:
-    linear-gradient(135deg, rgba(8, 23, 39, 0.25), rgba(8, 37, 63, 0.30) 48%, rgba(40, 136, 201, 0.20) 100%) !important;
-  background-position: center center !important;
-  background-repeat: no-repeat !important;
-  background-size: cover !important;
-  box-shadow: 0 34px 80px rgba(20, 47, 75, 0.24);
 }
 
 #Bio::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(circle at 14% 18%, rgba(116, 208, 255, 0.20), transparent 26%),
-    radial-gradient(circle at 84% 14%, rgba(76, 176, 255, 0.18), transparent 24%),
-    linear-gradient(180deg, rgba(5, 12, 20, 0.08), rgba(5, 12, 20, 0.24));
-  z-index: 0;
-  pointer-events: none;
+  content: none;
 }
 
 #Bio .bio-shell {
@@ -19022,7 +19010,7 @@ section.banner,
 
 @media screen and (max-width: 736px) {
   .bio-wrapper {
-    padding-inline: 1rem;
+    padding-inline: 0.25rem;
   }
 
   .inner-revolution-banner {
@@ -19030,8 +19018,8 @@ section.banner,
   }
 
   #Bio {
-    max-width: calc(100% - 1rem);
-    padding: 1.35rem;
+    max-width: 100%;
+    padding: 1.35rem 0.25rem;
     border-radius: 1.6rem;
   }
 
@@ -19097,15 +19085,10 @@ section.banner,
 /* --- End shared section particle canvas --- */
 
 /* --- Final bio layout polish: centered intro text, clean background, caps heading, larger ® --- */
+/* outer #Bio box paint removed */
 section#Bio,
 #Bio {
-  background-color: #10243a !important;
-  background-image:
-    linear-gradient(135deg, rgba(8, 23, 39, 0.82), rgba(8, 37, 63, 0.60) 48%, rgba(40, 136, 201, 0.34) 100%),
-    url("../../images/backgrounds/BackgroundBio.webp") !important;
-  background-position: center center !important;
-  background-repeat: no-repeat !important;
-  background-size: cover !important;
+  background: none !important;
 }
 
 #Bio .bio-panel--intro {
@@ -19141,15 +19124,10 @@ section#Bio,
 }
 
 /* --- Final bio correction reapplied: wallpaper-411edited + transparent portrait --- */
+/* outer #Bio box paint removed */
 section#Bio,
 #Bio {
-  background-color: #10243a !important;
-  background-image:
-    linear-gradient(135deg, rgba(8, 23, 39, 0.25), rgba(8, 37, 63, 0.30) 48%, rgba(40, 136, 201, 0.20) 100%),
-    url("../../images/backgrounds/wallpaper-411edited.webp") !important;
-  background-position: center center !important;
-  background-repeat: no-repeat !important;
-  background-size: cover !important;
+  background: none !important;
 }
 
 #Bio .bio-portrait-frame,
@@ -19191,15 +19169,10 @@ section#Bio,
   z-index: 1;
 }
 
+/* outer #Bio box paint removed */
 section#Bio,
 #Bio {
-  background-color: #10243a !important;
-  background-image:
-    linear-gradient(135deg, rgba(8, 23, 39, 0.78), rgba(8, 37, 63, 0.52) 48%, rgba(40, 136, 201, 0.26) 100%),
-    url("../../images/backgrounds/BackgroundBio.webp") !important;
-  background-position: center center !important;
-  background-repeat: no-repeat !important;
-  background-size: cover !important;
+  background: none !important;
 }
 
 #Bio::before {
@@ -19249,15 +19222,10 @@ section#Bio,
   z-index: 1;
 }
 
+/* outer #Bio box paint removed */
 section#Bio,
 #Bio {
-  background-color: #10243a !important;
-  background-image:
-    linear-gradient(135deg, rgba(8, 23, 39, 0.78), rgba(8, 37, 63, 0.52) 48%, rgba(40, 136, 201, 0.26) 100%),
-    url("../../images/backgrounds/BackgroundBio.webp") !important;
-  background-position: center center !important;
-  background-repeat: no-repeat !important;
-  background-size: cover !important;
+  background: none !important;
 }
 
 #Bio .bio-portrait-frame,
@@ -19299,17 +19267,10 @@ section#Bio,
   z-index: 1;
 }
 
+/* outer #Bio box paint removed (wallpaper variant) */
 section#Bio,
 #Bio {
-  background-color: #10243a !important;
-  background-image:
-    radial-gradient(circle at 16% 18%, rgba(120, 214, 255, 0.22), transparent 28%),
-    radial-gradient(circle at 84% 16%, rgba(89, 173, 255, 0.18), transparent 24%),
-    linear-gradient(135deg, rgba(8, 23, 39, 0.88), rgba(8, 37, 63, 0.72) 48%, rgba(40, 136, 201, 0.52) 100%),
-    url("../../images/backgrounds/wallpaper-411edited.webp") !important;
-  background-position: center center !important;
-  background-repeat: no-repeat !important;
-  background-size: cover !important;
+  background: none !important;
 }
 
 #Bio .bio-portrait-frame,
@@ -20862,7 +20823,7 @@ section.banner.footer-banner .contact p {
 }
 
 #Bio .bio-panel {
-  padding: clamp(1.15rem, 2vw, 1.75rem) !important;
+  padding: clamp(1.15rem, 2vw, 1.75rem) clamp(0.85rem, 3vw, 1.1rem) !important;
 }
 
 #Bio .bio-panel--vision {
@@ -22565,5 +22526,116 @@ body.low-fps {
     right: auto;
     left: 1.2rem;
     top: 1rem;
+  }
+}
+
+/* ─── Readings slider: explicit tablet-range lock (737–980px) ───
+   Keeps the full slider behavior in the middle band: fixed 340px cards,
+   nowrap wrapper, no legacy grid widths, visible pagination space. */
+@media screen and (min-width: 737px) and (max-width: 980px) {
+  .readings-wrapper .readingsSwiper {
+    width: 100%;
+    max-width: none;
+    overflow: hidden;
+    padding: 0 0 2.25rem; /* room for pagination dots, same as mobile */
+    box-sizing: border-box;
+  }
+
+  .readings-wrapper #Readings .row.swiper-wrapper {
+    flex-wrap: nowrap !important;
+    gap: 0 !important;
+    overflow: visible !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Neutralize the legacy 2-col grid width rule at this band —
+     Swiper slides stay fixed-width and centered via spaceBetween */
+  .readings-wrapper #Readings .row > article.special,
+  .readings-wrapper #Readings .row > article,
+  .readings-wrapper #Readings .row article {
+    width: 340px !important;
+    flex: 0 0 340px !important;
+    max-width: 340px !important;
+    min-width: 340px !important;
+    height: 695px !important;
+    margin: 0 !important;
+  }
+
+  .readings-wrapper #Readings .row article.swiper-slide .image.featured {
+    height: 220px !important;
+  }
+
+  .readings-pagination {
+    bottom: 0;
+  }
+}
+
+/* ─── Bio: perfect three-element alignment grid (desktop) ───
+   .bio-shell becomes the master 2-col grid; .bio-intro-grid dissolves via
+   display:contents. Statement box = column 1 row 1 (same width as the
+   Namaskaram panel below), portrait = column 2 spanning both rows,
+   Namaskaram panel stretches to meet the portrait's bottom edge exactly. */
+@media screen and (min-width: 981px) {
+  #Bio .bio-shell {
+    display: grid;
+    grid-template-columns: minmax(0, 0.85fr) minmax(280px, 0.74fr);
+    grid-template-rows: auto 1fr;
+    gap: clamp(1rem, 2vw, 1.5rem) clamp(1.35rem, 2.8vw, 2rem) !important;
+    align-items: stretch;
+  }
+
+  #Bio .bio-intro-grid {
+    display: contents;
+  }
+
+  #Bio .bio-panel--vision {
+    grid-column: 1;
+    grid-row: 1;
+    margin-top: 0 !important; /* aligned to the grid's top edge like the portrait */
+  }
+
+  #Bio .bio-panel--intro {
+    grid-column: 1;
+    grid-row: 2;
+    height: 100%; /* always exactly the portrait's height */
+  }
+
+  #Bio .bio-portrait {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    display: flex;
+    flex-direction: column;
+  }
+
+  #Bio .bio-portrait-frame {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  #Bio .bio-portrait-frame .side-image {
+    flex: 1;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+/* ─── Bio mobile: panels extend to the screen edges (like Sadhguru section) ─── */
+@media screen and (max-width: 736px) {
+  #Bio {
+    max-width: 100% !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  #Bio .bio-panel {
+    padding-left: 0.45rem !important;
+    padding-right: 0.45rem !important;
+  }
+
+  #Bio .bio-panel--intro {
+    padding-left: 0.45rem !important;
+    padding-right: 0.45rem !important;
   }
 }

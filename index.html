@@ -35,7 +35,7 @@
     />
     <link rel="preload" href="assets/webfonts/GrandifloraOne-Regular.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="assets/webfonts/DeliusSwashCaps-Regular.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="stylesheet" href="assets/css/main.css?v=202608300428" />
+    <link rel="stylesheet" href="assets/css/main.css?v=202609011410" />
     <link rel="stylesheet" href="assets/css/swiper-bundle.min.css" />
     
     <link rel="preload" href="images/backgrounds/wallpaper-1981.jpeg" as="image" />
@@ -806,7 +806,7 @@
 
       <!-- Bio -->
       <div class="wrapper style2 bio-wrapper shared-particles" data-theme="sky">
-        <article id="Bio" class="container special">
+        <article id="Bio">
           <div class="bio-shell">
             <section class="bio-panel bio-panel--vision">
               <h3>INNE<span class="bio-mark">&reg;</span>EVOLUTION</h3>
@@ -1427,8 +1427,30 @@
       <script src="assets/js/util.js"></script>
       <script src="assets/js/i18n.js"></script>
     <script src="booking/config.js"></script>
-    <script src="assets/js/main.js?v=202608302"></script>
+    <script src="assets/js/main.js?v=202609011410"></script>
   <script src="assets/js/swiper-bundle.min.js"></script>
+<script>
+  /* Inline readings-slider init — mirrors the .mySwiper pattern: guaranteed
+     to run with fresh code on every page load, independent of cached main.js */
+  (function() {
+    window._readingsSwiper = new Swiper(".readingsSwiper", {
+      slidesPerView: "auto",
+      spaceBetween: 16,
+      grabCursor: true,
+      speed: 300,
+      centeredSlides: true,
+      initialSlide: 4,
+      resizeObserver: true,
+      watchOverflow: true,
+      passiveListeners: true,
+      touchAngle: 45,
+      threshold: 5,
+      longSwipesRatio: 0.25,
+      followFinger: true,
+      pagination: { el: ".readings-pagination", clickable: true },
+    });
+  })();
+</script>
 <!-- Swiper Initialization -->
 <script>
   (function() {
