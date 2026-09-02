@@ -24590,26 +24590,24 @@ section.carousel-shell > .inner,
   display: none;
 }
 
-#carousel .cta-row {
-  display: flex !important;
+#carousel .cta-stack {
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 1.1rem;
-  margin-top: 0.6rem;
+  gap: 0.9rem;
+  margin-top: 1.2rem;
 }
 
-#carousel .cta-row .button {
+#carousel .cta-stack .button {
   margin-top: 0 !important;
 }
 
-#carousel .cta-or {
-  color: #f5efe3;
-  font-family: "FedraSansPro", sans-serif;
-  font-size: 0.85rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  opacity: 0.85;
+#carousel .cta-stack h4 {
+  margin: 0;
+  width: 100%;
+  text-align: center;
+  padding-left: 0;
+  padding-right: 0;
 }
 
 /* Per-card booking CTA inside program cards */
