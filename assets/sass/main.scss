@@ -18623,7 +18623,8 @@ section.carousel-shell > .inner,
   margin-top: 0.2rem;
 }
 
-#carousel footer .book-now-button {
+#carousel .book-now-button,
+#carousel .glance-button {
   /* Keep the carousel CTA immune to the legacy orange .hatha-button !important rules. */
   display: inline-flex !important;
   align-items: center;
@@ -18641,7 +18642,8 @@ section.carousel-shell > .inner,
   box-shadow: 0 12px 30px rgba(4, 8, 4, 0.24) !important;
 }
 
-#carousel footer .book-now-button:hover {
+#carousel .book-now-button:hover,
+#carousel .glance-button:hover {
   transform: translateY(-2px);
   border-color: rgba(214, 226, 214, 0.78) !important;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.08)) !important;
@@ -18649,9 +18651,69 @@ section.carousel-shell > .inner,
   box-shadow: 0 18px 40px rgba(4, 8, 4, 0.3) !important;
 }
 
-#carousel footer .book-now-button::before,
-#carousel footer .book-now-button::after {
+#carousel .book-now-button::before,
+#carousel .book-now-button::after {
   display: none;
+}
+
+#carousel .cta-row {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1.1rem;
+  margin-top: 0.6rem;
+}
+
+#carousel .cta-row .button {
+  margin-top: 0 !important;
+}
+
+#carousel .cta-or {
+  color: #f5efe3;
+  font-family: "FedraSansPro", sans-serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+/* Per-card booking CTA inside program cards */
+#program-calendar .program-card-book {
+  display: inline-block;
+  margin-top: 0.9rem;
+  padding: 0.55em 1.8em;
+  font-size: 0.85em;
+}
+
+#program-calendar .programs-feed-status .programs-empty-msg {
+  margin: 0 0 1.2rem 0;
+}
+
+#program-calendar .programs-empty-btn {
+  min-height: 3.15rem;
+  padding: 0.95rem 2.55rem !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(231, 220, 198, 0.58) !important;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.42)) !important;
+  color: #f8efe3 !important;
+  font-family: "FedraSansPro", sans-serif !important;
+  font-size: 0.95rem !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.14em !important;
+  line-height: 1 !important;
+  text-transform: uppercase;
+  text-decoration: none !important;
+  box-shadow: 0 14px 32px rgba(18, 22, 18, 0.22) !important;
+  transition: transform 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease, background 0.28s ease, color 0.28s ease !important;
+}
+
+#program-calendar .programs-empty-btn:hover {
+  transform: translateY(-2px);
+  border-color: rgba(250, 241, 227, 0.82) !important;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.10)) !important;
+  color: #fff7ed !important;
+  box-shadow: 0 18px 38px rgba(18, 22, 18, 0.28) !important;
 }
 
 /* Pagination dots */
@@ -18731,7 +18793,8 @@ section.carousel-shell > .inner,
 #Bio footer .hatha-button,
 #sadhguru footer .hatha-button,
 #footer .hatha-button,
-#carousel footer .book-now-button {
+#carousel .book-now-button,
+#carousel .glance-button {
   display: inline-flex !important;
   align-items: center;
   justify-content: center;
@@ -18760,8 +18823,8 @@ section.carousel-shell > .inner,
 #sadhguru footer .hatha-button::after,
 #footer .hatha-button::before,
 #footer .hatha-button::after,
-#carousel footer .book-now-button::before,
-#carousel footer .book-now-button::after {
+#carousel .book-now-button::before,
+#carousel .book-now-button::after {
   content: none !important;
   display: none !important;
 }
@@ -18770,7 +18833,8 @@ section.carousel-shell > .inner,
 #Bio footer .hatha-button:hover,
 #sadhguru footer .hatha-button:hover,
 #footer .hatha-button:hover,
-#carousel footer .book-now-button:hover {
+#carousel .book-now-button:hover,
+#carousel .glance-button:hover {
   transform: translateY(-2px);
   border-color: rgba(250, 241, 227, 0.82) !important;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.10)) !important;
@@ -18782,7 +18846,7 @@ section.carousel-shell > .inner,
 #Bio footer .hatha-button:focus-visible,
 #sadhguru footer .hatha-button:focus-visible,
 #footer .hatha-button:focus-visible,
-#carousel footer .book-now-button:focus-visible {
+#carousel .book-now-button:focus-visible {
   outline: 2px solid rgba(247, 236, 215, 0.82);
   outline-offset: 3px;
 }
@@ -22642,7 +22706,4 @@ body.low-fps {
     margin-bottom: 0.7rem !important;
   }
 }
-
-
-
 

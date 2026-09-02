@@ -744,11 +744,17 @@ updateActiveDot();
       card.appendChild(descEl);
     }
 
-    /* Footer: spots count only — CTA is the shared 'To Booking Page' button below all cards */
+    /* Footer: spots count + per-card booking CTA (only when bookable) */
     var footer = createElement('div', 'program-card-actions');
     if (program.spotsLeft !== null) {
       footer.appendChild(createElement('span', 'program-card-note',
         isFull ? 'Sold out' : program.spotsLeft + ' spot' + (program.spotsLeft === 1 ? '' : 's') + ' left'));
+    }
+    if (!isFull) {
+      var isDe = window.location.pathname.indexOf('/de/') !== -1;
+      var book = createElement('a', 'button program-card-book', isDe ? 'Jetzt buchen' : 'Book Now');
+      book.href = (isDe ? '../booking/?lang=de&program=' : 'booking/?program=') + encodeURIComponent(program.id);
+      footer.appendChild(book);
     }
     card.appendChild(footer);
     return card;
@@ -819,7 +825,16 @@ updateActiveDot();
 
     list.innerHTML = '';
     if (!programs.length) {
-      status.textContent = 'No programs are currently available. Check back soon!';
+      var isDe = window.location.pathname.indexOf('/de/') !== -1;
+      var msg = createElement('p', 'programs-empty-msg',
+        isDe ? 'Du findest kein Programm, das dir gefällt?'
+             : 'Can’t find the program you like?');
+      var btn = createElement('a', 'button programs-empty-btn',
+        isDe ? 'Kontaktiere mich' : 'Contact me');
+      btn.href = isDe ? '../#footer' : '#footer';
+      status.innerHTML = '';
+      status.appendChild(msg);
+      status.appendChild(btn);
       refreshParticles();
       return;
     }
