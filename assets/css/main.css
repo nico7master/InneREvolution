@@ -28439,6 +28439,12 @@ body.low-fps section::after {
     grid-template-columns: minmax(0, 1fr) auto;
     align-items: start;
   }
+  /* Statement box matches the combined width of the row below (panel + portrait) */
+  #Bio .bio-panel--vision {
+    max-width: 57.4rem;
+    margin-left: auto;
+    margin-right: auto;
+  }
   #Bio .bio-panel--intro {
     height: 48.7rem;
     display: flex;
