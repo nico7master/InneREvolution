@@ -176,6 +176,19 @@
       <image:title>Die Alternative zu Drogen</image:title>
     </image:image>
   </url>
+  <url>
+    <loc>https://innerevolutionyoga.life/de/wisdom/technology-and-yoga/</loc>
+    <lastmod>2026-08-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://innerevolutionyoga.life/wisdom/technology-and-yoga/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://innerevolutionyoga.life/de/wisdom/technology-and-yoga/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://innerevolutionyoga.life/wisdom/technology-and-yoga/" />
+    <image:image>
+      <image:loc>https://innerevolutionyoga.life/images/wisdom/technology-and-yoga-card.webp</image:loc>
+      <image:title>Technologie und Yoga</image:title>
+    </image:image>
+  </url>
 
 <url>
   <loc>https://innerevolutionyoga.life/wisdom/the-silent-revolution/</loc>
