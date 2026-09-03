@@ -51,11 +51,14 @@ var $toggle = $('<button id="mobileNavToggle" aria-label="Menu" aria-expanded="f
 '<span class="hamburger-line"></span>' +
 '<span class="hamburger-line"></span>' +
 '<span class="hamburger-line"></span>' +
-'</button>').appendTo($body);
+'</button>');
+var $navActions = $('.navbar-v8 .nav-actions');
+if ($navActions.length) { $toggle.appendTo($navActions); } else { $toggle.appendTo($body); }
 
 // Build overlay HTML from #nav structure
 var $navSrc = $('#nav > ul');
 var overlayHTML = '<div id="mobileNav" aria-hidden="true">' +
+'<button id="mobileNavClose" class="mobileNav-close" aria-label="Close menu">&#10005;</button>' +
 '<div class="mobileNav-inner">' +
 '<nav class="mobileNav-nav">';
 
@@ -90,7 +93,18 @@ overlayHTML += '<div class="mobileNav-item">' +
 }
 });
 
+var $langPillSrc = $('#langPill');
+var langLabel = ($langPillSrc.text().trim() || 'DE');
+var langOnclick = $langPillSrc.attr('onclick') || '';
+var langHref = $langPillSrc.attr('href') || '#';
+var onEnglishPage = /deutsch/i.test($langPillSrc.attr('title') || '');
+var bookLabel = onEnglishPage ? 'Book Now' : 'Jetzt buchen';
 overlayHTML += '</nav>' +
+'<div class="mobileNav-footer">' +
+'<a class="mobileNav-book" href="#program-calendar">' + bookLabel + '</a>' +
+'<a class="mobileNav-langlink" href="' + langHref + '"' +
+(langOnclick ? ' onclick="' + langOnclick + '"' : '') + '>' + langLabel + '</a>' +
+'</div>' +
 '<div class="mobileNav-snake" aria-hidden="true"></div>' +
 '</div></div>';
 
@@ -108,6 +122,8 @@ $mobileNav.attr('aria-hidden', 'true').removeClass('is-open');
 $toggle.attr('aria-expanded', 'false').removeClass('is-open');
 $body.removeClass('mobileNav-open');
 }
+
+$mobileNav.find('.mobileNav-close').on('click', function () { closeNav(); });
 
 $toggle.on('click', function () {
 if ($mobileNav.hasClass('is-open')) closeNav(); else openNav();
@@ -1106,9 +1122,11 @@ setTimeout(pinReadingsCenter, 400);
   var lastScrollY = window.scrollY;
   var ticking = false;
 
-  // Visible at page top
+  // Visible at page top; glass state once scrolled
   if (lastScrollY < 60) {
     navbar.classList.add('navbar-visible');
+  } else {
+    navbar.classList.add('navbar-visible', 'navbar-scrolled');
   }
 
   window.addEventListener('scroll', function() {
@@ -1117,6 +1135,7 @@ setTimeout(pinReadingsCenter, 400);
         var currentScrollY = window.scrollY;
         var delta = currentScrollY - lastScrollY;
 
+        navbar.classList.toggle('navbar-scrolled', currentScrollY >= 60);
         if (currentScrollY < 60) {
           // At top of page — always show
           navbar.classList.add('navbar-visible');

@@ -21863,9 +21863,11 @@ body .readings-wrapper #Readings p {
 }
 
 /* ============================================================
-   NAVBAR v7 — fixed floating nav with snake dividers
-   snake-divider-gray2.svg flanking the nav links left/right
-   Show on scroll-up / hide on scroll-down / visible at top
+   NAVBAR v8 — "THE CELESTIAL BAR"
+   Frosted-glass floating bar: brand | links | utility | action
+   Transparent at hero top; glass materializes on scroll (v7 logic).
+   Mobile: glass bar + circular hamburger + indigo-night overlay
+   with Book Now + language footer.
    ============================================================ */
 .navbar-wrapper {
   position: fixed;
@@ -21873,8 +21875,6 @@ body .readings-wrapper #Readings p {
   left: 0;
   width: 100%;
   z-index: 1000;
-  background: transparent;
-  box-shadow: none;
   pointer-events: none;
   opacity: 0;
   transform: translateY(-100%);
@@ -21891,12 +21891,33 @@ body .readings-wrapper #Readings p {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 1.2rem 0;
+    width: 100%;
+    padding: 0.9rem 2rem;
 
-    /* snake dividers are placed via #nav::before/::after below */
+    /* the glass shell */
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 999px;
+      background: linear-gradient(180deg, rgba(16, 12, 34, 0.38) 0%, rgba(16, 12, 34, 0.55) 100%);
+      backdrop-filter: blur(16px) saturate(1.35);
+      -webkit-backdrop-filter: blur(16px) saturate(1.35);
+      border: 1px solid rgba(218, 158, 78, 0.22);
+      box-shadow: 0 8px 32px rgba(5, 3, 12, 0.35);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      pointer-events: none;
+      z-index: -1;
+    }
   }
 
-  /* Override #nav positioning when inside navbar-wrapper */
+  /* glass materializes only once scrolled (hero top stays pure) */
+  &.navbar-scrolled .navbar-inner::before {
+    opacity: 1;
+  }
+
+  /* center links — the beloved floating serif + snakes, preserved */
   #nav {
     position: static;
     padding: 0;
@@ -21906,118 +21927,167 @@ body .readings-wrapper #Readings p {
 
     > ul {
       height: auto;
-      position: relative; /* required so ::before/::after use ul as anchor */
-      /* ul is inline-block (content-sized), so ::before/::after right:100%/left:100%
-         sit exactly next to the nav links — not at screen edges */
+      position: relative;
+      margin: 0;
+      border: none;
+      background: none;
 
-      /* Repurpose old line decorators as snake SVG dividers */
+      /* neutralize the template's line + flourish decorations */
       &::before,
       &::after {
-        content: '';
-        position: absolute; /* needed for right:100% / left:100% to work */
-        top: 50%;
-        display: block;
-        width: 220px;
-        height: 22px;
-        background: url('../../SVGs/snake-divider-gray2.svg') no-repeat center center;
-        background-size: 220px 22px;
-        opacity: 0.45;
-        transition: opacity 0.3s ease;
-        pointer-events: none;
-        border: none;    /* remove old border-top / border-bottom lines */
-        margin: 0;       /* remove old margin-top offsets */
-      }
-
-      &::before {
-        right: 100%;     /* just left of the nav links */
-        left: auto;
-        margin-right: 12px;
-        transform: translateY(-50%);
-      }
-
-      &::after {
-        left: 100%;      /* just right of the nav links */
-        right: auto;
-        margin-left: 12px;
-        transform: translateY(-50%) scaleX(-1);
+        content: none !important;
+        display: none !important;
       }
 
       > li {
-        margin: 0 0.15rem;
-        padding: 0.5rem 0.85rem;
+        margin: 0 0.3rem;
+        padding: 0.92rem 1.25rem;
+        border-radius: 999px;
+        background: linear-gradient(180deg, rgba(255, 250, 240, 0.10) 0%, rgba(255, 250, 240, 0.04) 100%);
+        border: 1px solid rgba(255, 250, 240, 0.18);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        box-shadow: 0 2px 10px rgba(5, 3, 12, 0.15);
+        transition: background 0.25s ease, border-color 0.25s ease;
+
+        &:hover {
+          background: linear-gradient(180deg, rgba(255, 250, 240, 0.17) 0%, rgba(255, 250, 240, 0.08) 100%);
+          border-color: rgba(232, 200, 143, 0.45);
+        }
 
         > a,
         > span {
-          font-family: 'GrandifloraOne', serif;
-          font-weight: 700;
-          font-size: 1.2rem; /* 1.5x of original 0.88rem */
+          font-family: 'FedraSansPro', sans-serif;
+          font-weight: 400;
+          font-size: 0.95rem;
           color: #ffffff;
-          letter-spacing: 0.04em;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
           text-shadow:
             0 1px 4px  rgba(0, 0, 0, 0.90),
             0 2px 12px rgba(0, 0, 0, 0.70);
-          transition: color 0.25s ease, text-shadow 0.25s ease;
+          transition: color 0.25s ease;
         }
 
         > a:hover,
         > span:hover {
-          color: rgba(255, 255, 255, 0.82);
+          color: #E8C88F;
         }
       }
     }
   }
+
+  /* right: utility + action */
+  .nav-actions {
+    position: absolute;
+    right: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    z-index: 5;
+  }
+
+  .nav-lang {
+    font-family: 'FedraSansPro', sans-serif;
+    font-weight: 600;
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    color: rgba(255, 250, 240, 0.85);
+    text-decoration: none;
+    padding: 0.38rem 0.85rem;
+    border: 1px solid rgba(255, 250, 240, 0.30);
+    border-radius: 999px;
+    transition: color 0.25s ease, border-color 0.25s ease;
+    white-space: nowrap;
+
+    &:hover {
+      color: #E8C88F;
+      border-color: rgba(232, 200, 143, 0.55);
+    }
+  }
+
+  .nav-book {
+    font-family: 'FedraSansPro', sans-serif;
+    font-weight: 700;
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #1a1030;
+    text-decoration: none;
+    padding: 0.42rem 1.05rem;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #F0D9A8 0%, #E8C88F 55%, #DDB578 100%);
+    box-shadow: 0 4px 18px rgba(232, 200, 143, 0.25);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    white-space: nowrap;
+
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 24px rgba(232, 200, 143, 0.4);
+    }
+  }
 }
 
-/* ── Minimal text-only dropotron dropdowns ── */
+/* dropdown: individual glass pill buttons — same family as the nav pills */
 body .dropotron {
-  background: transparent !important;          /* no box */
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  border: none !important;
-  border-radius: 0 !important;
-  box-shadow: none !important;
-  padding: 0.6rem 0 !important;
-  min-width: 160px;
-  overflow: visible !important;
-  margin-top: 0.5rem !important;               /* gap below nav trigger text */
-  text-align: left !important;                 /* align text to left of trigger */
+  background: linear-gradient(180deg, rgba(16, 12, 34, 0.45) 0%, rgba(16, 12, 34, 0.62) 100%) !important;
+  backdrop-filter: blur(14px) saturate(1.3) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(1.3) !important;
+  border: 1px solid rgba(255, 250, 240, 0.18) !important;
+  border-radius: 26px !important;
+  box-shadow: 0 10px 34px rgba(5, 3, 12, 0.35) !important;
+  padding: 0.75rem 0.75rem 0.75rem !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+  margin-top: 0.75rem !important;
+  text-align: center !important;
 
   &::before {
-    display: none !important;                   /* no caret arrow */
+    display: none !important;
   }
 
   li {
-    border-top: none !important;                /* remove default borders */
-    margin: 0 !important;
+    border: 1px solid rgba(255, 250, 240, 0.18) !important;
+    margin: 0 0 0.55rem !important;
     padding: 0 !important;
-    border-radius: 0 !important;
+    border-radius: 999px !important;
+    background: linear-gradient(180deg, rgba(255, 250, 240, 0.10) 0%, rgba(255, 250, 240, 0.04) 100%) !important;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 2px 10px rgba(5, 3, 12, 0.15) !important;
     overflow: visible !important;
+    transition: background 0.25s ease, border-color 0.25s ease !important;
 
-    /* Line divider between items — skip first */
-    & + li {
-      border-top: 1px solid rgba(255, 255, 255, 0.18) !important;
+    &:last-child {
+      margin-bottom: 0 !important;
+    }
+
+    &:hover,
+    &.hover {
+      background: linear-gradient(180deg, rgba(255, 250, 240, 0.17) 0%, rgba(255, 250, 240, 0.08) 100%) !important;
+      border-color: rgba(232, 200, 143, 0.45) !important;
     }
   }
 
   li a,
   li span {
     display: block !important;
-    padding: 0.6rem 1.2rem !important;
-    font-family: 'GrandifloraOne', serif !important;  /* same as nav links */
-    font-size: 1rem !important;
-    font-weight: 700 !important;
-    font-style: normal !important;               /* prevent italic on any child elements */
+    padding: 0.92rem 1.6rem !important;
+    font-family: 'FedraSansPro', sans-serif !important;
+    font-size: 0.95rem !important;
+    font-weight: 400 !important;
+    font-style: normal !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.12em !important;
     color: #ffffff !important;
     text-decoration: none !important;
     background: transparent !important;
     border: none !important;
-    border-radius: 0 !important;
-    /* Heavy shadow so text is legible over any background */
+    border-radius: 999px !important;
     text-shadow:
-      0 1px 3px  rgba(0, 0, 0, 0.95),
-      0 2px 10px rgba(0, 0, 0, 0.85),
-      0 4px 20px rgba(0, 0, 0, 0.70) !important;
-    transition: color 0.2s ease, text-shadow 0.2s ease !important;
+      0 1px 4px  rgba(0, 0, 0, 0.90),
+      0 2px 12px rgba(0, 0, 0, 0.70) !important;
+    transition: color 0.2s ease !important;
 
     &::before {
       display: none !important;
@@ -22026,11 +22096,7 @@ body .dropotron {
 
   li a:hover,
   li span:hover {
-    color: rgba(255, 255, 255, 0.75) !important;
-    text-shadow:
-      0 1px 3px  rgba(0, 0, 0, 0.95),
-      0 2px 10px rgba(0, 0, 0, 0.85),
-      0 4px 20px rgba(0, 0, 0, 0.70) !important;
+    color: #E8C88F !important;
     background: transparent !important;
     transform: none !important;
   }
@@ -22039,7 +22105,6 @@ body .dropotron {
     display: none !important;
   }
 
-  /* Center level-0 dropdown horizontally under its trigger text */
   &.level-0 {
     left: 50% !important;
     transform: translateX(-50%) !important;
@@ -22047,9 +22112,7 @@ body .dropotron {
   }
 }
 
-/* ── Mobile Nav Overlay (full-screen mystic menu) ── */
-
-/* Hamburger toggle button — hidden on desktop */
+/* Hamburger toggle button — desktop hidden, in-bar on mobile */
 #mobileNavToggle {
   display: none;
 }
@@ -22059,69 +22122,108 @@ body .dropotron {
   display: none;
 }
 
+/* retire the old top-edge language pill (homepage only; bar carries DE now) */
+body.homepage .lang-pill {
+  display: none !important;
+}
+
 @media screen and (max-width: 980px) {
+  /* the glass bar on mobile — slim, glass always materialized */
   .navbar-wrapper {
-    display: none !important;
+    display: block !important;
+    pointer-events: auto;
   }
 
-  /* Hamburger button */
+  .navbar-wrapper .navbar-inner {
+    padding: 0.5rem 0.7rem;
+    justify-content: flex-end;
+
+    &::before {
+      background: linear-gradient(180deg, rgba(16, 12, 34, 0.52) 0%, rgba(16, 12, 34, 0.66) 100%);
+      opacity: 1;
+    }
+  }
+
+  .navbar-wrapper .nav-actions {
+    position: static;
+    order: 2;
+    margin-left: auto;
+    gap: 0.4rem;
+    flex-shrink: 0;
+  }
+
+  .navbar-wrapper .nav-lang {
+    font-size: 0.6rem;
+    padding: 0.26rem 0.58rem;
+  }
+
+  .navbar-wrapper .nav-book {
+    font-size: 0.56rem;
+    padding: 0.3rem 0.65rem;
+  }
+
+  /* desktop center links are irrelevant on phones — keep bar clean */
+  .navbar-wrapper #nav {
+    display: none;
+  }
+
+  /* hamburger: circular glass button inside the bar */
   #mobileNavToggle {
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
-    position: fixed;
-    top: 1rem;
-    right: 1.2rem;
-    z-index: 10002;
-    width: 44px;
-    height: 44px;
+    justify-content: center;
+    gap: 4px;
+    width: 38px;
+    height: 38px;
     padding: 0;
-    background: transparent;
-    border: none;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: linear-gradient(180deg, rgba(255, 250, 240, 0.14) 0%, rgba(255, 250, 240, 0.06) 100%);
+    border: 1px solid rgba(255, 250, 240, 0.35);
+    box-shadow: 0 2px 10px rgba(5, 3, 12, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.12);
     cursor: pointer;
+    z-index: 12000;
     -webkit-tap-highlight-color: transparent;
-
-    .hamburger-line {
-      display: block;
-      width: 26px;
-      height: 2px;
-      background: rgba(255, 255, 255, 0.85);
-      border-radius: 2px;
-      transition: transform 0.35s ease, opacity 0.2s ease, background 0.25s ease;
-      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
-
-      &:nth-child(1) { margin-bottom: 6px; }
-      &:nth-child(3) { margin-top: 6px; }
-    }
-
-    /* ✕ state */
-    &.is-open {
-      .hamburger-line {
-        background: #fff;
-
-        &:nth-child(1) {
-          transform: translateY(8px) rotate(45deg);
-        }
-        &:nth-child(2) {
-          opacity: 0;
-          transform: scaleX(0);
-        }
-        &:nth-child(3) {
-          transform: translateY(-8px) rotate(-45deg);
-        }
-      }
-    }
+    transition: background 0.25s ease, border-color 0.25s ease;
   }
 
-  /* Full-screen overlay */
+  #mobileNavToggle .hamburger-line {
+    display: block;
+    width: 17px;
+    height: 2px;
+    border-radius: 2px;
+    background: #FFF8EC;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+    transition: transform 0.3s ease, opacity 0.3s ease;
+  }
+
+  #mobileNavToggle:hover {
+    background: linear-gradient(180deg, rgba(255, 250, 240, 0.22) 0%, rgba(255, 250, 240, 0.10) 100%);
+    border-color: rgba(232, 200, 143, 0.5);
+  }
+
+  /* hamburger morphs to X and pins to overlay corner when open */
+  #mobileNavToggle.is-open {
+    position: fixed;
+    top: 12px;
+    right: 12px;
+    z-index: 12000;
+  }
+
+  #mobileNavToggle.is-open .hamburger-line:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+  #mobileNavToggle.is-open .hamburger-line:nth-child(2) { opacity: 0; }
+  #mobileNavToggle.is-open .hamburger-line:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+  /* the indigo-night overlay */
   #mobileNav {
     display: flex;
     position: fixed;
     inset: 0;
-    z-index: 10001;
-    background: rgba(10, 6, 14, 0.92);
+    z-index: 11000;
+    background:
+      radial-gradient(ellipse at 50% 120%, rgba(58, 40, 92, 0.35) 0%, transparent 55%),
+      linear-gradient(180deg, #120C22 0%, #1A1230 55%, #241A3E 100%);
     backdrop-filter: blur(22px) saturate(1.2);
     -webkit-backdrop-filter: blur(22px) saturate(1.2);
     opacity: 0;
@@ -22134,7 +22236,6 @@ body .dropotron {
     }
   }
 
-  /* Inner layout — centered */
   .mobileNav-inner {
     display: flex;
     flex-direction: column;
@@ -22143,11 +22244,10 @@ body .dropotron {
     width: 100%;
     height: 100%;
     overflow-y: auto;
-    padding: 5rem 2rem 3rem;
+    padding: 4.5rem 2rem 2.5rem;
     -webkit-overflow-scrolling: touch;
   }
 
-  /* Navigation items */
   .mobileNav-nav {
     display: flex;
     flex-direction: column;
@@ -22168,28 +22268,24 @@ body .dropotron {
     font-family: 'GrandifloraOne', serif;
     font-weight: 700;
     font-size: 1.8rem;
-    color: #fff;
+    color: #FFF8EC;
     text-decoration: none;
     background: transparent !important;
     border: none;
     cursor: pointer;
-    text-shadow:
-      0 1px 4px  rgba(0, 0, 0, 0.95),
-      0 2px 12px rgba(0, 0, 0, 0.75),
-      0 4px 24px rgba(0, 0, 0, 0.6);
-    transition: color 0.25s ease, text-shadow 0.25s ease;
+    text-shadow: 0 2px 14px rgba(0, 0, 0, 0.45);
+    transition: color 0.25s ease;
     -webkit-tap-highlight-color: transparent;
 
     &:hover,
     &:focus,
     &:active {
-      color: rgba(255, 255, 255, 0.8);
+      color: #E8C88F;
       background: transparent !important;
       outline: none;
     }
   }
 
-  /* Parent item with expand arrow — text turns orange when open */
   .mobileNav-parent > .mobileNav-link {
     display: flex;
     align-items: center;
@@ -22200,7 +22296,7 @@ body .dropotron {
     background: transparent !important;
 
     &[aria-expanded="true"] {
-      color: #DA782E;
+      color: #E8C88F;
       background: transparent !important;
     }
 
@@ -22209,7 +22305,6 @@ body .dropotron {
     }
   }
 
-  /* Arrow indicator */
   .mobileNav-arrow {
     display: inline-block;
     font-size: 0.6em;
@@ -22221,7 +22316,6 @@ body .dropotron {
     }
   }
 
-  /* Accordion submenu */
   .mobileNav-sub {
     max-height: 0;
     overflow: hidden;
@@ -22240,55 +22334,102 @@ body .dropotron {
     font-family: 'GrandifloraOne', serif;
     font-weight: 700;
     font-size: 1.15rem;
-    color: rgba(255, 255, 255, 0.7);
+    color: rgba(255, 248, 236, 0.65);
     text-decoration: none;
     text-align: center;
     transition: color 0.2s ease;
     -webkit-tap-highlight-color: transparent;
-    text-shadow:
-      0 1px 3px  rgba(0, 0, 0, 0.9),
-      0 2px 8px  rgba(0, 0, 0, 0.7);
 
     &:hover {
-      color: #DA782E;
+      color: #E8C88F;
     }
   }
 
-  /* Language switch pill */
+  /* legacy inner lang pill style (kept for structure safety) */
   .mobileNav-lang .mobileNav-link {
     font-size: 1.1rem;
     padding: 0.6rem 1.8rem;
     margin-top: 1.5rem;
-    border: 1px solid rgba(255, 255, 255, 0.25);
+    border: 1px solid rgba(255, 248, 236, 0.25);
     border-radius: 2rem;
-    color: rgba(255, 255, 255, 0.65);
+    color: rgba(255, 248, 236, 0.65);
     letter-spacing: 0.1em;
     transition: color 0.25s ease, border-color 0.25s ease;
 
     &:hover {
-      color: #DA782E;
-      border-color: #DA782E;
+      color: #E8C88F;
+      border-color: #E8C88F;
     }
   }
 
-  /* Snake divider at bottom of menu */
+  /* overlay footer: Book Now + language */
+  .mobileNav-footer {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    margin-top: 2.2rem;
+  }
+
+  .mobileNav-book {
+    font-family: 'FedraSansPro', sans-serif;
+    font-weight: 700;
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #1a1030;
+    text-decoration: none;
+    padding: 0.6rem 1.4rem;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #F0D9A8 0%, #E8C88F 55%, #DDB578 100%);
+    box-shadow: 0 4px 18px rgba(232, 200, 143, 0.3);
+  }
+
+  .mobileNav-langlink {
+    font-family: 'FedraSansPro', sans-serif;
+    font-weight: 600;
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    color: rgba(255, 248, 236, 0.8);
+    text-decoration: none;
+    padding: 0.58rem 1.1rem;
+    border: 1px solid rgba(255, 248, 236, 0.35);
+    border-radius: 999px;
+    transition: color 0.25s ease, border-color 0.25s ease;
+  }
+
+  /* snake divider at bottom of menu */
   .mobileNav-snake {
     width: 180px;
     height: 18px;
-    margin-top: 2.5rem;
+    margin-top: 2.2rem;
     background: url('../../SVGs/snake-divider-gray2.svg') no-repeat center center;
     background-size: 180px 18px;
-    opacity: 0.35;
+    opacity: 0.4;
   }
 
-  /* No underline decoration — keep it simple */
+  /* close button (fixed, above overlay) */
+  .mobileNav-close {
+    position: fixed;
+    top: 14px;
+    right: 14px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(180deg, rgba(255, 250, 240, 0.12) 0%, rgba(255, 255, 255, 0.05) 100%);
+    border: 1px solid rgba(255, 248, 236, 0.3);
+    color: #FFF8EC;
+    font-size: 1rem;
+    line-height: 1;
+    cursor: pointer;
+    z-index: 12001;
+  }
 
-  /* Prevent body scroll when overlay is open */
+  /* prevent body scroll when overlay is open */
   body.mobileNav-open {
     overflow: hidden !important;
   }
 
-  /* ── Neutralize old navPanel/button (legacy) ── */
+  /* neutralize old navPanel/button (legacy) */
   #navButton,
   #navPanel {
     display: none !important;
@@ -22301,7 +22442,7 @@ body .dropotron {
   }
 }
 
-/* === END NAVBAR v7 === */
+/* === END NAVBAR v8 === */
 
 /* === HERO DAY WIND: FIXED PATH ON MOBILE (NO RESCALING) === */
 /* On mobile the particle path keeps its full desktop dimensions.          */
