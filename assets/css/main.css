@@ -20296,11 +20296,21 @@ body.homepage.is-preload #header:after {
   line-height: 1.4em !important;
 }
 
+/* Size containers for the proportional (cqi) quote text — all banner sections */
+.banner .quote-container {
+  container-type: inline-size;
+}
+
 /* --- Uniform Quote Text across both banner sections --- */
+/* Font scales with the banner via container-query units so every designed
+   <br> line cut stays on ONE line at desktop widths. Factor 1.92cqi measured
+   with the real Fedra Serif Book font: widest segment (Harmony, 82ch) fits
+   the 92%/1360px container from ~1200px viewport up, EN + DE. */
 .banner .quote-text h2,
 section.banner .quote-text h2 {
-  font-size: 1.4em !important;
-  line-height: 1.7em !important;
+  font-size: clamp(1.2rem, 1.77vw, 2.2rem) !important; /* fallback: no container-query support */
+  font-size: clamp(1.2rem, 1.92cqi, 2.2rem) !important; /* proportional — keeps the perfect line cuts */
+  line-height: 1.35 !important;
   font-weight: 400 !important;
 }
 
@@ -20362,22 +20372,7 @@ section.banner .quote-text h2 {
    PATCH 2 — 2026-02-28
    Fix: footer too wide/empty, quotes too small
    ============================================================ */
-/* --- QUOTES: restore to a readable, impactful size --- */
-.banner .quote-text h2,
-section.banner .quote-text h2 {
-  font-size: 1.75em !important;
-  line-height: 1.65em !important;
-  font-weight: 400 !important;
-  letter-spacing: 0.01em !important;
-}
-
-@media screen and (max-width: 736px) {
-  .banner .quote-text h2,
-  section.banner .quote-text h2 {
-    font-size: 1.2rem !important; /* reduced for mobile readability */
-    line-height: 1.6em !important;
-  }
-}
+/* Quote sizing consolidated into the Uniform Quote Text rule (measured 1.92cqi proportional — keeps the designed line cuts). */
 /* --- FOOTER: visually box the content so it doesn't float in empty space --- */
 /* Tighter vertical padding on the outer footer */
 #footer {
@@ -23943,22 +23938,7 @@ body.homepage .stars > .stars-fore::after {
 /* End Hatha refinement */
 /* --- End Phase 3 SCSS migration: hero layer restored from pre-migration live CSS backup --- */
 /* --- Phase 1 SCSS migration: live quote + Hatha overrides from assets/css/main.css --- */
-/* Quote sizing parity for the pre-slider banner sections. */
-.banner .quote-text h2,
-section.banner .quote-text h2 {
-  font-size: 1.75em !important;
-  line-height: 1.65em !important;
-  font-weight: 400 !important;
-  letter-spacing: 0.01em !important;
-}
-
-@media screen and (max-width: 736px) {
-  .banner .quote-text h2,
-  section.banner .quote-text h2 {
-    font-size: 1.2rem !important; /* reduced for mobile readability */
-    line-height: 1.6em !important;
-  }
-}
+/* Quote sizing parity consolidated into the Uniform Quote Text rule (measured 1.92cqi proportional). */
 /* Hatha Yoga live redesign parity. Keep these selectors and order stable. */
 .hatha-yoga-wrapper {
   position: relative;
@@ -26088,25 +26068,25 @@ section#Bio,
   justify-content: center;
   gap: clamp(0.4rem, 0.9vw, 0.75rem); /* tight but balanced */
   padding: 0 1.25rem;
-  width: 75%;
-  max-width: 980px;
+  width: 92%;
+  max-width: 1360px;
   margin: 0 auto;
   box-sizing: border-box;
+  container-type: inline-size; /* enables cqi-based font sizing below */
 }
 
 .inner-revolution-banner .quote-text {
-  flex: 1 1 0%;
-  min-width: min-content;
-  max-width: 820px;
-  margin: 0 auto;
+  flex: 0 1 auto;
+  width: fit-content; /* shrink to the text */
+  min-width: 0;
+  max-width: 100%;
+  margin: 0; /* NO auto margins — they would absorb free space and push the quote marks away; the flex container centers the group */
 }
 
 .inner-revolution-banner .quote-text h2 {
   margin: 0;
   font-family: "FedraSerifAPro", serif;
-  font-size: clamp(1.6rem, 3.5vw, 2.6rem);
-  font-weight: 500;
-  line-height: 1.2;
+  /* font-size + line-height governed by the Uniform Quote Text rule below (cascade winner) */
   letter-spacing: 0.01em;
   color: #3c2f1f;
   /* Break at explicit <br> tags, but allow wrapping when a segment is
@@ -26118,7 +26098,7 @@ section#Bio,
 
 .inner-revolution-banner .quote-text p {
   margin: 0.85rem auto 0;
-  max-width: 760px;
+  max-width: 880px;
   color: #6d5334;
   font-family: "FedraSerifAPro", serif;
   font-size: clamp(1rem, 1.9vw, 1.16rem);
@@ -26144,7 +26124,7 @@ section#Bio,
 
 .inner-revolution-banner .banner-signature {
   display: block;
-  width: min(220px, 50vw);
+  width: min(180px, 40vw);
   margin: 0 auto;
 }
 
@@ -26431,15 +26411,9 @@ section#Bio,
   margin-right: auto;
 }
 #program-calendar + .inner-revolution-banner .quote-text {
-  flex: 1 1 auto;
-  width: 100%;
-  margin-left: auto;
-  margin-right: auto;
-}
-#program-calendar + .inner-revolution-banner .quote-text h2 {
-  width: 100%;
-  margin-left: auto;
-  margin-right: auto;
+  flex: 0 1 auto;
+  width: fit-content; /* constant gap between quote marks and text */
+  margin: 0;
 }
 
 /* programs-bottom-quote inherits canonical .inner-revolution-banner .quote-container width/flex */
@@ -27640,7 +27614,7 @@ body .readings-wrapper #Readings p {
   }
   .inner-revolution-banner .banner-signature,
   .banner-signature {
-    width: 160px !important;
+    width: 130px !important;
     height: auto !important;
   }
   .quote-mark {
