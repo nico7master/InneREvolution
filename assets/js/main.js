@@ -105,7 +105,6 @@ overlayHTML += '</nav>' +
 '<a class="mobileNav-langlink" href="' + langHref + '"' +
 (langOnclick ? ' onclick="' + langOnclick + '"' : '') + '>' + langLabel + '</a>' +
 '</div>' +
-'<div class="mobileNav-snake" aria-hidden="true"></div>' +
 '</div></div>';
 
 var $overlay = $(overlayHTML).appendTo($body);

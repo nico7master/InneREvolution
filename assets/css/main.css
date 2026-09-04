@@ -27874,12 +27874,12 @@ body.homepage .lang-pill {
     pointer-events: auto;
   }
   .navbar-wrapper .navbar-inner {
-    padding: 0.5rem 0.7rem;
+    padding: 0.7rem 0.7rem;
     justify-content: flex-end;
+    /* mobile: no glass shell — only the floating hamburger button */
   }
   .navbar-wrapper .navbar-inner::before {
-    background: linear-gradient(180deg, rgba(16, 12, 34, 0.52) 0%, rgba(16, 12, 34, 0.66) 100%);
-    opacity: 1;
+    display: none;
   }
   .navbar-wrapper .nav-actions {
     position: static;
@@ -27888,13 +27888,12 @@ body.homepage .lang-pill {
     gap: 0.4rem;
     flex-shrink: 0;
   }
+  /* mobile: only the hamburger in the bar — language + Book Now live in the menu footer */
   .navbar-wrapper .nav-lang {
-    font-size: 0.6rem;
-    padding: 0.26rem 0.58rem;
+    display: none !important;
   }
   .navbar-wrapper .nav-book {
-    font-size: 0.56rem;
-    padding: 0.3rem 0.65rem;
+    display: none !important;
   }
   /* desktop center links are irrelevant on phones — keep bar clean */
   .navbar-wrapper #nav {
@@ -27991,6 +27990,7 @@ body.homepage .lang-pill {
   .mobileNav-link {
     display: block;
     width: 100%;
+    line-height: 1.2; /* neutralize template button line-height:3em — parents otherwise tower over plain links */
     padding: 1rem 0;
     font-family: "GrandifloraOne", serif;
     font-weight: 700;
@@ -28105,15 +28105,6 @@ body.homepage .lang-pill {
     border: 1px solid rgba(255, 248, 236, 0.35);
     border-radius: 999px;
     transition: color 0.25s ease, border-color 0.25s ease;
-  }
-  /* snake divider at bottom of menu */
-  .mobileNav-snake {
-    width: 180px;
-    height: 18px;
-    margin-top: 2.2rem;
-    background: url("../../SVGs/snake-divider-gray2.svg") no-repeat center center;
-    background-size: 180px 18px;
-    opacity: 0.4;
   }
   /* close button (fixed, above overlay) */
   .mobileNav-close {
