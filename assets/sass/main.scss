@@ -22902,3 +22902,34 @@ body.low-fps {
     width: 54px;
   }
 }
+/* ============================================================
+   BIO DESKTOP (DE) — probe-verified layout.
+   i18n.js rewrites html[lang] at runtime, so rules key on the
+   stable data-lang attribute. Probe measured the German text:
+   natural panel height ~895px at the 496px column (fits, no
+   overflow). Text box keeps height:auto (can never clip);
+   portrait locks to 55.9rem (894px) — same construction as EN.
+   ============================================================ */
+@media screen and (min-width: 981px) {
+  html[data-lang="de"] #Bio .bio-intro-grid {
+    max-width: 60.7rem !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    align-items: start !important;
+  }
+
+  html[data-lang="de"] #Bio .bio-panel--vision {
+    max-width: 60.7rem !important;
+  }
+
+  html[data-lang="de"] #Bio .bio-panel--intro {
+    height: auto !important;
+  }
+
+  html[data-lang="de"] #Bio .bio-portrait-frame .side-image {
+    height: 55.9rem !important;
+    width: auto !important;
+    max-height: none !important;
+    aspect-ratio: 1641 / 3334;
+    object-fit: fill !important;
+  }
+}
