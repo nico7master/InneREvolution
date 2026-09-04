@@ -565,4 +565,30 @@
       <image:title>Yoga Namaskar</image:title>
     </image:image>
   </url>
+  <url>
+    <loc>https://innerevolutionyoga.life/practices/jala-neti/</loc>
+    <lastmod>2026-09-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://innerevolutionyoga.life/practices/jala-neti/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://innerevolutionyoga.life/de/practices/jala-neti/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://innerevolutionyoga.life/practices/jala-neti/" />
+    <image:image>
+      <image:loc>https://innerevolutionyoga.life/images/Yoga/JalaNeti.jpg</image:loc>
+      <image:title>Jala Neti</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://innerevolutionyoga.life/de/practices/jala-neti/</loc>
+    <lastmod>2026-09-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://innerevolutionyoga.life/practices/jala-neti/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://innerevolutionyoga.life/de/practices/jala-neti/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://innerevolutionyoga.life/practices/jala-neti/" />
+    <image:image>
+      <image:loc>https://innerevolutionyoga.life/images/Yoga/JalaNeti.jpg</image:loc>
+      <image:title>Jala Neti</image:title>
+    </image:image>
+  </url>
 </urlset>
