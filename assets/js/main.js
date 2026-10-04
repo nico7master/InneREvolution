@@ -844,12 +844,9 @@ updateActiveDot();
       var msg = createElement('p', 'programs-empty-msg',
         isDe ? 'Du findest kein Programm, das dir gefällt?'
              : 'Can’t find the program you like?');
-      var btn = createElement('a', 'button programs-empty-btn',
-        isDe ? 'Kontaktiere mich' : 'Contact me');
-      btn.href = isDe ? '../#footer' : '#footer';
+      // Contact CTA moved into the static newsletter block below the feed
       status.innerHTML = '';
       status.appendChild(msg);
-      status.appendChild(btn);
       refreshParticles();
       return;
     }
@@ -888,14 +885,20 @@ updateActiveDot();
       (location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.protocol === 'file:');
 
     if (isLocal) {
-      fetch('data/sheet-cache.json', { cache: 'no-store' })
+      // Cache path must work from both /index.html and /de/index.html
+      var cachePath = window.location.pathname.indexOf('/de/') === 0
+        ? '../data/sheet-cache.json'
+        : 'data/sheet-cache.json';
+      fetch(cachePath, { cache: 'no-store' })
         .then(function (r) { if (!r.ok) throw new Error('sheet-cache.json not found'); return r.json(); })
         .then(function (cache) {
           processSheetData(cache.programs || [], cache.sessions || [], status, list);
         })
         .catch(function (err) {
           console.error('[Programs feed] Local cache error:', err);
-          status.textContent = 'Programs will appear here soon.';
+          status.textContent = window.location.pathname.indexOf('/de/') !== -1
+            ? 'Hier erscheinen in Kürze neue Programme.'
+            : 'Programs will appear here soon.';
           refreshParticles();
         });
       return;
@@ -903,7 +906,9 @@ updateActiveDot();
 
     /* No CONFIG — no data source */
     if (typeof CONFIG === 'undefined' || !CONFIG.SHEET_ID || !CONFIG.SHEETS_API_KEY) {
-      status.textContent = 'Programs coming soon.';
+      status.textContent = window.location.pathname.indexOf('/de/') !== -1
+        ? 'Neue Programme folgen in Kürze.'
+        : 'Programs coming soon.';
       return;
     }
 
@@ -915,7 +920,9 @@ updateActiveDot();
       processSheetData(results[0], results[1], status, list);
     }).catch(function (err) {
       console.error('[Programs feed] Sheets error:', err);
-      status.textContent = 'Programs will appear here soon.';
+      status.textContent = window.location.pathname.indexOf('/de/') !== -1
+        ? 'Hier erscheinen in Kürze neue Programme.'
+        : 'Programs will appear here soon.';
       refreshParticles();
     });
   }

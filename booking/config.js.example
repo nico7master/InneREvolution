@@ -8,6 +8,8 @@ const CONFIG = {
   SHEETS_API_KEY:  "your-restricted-api-key",
   // APPS_SCRIPT_URL disabled — booking now uses external form links
   // APPS_SCRIPT_URL: "https://script.google.com/macros/s/YOUR_ID/exec",
+  // Newsletter endpoint — passive email capture (same Apps Script web app)
+  NEWSLETTER_URL:  "https://script.google.com/macros/s/YOUR_APPS_SCRIPT_ID/exec",
   // Fallback form URL if a program has no formUrl in the sheet (column N)
   DEFAULT_FORM_URL: ""
 };

@@ -316,11 +316,19 @@ function htmlPage(message, color) {
 }
 
 function doPost(e) {
-  if (MANUAL_MODE) { Logger.log('[MANUAL_MODE] doPost blocked'); return jsonResponse({ success: false, error: 'Booking system is in manual mode. Please contact us directly.' }); }
   Logger.log('[REQUEST] doPost received');
   try {
     var data = JSON.parse(e.postData.contents);
     Logger.log('[REQUEST] Parsed data keys: ' + Object.keys(data).join(','));
+
+    // Newsletter signup — passive sheet write only (no emails, Stripe or
+    // triggers involved), therefore exempt from MANUAL_MODE (N1).
+    if (data.action === 'newsletter') {
+      Logger.log('[REQUEST] Routing to newsletter handler');
+      return handleNewsletter(data);
+    }
+
+    if (MANUAL_MODE) { Logger.log('[MANUAL_MODE] doPost blocked'); return jsonResponse({ success: false, error: 'Booking system is in manual mode. Please contact us directly.' }); }
 
     // Route: Stripe webhook events (authenticity re-verified inside)
     if (data.type && (data.type.indexOf('payment_intent') === 0 ||
@@ -523,6 +531,81 @@ function handleBooking(data) {
     return jsonResponse({ success: true, bookingId: bookingId, paymentUrl: payUrl, programName: programName, finalPrice: finalPrice });
   } finally {
     try { lock.releaseLock(); } catch(e2) {}
+  }
+}
+
+
+
+// ─── NEWSLETTER SIGNUP (N-series) ────────────────────────────────────────────
+// Passive email capture for the website "get notified" signup form.
+// Writes new rows to the NEWSLETTER_TAB in the MAIN sheet. Exempt from
+// MANUAL_MODE because it performs no emails, Stripe actions or triggers (N1).
+// Tab name uses a unicode escape so the source stays plain-ASCII safe.
+var NEWSLETTER_TAB = '\uD83D\uDCE7 Newsletter';
+
+function handleNewsletter(data) {
+  try {
+    if (!data || !data.email) {
+      return jsonResponse({ success: false, error: 'Missing email address.' });
+    }
+    var email = String(data.email).trim().toLowerCase();
+    var lang  = (String(data.lang || 'en').toLowerCase() === 'de') ? 'de' : 'en';
+
+    if (email.length > 254 || !isValidEmail(email)) {
+      return jsonResponse({ success: false, error: 'Invalid email address format.' });
+    }
+
+    // N2: rate limit - 10 signups/min globally is plenty for a small audience
+    if (!checkRateLimit('newsletter', 10)) {
+      Logger.log('[RATELIMIT] rejected newsletter signup');
+      return jsonResponse({ success: false, error: 'Too many requests. Please try again in a minute.' });
+    }
+
+    var cfg = getConfig();
+    var ss  = SpreadsheetApp.openById(cfg.SHEET_ID);
+
+    // Get or create the newsletter tab (emoji primary, plain fallback)
+    var sheet = ss.getSheetByName(NEWSLETTER_TAB) || ss.getSheetByName('Newsletter');
+    if (!sheet) {
+      sheet = ss.insertSheet(NEWSLETTER_TAB);
+      sheet.appendRow(['Timestamp', 'Email', 'Language', 'Status', 'Source']);
+      sheet.getRange(1, 1, 1, 5).setFontWeight('bold').setBackground('#1F4E36').setFontColor('#ffffff');
+      sheet.setFrozenRows(1);
+    }
+
+    // N3: duplicate check (case-insensitive) so re-subscribes don't spam the tab
+    var lock = LockService.getScriptLock();
+    try {
+      if (!lock.tryLock(10000)) {
+        return jsonResponse({ success: false, error: 'Server busy, please try again.' });
+      }
+      var existing = sheet.getDataRange().getValues();
+      for (var r = 1; r < existing.length; r++) {
+        if (String(existing[r][1]).toLowerCase().trim() === email) {
+          Logger.log('[NEWSLETTER] duplicate: ' + email);
+          // Already subscribed - respond with success so the user is not confused
+          return jsonResponse({ success: true, alreadySubscribed: true });
+        }
+      }
+
+      sheet.appendRow([
+        new Date(),
+        email,
+        lang,
+        'subscribed',
+        String(data.source || 'website').substring(0, 100)
+      ]);
+    } finally {
+      try { lock.releaseLock(); } catch (e2) {}
+    }
+
+    Logger.log('[NEWSLETTER] SUCCESS: ' + email + ' (' + lang + ')');
+    return jsonResponse({ success: true, alreadySubscribed: false });
+
+  } catch (err) {
+    Logger.log('[ERROR] handleNewsletter: ' + err.message + '\nStack: ' + err.stack);
+    logError('handleNewsletter', err, data);
+    return jsonResponse({ success: false, error: 'Subscription failed. Please try again later.' });
   }
 }
 

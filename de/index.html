@@ -35,7 +35,7 @@
     />
     <link rel="preload" href="../assets/webfonts/GrandifloraOne-Regular.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="../assets/webfonts/DeliusSwashCaps-Regular.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="stylesheet" href="../assets/css/main.css?v=202609041702" />
+    <link rel="stylesheet" href="../assets/css/main.css?v=202610042340" />
     <link rel="stylesheet" href="../assets/css/swiper-bundle.min.css" />
     
     <link rel="preload" href="../images/backgrounds/wallpaper-1981.jpeg" as="image" />
@@ -1054,6 +1054,30 @@
           </div>
 
         </div>
+        <!-- Newsletter-Anmeldung — Besucher über kommende Programme informieren -->
+        <div class="newsletter-signup" id="newsletter-signup">
+          <p class="newsletter-heading">Kein Programm mehr verpassen:</p>
+          <form class="newsletter-form" id="newsletter-form" novalidate>
+            <input
+              type="email"
+              class="newsletter-input"
+              id="newsletter-email"
+              name="email"
+              placeholder="Deine E-Mail-Adresse"
+              autocomplete="email"
+              maxlength="254"
+              aria-label="E-Mail-Adresse"
+              required
+            />
+            <button type="submit" class="button newsletter-button" id="newsletter-submit">
+              <span class="newsletter-btn-label">Benachrichtigen</span>
+              <span class="newsletter-btn-spinner" hidden></span>
+            </button>
+          </form>
+          <p class="newsletter-message" id="newsletter-message" role="status" aria-live="polite"></p>
+          <p class="newsletter-or">Oder</p>
+          <a href="../#footer" class="button programs-empty-btn">Kontaktiere mich</a>
+        </div>
       </section>
 
       <!-- Zitat Banner unter Kommende Programme -->
@@ -1355,7 +1379,8 @@
       <script src="../assets/js/util.js"></script>
       <script src="../assets/js/i18n.js"></script>
     <script src="../booking/config.js"></script>
-    <script src="../assets/js/main.js?v=202609041702"></script>
+    <script src="../assets/js/newsletter.js?v=202610050020"></script>
+    <script src="../assets/js/main.js?v=202610042340"></script>
     <script src="../assets/js/quote-fit.js?v=202609030300"></script>
   <script src="../assets/js/swiper-bundle.min.js"></script>
 <script>
