@@ -25,6 +25,7 @@ var BOOKING_STRINGS = {
     soldOutBtn:         'Sold Out',
     registerBtn:        'Register',
     modalTitle:         'Register',
+    freeLabel:          'Free',
     labelName:          'Full Name',
     labelEmail:         'Email',
     labelPhone:         'Phone',
@@ -81,6 +82,7 @@ var BOOKING_STRINGS = {
     soldOutBtn:         'Ausverkauft',
     registerBtn:        'Anmelden',
     modalTitle:         'Anmelden',
+    freeLabel:          'Kostenlos',
     labelName:          'Vollst\u00e4ndiger Name',
     labelEmail:         'E-Mail',
     labelPhone:         'Telefon',
@@ -335,7 +337,7 @@ function buildCard(p) {
         ${scheduleHtml}
       </div>
       <div class="program-card-footer">
-        <span class="program-card-price">&euro;${p.price.toFixed(2)}</span>
+        <span class="program-card-price">${p.price > 0 ? "&euro;" + p.price.toFixed(2) : bs("freeLabel")}</span>
         <div class="footer-right">
           ${spotsHtml}
           ${isFull

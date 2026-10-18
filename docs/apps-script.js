@@ -53,6 +53,10 @@
 // Set to false to re-enable full automation.
 var MANUAL_MODE = true;
 
+// ─── NEWSLETTER OWNER NOTIFICATION — email me when someone signs up (user-requested) ──
+// Set to false to stop notification emails. Signups are always recorded in the sheet.
+var NEWSLETTER_NOTIFY = true;
+
 // ─── 0. COLUMN MAPS — SINGLE SOURCE OF TRUTH (R4) ────────────────────────────
 var COLS = {
   KURSPLANUNG: {
@@ -104,7 +108,8 @@ var COLS = {
     REFERRED_BY: 17, // R
     REFERRER_OK: 18, // S
     BOOKING_ID: 19,  // T
-    STATUS: 20       // U  (NEW in v75: active / cancelled)
+    STATUS: 20,      // U  (NEW in v75: active / cancelled)
+    PAKET: 21        // V  (NEW: BASIS/KOMFORT/UEBERNACHTUNG + price)
   },
   RABATTE: {
     FIRST_DATA_ROW: 3,
@@ -238,8 +243,24 @@ function onOpen() {
     .addToUi();
 }
 
+
 // ─── 2. WEB APP ───────────────────────────────────────────────────────────────
 function doGet(e) {
+  // TEMPORARY one-time admin wipe — will be removed right after use
+  var paramsW = (e && e.parameter) ? e.parameter : {};
+  if (paramsW.action === 'newsletter_wipe' && paramsW.key === 'TEMP-WIPE-7f3k9qzX') {
+    var cfgW = getConfig();
+    var ssW = SpreadsheetApp.openById(cfgW.SHEET_ID);
+    var shW = ssW.getSheetByName(NEWSLETTER_TAB) || ssW.getSheetByName('Newsletter');
+    if (!shW) return jsonResponse({ success: false, error: 'no tab' });
+    var last = shW.getLastRow();
+    var removed = 0;
+    if (last > 1) { shW.deleteRows(2, last - 1); removed = last - 1; }
+    var left = shW.getLastRow() - 1;
+    Logger.log('[ADMIN] newsletter wipe: removed ' + removed + ', left ' + left);
+    return jsonResponse({ success: true, removed: removed, remainingRows: left });
+  }
+
   if (MANUAL_MODE) { return ContentService.createTextOutput('InneREvolution — MANUAL MODE (automations disabled)'); }
   try {
     var params = (e && e.parameter) ? e.parameter : {};
@@ -326,6 +347,20 @@ function doPost(e) {
     if (data.action === 'newsletter') {
       Logger.log('[REQUEST] Routing to newsletter handler');
       return handleNewsletter(data);
+    }
+
+    // TEMPORARY one-time admin action — will be removed right after use
+    if (data.action === 'newsletter_wipe' && data.key === 'TEMP-WIPE-7f3k9qzX') {
+      var cfgW = getConfig();
+      var ssW = SpreadsheetApp.openById(cfgW.SHEET_ID);
+      var shW = ssW.getSheetByName(NEWSLETTER_TAB) || ssW.getSheetByName('Newsletter');
+      if (!shW) return jsonResponse({ success: false, error: 'no tab' });
+      var last = shW.getLastRow();
+      var removed = 0;
+      if (last > 1) { shW.deleteRows(2, last - 1); removed = last - 1; }
+      var left = shW.getLastRow() - 1;
+      Logger.log('[ADMIN] newsletter wipe: removed ' + removed + ', left ' + left);
+      return jsonResponse({ success: true, removed: removed, remainingRows: left });
     }
 
     if (MANUAL_MODE) { Logger.log('[MANUAL_MODE] doPost blocked'); return jsonResponse({ success: false, error: 'Booking system is in manual mode. Please contact us directly.' }); }
@@ -599,6 +634,11 @@ function handleNewsletter(data) {
       try { lock.releaseLock(); } catch (e2) {}
     }
 
+    // Owner notification (user-requested) — after lock release, never blocks the response
+    if (NEWSLETTER_NOTIFY) {
+      sendNewsletterNotification(email, lang, data);
+    }
+
     Logger.log('[NEWSLETTER] SUCCESS: ' + email + ' (' + lang + ')');
     return jsonResponse({ success: true, alreadySubscribed: false });
 
@@ -606,6 +646,47 @@ function handleNewsletter(data) {
     Logger.log('[ERROR] handleNewsletter: ' + err.message + '\nStack: ' + err.stack);
     logError('handleNewsletter', err, data);
     return jsonResponse({ success: false, error: 'Subscription failed. Please try again later.' });
+  }
+}
+
+/**
+ * Owner notification for newsletter signups (user-requested).
+ * Fired only for NEW subscribers (duplicates return earlier).
+ * Wrapped in try/catch — a mail failure must never break the signup response.
+ */
+function sendNewsletterNotification(email, lang, data) {
+  try {
+    var cfg           = getConfig();
+    var instructorEmail = cfg.INSTRUCTOR_EMAIL || 'info@innerevolutionyoga.life';
+    var timestamp     = new Date().toLocaleString('de-AT', { timeZone: 'Europe/Vienna' });
+    var source        = String(data.source || 'website');
+
+    var html =
+      '<div style="font-family:Arial,sans-serif;max-width:600px;background:#fff;border-radius:8px;overflow:hidden">'
+      + '<div style="background:#1F4E36;padding:20px 24px">'
+      + '<h2 style="color:#ffffff;margin:0;font-size:18px">📧 New newsletter signup</h2>'
+      + '</div>'
+      + '<div style="padding:24px">'
+      + '<table style="border-collapse:collapse;width:100%;font-size:14px">'
+      + '<tr><td style="padding:8px 0;color:#666;width:120px">Email</td><td style="padding:8px 0;font-weight:bold">' + email + '</td></tr>'
+      + '<tr><td style="padding:8px 0;color:#666">Language</td><td style="padding:8px 0">' + (lang === 'de' ? 'German' : 'English') + '</td></tr>'
+      + '<tr><td style="padding:8px 0;color:#666">Source</td><td style="padding:8px 0">' + source + '</td></tr>'
+      + '<tr><td style="padding:8px 0;color:#666">Time (Vienna)</td><td style="padding:8px 0">' + timestamp + '</td></tr>'
+      + '</table>'
+      + '<p style="margin-top:20px;font-size:13px;color:#666">The subscriber is recorded in the \u201C📧 Newsletter\u201D tab of your main spreadsheet.</p>'
+      + '</div>'
+      + '</div>';
+
+    GmailApp.sendEmail(instructorEmail,
+      '📧 Newsletter signup: ' + email,
+      'New newsletter signup\nEmail: ' + email + '\nLanguage: ' + lang + '\nSource: ' + source + '\nTime: ' + timestamp,
+      { htmlBody: html, name: 'InneREvolution Website' }
+    );
+    Logger.log('[NEWSLETTER] owner notification sent to ' + instructorEmail);
+  } catch (mailErr) {
+    // Never fail the signup because of a notification problem
+    Logger.log('[ERROR] sendNewsletterNotification: ' + mailErr.message);
+    logError('sendNewsletterNotification', mailErr, { email: email, lang: lang });
   }
 }
 
@@ -734,6 +815,7 @@ function sendInstructorNotification(data, programName, finalPrice, instructorEma
     + '<tr><td style="padding:6px 12px;color:#666;background:#f9f9f9;font-size:13px">E-Mail</td><td style="padding:6px 12px;font-size:13px"><a href="mailto:' + data.email + '" style="color:#371964">' + data.email + '</a></td></tr>'
     + '<tr><td style="padding:6px 12px;color:#666;background:#f9f9f9;font-size:13px">Telefon</td><td style="padding:6px 12px;font-size:13px">' + data.phone + '</td></tr>'
     + '<tr><td style="padding:6px 12px;color:#666;background:#f9f9f9;font-size:13px">Programm</td><td style="padding:6px 12px;font-size:13px"><strong>' + programName + '</strong></td></tr>'
+    + (data.package ? '<tr><td style="padding:6px 12px;color:#666;background:#f9f9f9;font-size:13px">Paket</td><td style="padding:6px 12px;font-size:13px"><strong>' + data.package + '</strong></td></tr>' : '')
     + '<tr><td style="padding:6px 12px;color:#666;background:#f9f9f9;font-size:13px">Betrag</td><td style="padding:6px 12px"><strong style="color:#0A5A41;font-size:16px">EUR ' + finalPrice.toFixed(2) + '</strong></td></tr>'
     + friends + referral + comments
     + '</table>'
@@ -1667,12 +1749,14 @@ var FORM_FIELD_KEYWORDS = {
   email:    ['e-mail', 'email', 'mail'],
   phone:    ['telefon', 'telefonnummer', 'phone', 'handynummer', 'mobile'],
   program:  ['programm', 'program', 'kurs', 'workshop'],
+  package:  ['paket', 'package', 'paketwahl', 'tarif'],
+  earlybird: ['frühbucher', 'early-bird', 'earlybird', 'frühbucher-preis'],
   comments: ['anmerkung', 'comment', 'nachricht', 'message', 'frage']
 };
 
 // Map response-sheet columns to fields by header text (leftmost match wins).
 function mapFormColumns(headers) {
-  var map = { name: -1, email: -1, phone: -1, program: -1, comments: -1 };
+  var map = { name: -1, email: -1, package: -1, earlybird: -1, program: -1, comments: -1 };
   for (var c = 0; c < headers.length; c++) {
     var h = String(headers[c] || '').toLowerCase().trim();
     if (!h || h.indexOf('freund') >= 0 || h.indexOf('friend') >= 0) continue;
@@ -1827,7 +1911,9 @@ function handleFormResponse(e) {
       email:    map.email    >= 0 ? String(rowVals[map.email] || '').trim() : '',
       phone:    map.phone    >= 0 ? String(rowVals[map.phone] || '').trim() : '',
       program:  map.program  >= 0 ? String(rowVals[map.program] || '').trim() : '',
-      comments: map.comments >= 0 ? String(rowVals[map.comments] || '').trim() : ''
+      comments: map.comments >= 0 ? String(rowVals[map.comments] || '').trim() : '',
+      package:   map.package   >= 0 ? String(rowVals[map.package]   || '').trim() : '',
+      earlybird: map.earlybird >= 0 ? String(rowVals[map.earlybird] || '').trim() : ''
     };
     Logger.log('[BRIDGE] response: ' + data.fullName + ' / ' + data.email + ' / program=' + data.program);
 
@@ -1883,6 +1969,21 @@ function handleFormResponse(e) {
       ? (parseFloat(String(match.row[K.PREIS_TN]).replace(/[^0-9.,]/g, '').replace(',', '.')) || 0)
       : 0;
 
+    // Package pricing - early-bird aware. The sheet base price IS the BASIS price
+    // (formula auto-switches 240 to 290 on 20.11.), so the price printed in the form
+    // option label is ignored on purpose (labels can go stale):
+    //   BASIS        -> sheet base price (240 -> 290)
+    //   KOMFORT      -> base + 80 (320 -> 370)
+    //   UEBERNACHTUNG -> flat 480
+    var packageLabel = data.package || '';
+    var pl = packageLabel.toLowerCase();
+    if (pl.indexOf('komfort') >= 0) basePrice = basePrice + 80;
+    else if (pl.indexOf('bernachtung') >= 0) basePrice = 480;
+    // 'basis' or empty -> keep sheet base price
+
+    // Auto-heal: ensure the Paket header exists in column V (first import writes it)
+    if (String(book.getRange(1, B.PAKET + 1).getValue() || '').trim() === '') book.getRange(1, B.PAKET + 1).setValue('Paket');
+
     book.appendRow([
       new Date(),              // A  Datum
       data.fullName,           // B  Name
@@ -1898,7 +1999,8 @@ function handleFormResponse(e) {
       'NO',                    // N  Intake gesendet
       0, '', 'NO', '', 'NO',   // O–S Freunde / Referral
       bookingId,               // T  Booking ID
-      'active'                 // U  Status
+      'active',                // U  Status
+      packageLabel             // V  Paket
     ]);
 
     if (match) updateCapacityAfterBooking_(prog, match.rowIndex);
@@ -1908,7 +2010,7 @@ function handleFormResponse(e) {
     try {
       var progLabel = match ? match.name : ((data.program || 'UNASSIGNED') + ' — Programm bitte zuordnen!');
       sendInstructorNotification(
-        { fullName: data.fullName, email: data.email, phone: data.phone || '—', comments: data.comments },
+        { fullName: data.fullName, email: data.email, phone: data.phone || '—', comments: data.comments, package: packageLabel },
         progLabel, basePrice, cfg.INSTRUCTOR_EMAIL);
     } catch (err) { logError('handleFormResponse:notify', err, data); }
 

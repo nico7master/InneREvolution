@@ -31,6 +31,38 @@
       "Bad Tatzmannsdorf, Reduce",
       "Deutsch",
       ""
+    ],
+    [
+      "RT-2026-12-001",
+      "SONNENKRAFT — Surya Kriya Wochenend-Retreat",
+      240,
+      10,
+      10,
+      "Yes",
+      46360,
+      5,
+      2.5,
+      12.5,
+      "Die ursprüngliche Sonnenpraxis: Surya Kriya in einem Wochenende. „Wenn draußen die Sonne fehlt — weck deine innere.“ Erlerne die komplette Surya-Kriya-Praxis — danach selbstständig zu Hause weiterpraktizierbar. 5 Praxis-Einheiten · Spaziergänge in der Natur · Wellness & Ruhe dazwischen. Kleine Gruppe (max. 10) — persönliche Betreuung durch Nico Schlager, zertifizierter Isha-Lehrer.\nPakete (Frühbucher bis 20.11.): BASIS 240 € (danach 290 €) · KOMFORT 320 € (danach 370 €) · ÜBERNACHTUNG 480 € (+ Hotelzimmer).\nAnreise Fr ab 15:00 · Abreise So ca. 19:00 · Übernachtung optional auf Anfrage.",
+      "SIMON Hotel & Café, Bad Tatzmannsdorf",
+      "Deutsch",
+      ""
+    ],
+    [
+      "YM-2026-11-001",
+      "Yoga für Männer — Kraft & Ankommen",
+      0,
+      12,
+      12,
+      "Yes",
+      46337,
+      1,
+      1.25,
+      1.25,
+      "Kostenloses Schnuppertraining — sanfte Einführung für Männer, ohne Vorkenntnisse. Atmen · Loslassen · Auftanken. Ganz ohne Dresscode — einfach reinschnuppern. Mitbringen: bequeme Kleidung, Matte (falls vorhanden). Kleine Gruppe — bitte kurz anmelden.",
+      "Café Simon, Bad Tatzmannsdorf",
+      "Deutsch",
+      ""
     ]
   ],
   "sessions": [
@@ -81,6 +113,54 @@
       46172,
       0.7916666666678793,
       0.8541666666666666
+    ],
+    [
+      "RT-2026-12-001",
+      "SONNENKRAFT — Surya Kriya Wochenend-Retreat",
+      1,
+      46360,
+      0.625,
+      0.729
+    ],
+    [
+      "RT-2026-12-001",
+      "SONNENKRAFT — Surya Kriya Wochenend-Retreat",
+      2,
+      46361,
+      0.354,
+      0.458
+    ],
+    [
+      "RT-2026-12-001",
+      "SONNENKRAFT — Surya Kriya Wochenend-Retreat",
+      3,
+      46361,
+      0.667,
+      0.75
+    ],
+    [
+      "RT-2026-12-001",
+      "SONNENKRAFT — Surya Kriya Wochenend-Retreat",
+      4,
+      46362,
+      0.354,
+      0.458
+    ],
+    [
+      "RT-2026-12-001",
+      "SONNENKRAFT — Surya Kriya Wochenend-Retreat",
+      5,
+      46362,
+      0.625,
+      0.729
+    ],
+    [
+      "YM-2026-11-001",
+      "Yoga für Männer — Kraft & Ankommen",
+      1,
+      46337,
+      0.7083333,
+      0.7604167
     ]
   ]
 }
