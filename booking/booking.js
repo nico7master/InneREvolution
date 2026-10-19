@@ -73,7 +73,7 @@ var BOOKING_STRINGS = {
   de: {
     toSite:             '\u2190 Home',
     footerReturn:       'Zur Website zurück',
-    sessionsLabel:     function (n) { return n + (n === 1 ? ' Termin' : ' Termine'); },
+    sessionsLabel:     function (n) { return n + (n === 1 ? ' Einheit' : ' Einheiten'); },
     hrsLabel:          ' Std.',
     titleTag:          'Yoga Programme — InneREvolution Yoga',
     heroTitle:          'Yoga Programme',

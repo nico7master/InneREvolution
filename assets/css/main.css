@@ -28632,6 +28632,32 @@ body.low-fps section::after {
   box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.25);
   overflow: hidden;
   transition: border-color 0.28s ease, box-shadow 0.28s ease;
+  /* On narrow screens the long German label ('Benachrichtigen') would
+     squeeze the email input to ~30px — stack the capsule instead so the
+     input gets a full-width row and the button sits below it. */
+}
+@media screen and (max-width: 560px) {
+  #program-calendar .newsletter-form {
+    flex-direction: column;
+    border-radius: 1.4em;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+  }
+  #program-calendar .newsletter-form .newsletter-input {
+    border: 1px solid rgba(231, 220, 198, 0.4);
+    border-radius: 999px;
+    background: rgba(20, 10, 28, 0.55);
+    box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.25);
+    padding: 0.95rem 1.4rem;
+    text-align: center;
+  }
+  #program-calendar .newsletter-form .newsletter-button {
+    margin: 0.65rem auto 0;
+    padding: 0.9rem 2.4rem;
+    width: auto;
+    min-height: 46px;
+  }
 }
 
 /* Whole capsule glows when anything inside is focused */
