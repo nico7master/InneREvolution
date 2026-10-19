@@ -189,11 +189,12 @@
           </div>
 
           <!-- Package selector — dynamically rendered from sheet spec -->
-          <div class="form-group" id="package-group" style="display:none;">
-            <label for="field-package">Package <span class="required">*</span></label>
-            <select id="field-package" name="packageKey"></select>
+          <fieldset class="form-group package-fieldset" id="package-group" style="display:none;">
+            <legend id="package-legend">Package <span class="required">*</span></legend>
+            <div class="package-cards" id="package-cards" role="radiogroup" aria-labelledby="package-legend"></div>
+            <input type="hidden" id="field-package" name="packageKey" value="" />
             <div id="package-detail" class="package-detail" aria-live="polite"></div>
-          </div>
+          </fieldset>
 
           <div class="form-group">
             <label for="field-name">Full Name <span class="required">*</span></label>
@@ -286,7 +287,7 @@
     </div>
 
     <script src="./config.js"></script>
-    <script src="./booking.js?v=202610193"></script>
+    <script src="./booking.js?v=202610194"></script>
 
     <script src="/assets/js/topbar-scroll.js?v=202608292"></script>
   </body>

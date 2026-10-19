@@ -59,6 +59,8 @@ var BOOKING_STRINGS = {
     successSpamTip:     'If nothing arrives within 2 minutes, please check your spam folder.',
     successContactFallback: function(mail) { return 'Still nothing? Email us directly at ' + mail + '.'; },
     payNowBtn: 'Pay now & confirm your spot',
+    labelPackage: 'Package',
+    earlyBirdNote: 'Early-bird prices until 20 November 2026',
     successManual: function (email) { return 'Your spot is reserved! ✉️ I will email you the payment details (' + email + ') within 24 hours — your place is already secured.'; },
     alertTimeout:       'The request is taking longer than expected. Your booking may still go through \u2014 please check your email in a few minutes before retrying.',
     alertNetwork:       'We couldn\u2019t reach the booking server. Please check your internet connection and try again.',
@@ -118,6 +120,8 @@ var BOOKING_STRINGS = {
     successSpamTip:     'Falls innerhalb von 2 Minuten nichts ankommt, schau bitte auch im Spam-Ordner nach.',
     successContactFallback: function(mail) { return 'Immer noch nichts? Schreib uns direkt an ' + mail + '.'; },
     payNowBtn: 'Jetzt zahlen & Platz sichern',
+    labelPackage: 'Paket',
+    earlyBirdNote: 'Frühbucher-Preise bis 20. November 2026',
     successManual: function (email) { return 'Dein Platz ist reserviert! ✉️ Ich schicke dir die Zahlungsdetails (' + email + ') innerhalb von 24 Stunden per E-Mail — dein Platz ist bereits gesichert.'; },
     alertTimeout:       'Die Anfrage dauert l\u00e4nger als gewohnt. Deine Buchung k\u00f6nnte trotzdem durchgehen \u2014 bitte pr\u00fcfe in ein paar Minuten dein Postfach, bevor du es erneut versuchst.',
     alertNetwork:       'Der Buchungsserver ist gerade nicht erreichbar. Bitte pr\u00fcfe deine Internetverbindung und versuche es erneut.',
@@ -400,6 +404,9 @@ function applyStaticTranslations() {
   el = document.querySelector('#programs-empty p:first-of-type');  if (el) el.textContent = bs('noPrograms');
   el = document.querySelector('#programs-empty .empty-subtext');
   if (el) el.innerHTML = bs('checkBack') + '<a href="' + homeHref + '">' + bs('returnSiteLink') + '</a>.';
+  /* Package legend */
+  el = document.getElementById('package-legend');
+  if (el) el.innerHTML = bs('labelPackage') + ' <span class="required">*</span>';
   /* Modal title */
   el = document.getElementById('modal-title');                     if (el) el.textContent = bs('modalTitle');
   /* Form labels — preserve child spans where needed */
@@ -500,13 +507,22 @@ function openModal(programId) {
   })(program.packageSpec, program.price);
 
   if (pkgs.length > 1) {
+    // Production package cards: real radio inputs (native keyboard + screen-reader
+    // support), styled as selectable cards. Hidden input keeps payload parity.
+    const cardsWrap = document.getElementById('package-cards');
+    cardsWrap.innerHTML = '';
     pkgs.forEach((pk, i) => {
-      const opt = document.createElement('option');
-      opt.value = pk.key;
-      opt.dataset.price = pk.price;
-      opt.textContent = `${pk.label} \u2014 \u20AC${pk.price.toFixed(2)}`;
-      pkgSelect.appendChild(opt);
+      const card = document.createElement('label');
+      card.className = 'package-card';
+      card.innerHTML =
+        '<input type="radio" name="packageChoice" value="' + pk.key + '" data-price="' + pk.price + '"' + (i === 0 ? ' checked' : '') + ' />' +
+        '<span class="package-card-body">' +
+          '<span class="package-card-name">' + pk.label + '</span>' +
+          '<span class="package-card-price">€' + pk.price.toFixed(0) + '</span>' +
+        '</span>';
+      cardsWrap.appendChild(card);
     });
+    pkgSelect.value = pkgs[0].key;
     pkgGroup.style.display = '';
     // Show package contents hint from the description's package lines when present
     const descPkgLines = (program.description || '').split('\n').filter(l => /\u2022|BASIS|KOMFORT|\u00dcBERNACHTUNG/i.test(l));
@@ -514,6 +530,7 @@ function openModal(programId) {
   } else {
     // Single/implicit price — no selector
     pkgGroup.style.display = 'none';
+    pkgSelect.value = '';
   }
   window._modalPackages = pkgs;
 
@@ -761,7 +778,9 @@ async function handleSubmit(event) {
 
   const bringingFriends = document.querySelector('input[name="bringingFriends"]:checked')?.value === 'yes';
   const pkgSelect = document.getElementById('field-package');
-  const pkgKey    = (pkgSelect && pkgSelect.offsetParent !== null && pkgSelect.value) ? pkgSelect.value : '';
+  const pkgGroupEl = document.getElementById('package-group');
+  const pkgVisible = pkgGroupEl && pkgGroupEl.style.display !== 'none';
+  const pkgKey    = (pkgSelect && pkgVisible && pkgSelect.value) ? pkgSelect.value : '';
   // Package price overrides the card base price for discount math (parity with backend)
   const effectiveBase = (pkgKey && window._modalPackages) ?
     ((window._modalPackages.find(pk => pk.key === pkgKey) || {}).price || basePrice) : basePrice;
@@ -864,11 +883,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Friends count input
   document.getElementById('field-friends-count').addEventListener('input', onFriendsCountChange);
 
-  // Package selector — live price updates when switching packages
-  const pkgSel = document.getElementById('field-package');
-  if (pkgSel) {
-    pkgSel.addEventListener('change', function () {
-      const pk = (window._modalPackages || []).find(p => p.key === this.value);
+  // Package cards — live price updates when switching packages
+  const pkgCards = document.getElementById('package-cards');
+  if (pkgCards) {
+    pkgCards.addEventListener('change', function (e) {
+      if (e.target.name !== 'packageChoice') return;
+      document.getElementById('field-package').value = e.target.value;
+      const pk = (window._modalPackages || []).find(p => p.key === e.target.value);
       if (pk) updatePriceDisplay(pk.price);
     });
   }

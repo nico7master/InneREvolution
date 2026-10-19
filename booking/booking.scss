@@ -632,6 +632,99 @@ a {
   opacity: 0;
 }
 
+// Package selector — production radio-card design
+.package-fieldset {
+  border: none;
+  padding: 0;
+  margin: 0 0 1.25em;
+
+  legend {
+    font-size: 0.8em;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(241, 224, 255, 0.75);
+    padding: 0;
+    margin-bottom: 0.6em;
+  }
+}
+
+.package-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.6em;
+
+  @media (max-width: 560px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.package-card {
+  display: block;
+  cursor: pointer;
+  position: relative;
+
+  // Native radio visually hidden but keyboard-reachable
+  input[type='radio'] {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+    margin: 0;
+  }
+
+  .package-card-body {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.2em;
+    padding: 0.85em 1em;
+    border-radius: 0.8em;
+    border: 1px solid rgba(241, 224, 255, 0.22);
+    background: rgba(241, 224, 255, 0.06);
+    transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .package-card-name {
+    font-size: 0.78em;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(241, 224, 255, 0.85);
+  }
+
+  .package-card-price {
+    font-size: 1.25em;
+    font-weight: 700;
+    color: #ffffff;
+  }
+
+  &:hover .package-card-body {
+    border-color: rgba(232, 86, 42, 0.55);
+    background: rgba(232, 86, 42, 0.08);
+  }
+
+  input[type='radio']:checked + .package-card-body {
+    border-color: #e8562a;
+    background: rgba(232, 86, 42, 0.14);
+    box-shadow: 0 0 0 1px #e8562a, 0 6px 18px rgba(232, 86, 42, 0.22);
+    transform: translateY(-1px);
+
+    .package-card-name {
+      color: #ffb699;
+    }
+
+    .package-card-price {
+      color: #ff8a5c;
+    }
+  }
+
+  input[type='radio']:focus-visible + .package-card-body {
+    outline: 2px solid #ffb699;
+    outline-offset: 2px;
+  }
+}
+
 // Package selector detail hint (contents line from sheet description)
 .package-detail {
   font-size: 0.85em;
