@@ -760,7 +760,10 @@ a {
   }
 
   @include breakpoint('<=mobile') {
-    max-height: 100vh;
+    /* Cap to the overlay's inner box (viewport minus padding) so the header
+       with the close button always stays on-screen and reachable. */
+    max-height: calc(100vh - 2 * $padding-md);
+    max-height: calc(100dvh - 2 * $padding-md);
     border-radius: 1.25em 1.25em 0 0;
     align-self: flex-end;
   }

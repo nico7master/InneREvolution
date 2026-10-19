@@ -142,8 +142,8 @@ $btn.attr('aria-expanded', !isOpen);
 $sub.toggleClass('is-open', !isOpen);
 });
 
-// Close on link click (sublinks and direct links)
-$mobileNav.find('.mobileNav-sublink, .mobileNav-item:not(.mobileNav-parent) .mobileNav-link').on('click', function () {
+// Close on link click (sublinks, direct links, Book Now, language switch)
+$mobileNav.find('.mobileNav-sublink, .mobileNav-item:not(.mobileNav-parent) .mobileNav-link, .mobileNav-book, .mobileNav-langlink').on('click', function () {
 closeNav();
 });
 

@@ -718,7 +718,10 @@ a:hover {
 }
 @media screen and (max-width: 736px) {
   .modal {
-    max-height: 100vh;
+    /* Cap to the overlay's inner box (viewport minus padding) so the header
+       with the close button always stays on-screen and reachable. */
+    max-height: calc(100vh - 32px);
+    max-height: calc(100dvh - 32px);
     border-radius: 1.25em 1.25em 0 0;
     align-self: flex-end;
   }
