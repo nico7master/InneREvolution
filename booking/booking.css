@@ -1172,3 +1172,44 @@ a:hover {
   box-shadow: 0 0 24px rgba(223, 115, 102, 0.35);
   transition: outline 0.3s ease, box-shadow 0.3s ease;
 }
+
+/* Share button — small icon button in the card footer (Web Share API) */
+.btn-share {
+  background: transparent;
+  color: #D3D3D3;
+  border: 1.5px solid white;
+  border-radius: 999px;
+  width: 2.3em;
+  height: 2.3em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: color 0.25s ease, border-color 0.25s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+.btn-share:hover {
+  color: #ff760d;
+  border-color: #ff760d;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(255, 118, 13, 0.2);
+}
+.btn-share:focus-visible {
+  outline: 2px solid #ff760d;
+  outline-offset: 2px;
+}
+.btn-share svg {
+  display: block;
+}
+
+/* Expired-event notice — shown when a short link targets a past event */
+.expired-notice {
+  display: none;
+  background: rgba(255, 118, 13, 0.08);
+  border-left: 3px solid #ff760d;
+  border-radius: 8px;
+  padding: 0.9em 1.2em;
+  margin: 0 0 1.5em 0;
+  font-family: "FedraSansPro", sans-serif;
+  font-size: 0.95em;
+  color: #4a4a4a;
+}

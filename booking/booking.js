@@ -24,6 +24,9 @@ var BOOKING_STRINGS = {
     fullBadge:          'Full',
     soldOutBtn:         'Sold Out',
     registerBtn:        'Register',
+    shareTitle:         'Share this event',
+    eventOverNotice:    'This event has already taken place — here you’ll find all current programs & events.',
+    shareCopied:        'Link copied! You can paste it anywhere.',
     modalTitle:         'Register',
     freeLabel:          'Free',
     labelName:          'Full Name',
@@ -85,6 +88,9 @@ var BOOKING_STRINGS = {
     fullBadge:          'Voll',
     soldOutBtn:         'Ausverkauft',
     registerBtn:        'Anmelden',
+    shareTitle:         'Dieses Event teilen',
+    eventOverNotice:    'Dieses Event hat bereits stattgefunden — hier findest du alle aktuellen Programme & Events.',
+    shareCopied:        'Link kopiert! Du kannst ihn überall einfügen.',
     modalTitle:         'Anmelden',
     freeLabel:          'Kostenlos',
     labelName:          'Vollst\u00e4ndiger Name',
@@ -145,6 +151,73 @@ function bs(key) { return BOOKING_STRINGS[window._bookingLang || 'en'][key]; }
 
 // ─── State ────────────────────────────────────────────────────────────────────
 let programs       = [];
+
+// ─── Dynamic short-link slugs (derived from program names — zero config) ──────────────
+// Every program in the sheet automatically gets /b/<slug>: the slug is the
+// shortest unique prefix of its slugified name (min 4 chars). New listings
+// therefore get a working short URL the moment they sync — no manual steps.
+function slugify(name) {
+  return String(name || '').toLowerCase()
+    .replace(/[äöüß]/g, function (ch) {
+      return { 'ä': 'ae', 'ö': 'oe', 'ü': 'ue', 'ß': 'ss' }[ch];
+    })
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+// Map: slug -> program id. Full slugs always work; additionally every
+// unambiguous prefix (4+ chars) works, so /b/sonn and /b/sonnenkraft both hit.
+// Prefixes shared by several programs are skipped (never ambiguous matches).
+function buildSlugMap(list) {
+  const fulls = list.map(p => ({ id: p.id, full: slugify(p.name) })).filter(x => x.full);
+  const map = {};
+  fulls.forEach(x => { map[x.full] = x.id; });
+  fulls.forEach(x => {
+    for (let len = 4; len < x.full.length; len++) {
+      const cand = x.full.substring(0, len);
+      if (fulls.some(o => o.id !== x.id && o.full.startsWith(cand))) continue; // ambiguous
+      if (!(cand in map)) map[cand] = x.id;
+    }
+  });
+  return map;
+}
+// Share slug: the program's first *meaningful* word (e.g. "sonnenkraft",
+// "maenner") so links read naturally. Generic leading words (yoga, retreat, ...)
+// are skipped. Falls back to the full slug if uniqueness is at risk.
+const SLUG_STOP_WORDS = ['yoga', 'retreat', 'event', 'workshop', 'kurs', 'course', 'seminar', 'the', 'der', 'die', 'das', 'ein', 'eine', 'fuer', 'und', 'mit', 'am', 'im', 'in', 'on', 'at', 'for', 'with', 'and', 'of', 'to'];
+function programSlug(p, list) {
+  const words = slugify(p.name).split('-').filter(Boolean);
+  let pick = words[0];
+  for (const w of words) {
+    if (SLUG_STOP_WORDS.indexOf(w) === -1) { pick = w; break; }
+  }
+  const collision = list.some(o => {
+    if (o.id === p.id) return false;
+    const ow = slugify(o.name).split('-').filter(Boolean);
+    let opick = ow[0];
+    for (const w of ow) {
+      if (SLUG_STOP_WORDS.indexOf(w) === -1) { opick = w; break; }
+    }
+    return opick === pick;
+  });
+  return collision ? slugify(p.name) : pick;
+}
+// ─── Share: Web Share API with clipboard fallback ─────────────────────────────────────
+function handleShare(programId, btn) {
+  const p = programs.find(x => x.id === programId);
+  if (!p) return;
+  const lang = window._bookingLang === 'de' ? 'de' : 'en';
+  const url = 'https://innerevolutionyoga.life/b/' + programSlug(p, programs) + '?lang=' + lang;
+  const title = p.name;
+  const done = () => { if (window.toastAlert) toastAlert(bs('shareCopied')); else alert(bs('shareCopied')); };
+  if (navigator.share) {
+    navigator.share({ title: title, url: url }).catch(function () {});
+  } else if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url).then(done).catch(function () { window.prompt(bs('shareTitle'), url); });
+  } else {
+    window.prompt(bs('shareTitle'), url);
+  }
+}
+
 let sessions       = [];
 let discountCodes  = [];
 let activeDiscount = { pct: 0, code: '', description: '' };
@@ -356,6 +429,9 @@ function buildCard(p) {
         <span class="program-card-price">${p.price > 0 ? "&euro;" + p.price.toFixed(2) : bs("freeLabel")}</span>
         <div class="footer-right">
           ${spotsHtml}
+          <button class="btn-share" data-share-id="${p.id}" title="${bs('shareTitle')}" aria-label="${bs('shareTitle')}">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+          </button>
           ${isFull
             ? `<button class="btn-register" disabled aria-disabled="true">${bs('soldOutBtn')}</button>`
             : (() => {
@@ -444,7 +520,7 @@ function applyStaticTranslations() {
 // ─── End static translations ──────────────────────────────────────────────────
 
 // ─── Modal ────────────────────────────────────────────────────────────────────
-function openModal(programId) {
+function openModal(programId, presetPkg) {
   const program = programs.find(p => p.id === programId);
   if (!program) return;
 
@@ -523,6 +599,15 @@ function openModal(programId) {
       cardsWrap.appendChild(card);
     });
     pkgSelect.value = pkgs[0].key;
+    // Deep-link package preselect: check the matching card and sync state
+    var effectivePkg = pkgs[0]; // var: function-scoped, read later by initial-price line
+    if (presetPkg) {
+      const presetRadio = pkgs.map((pk, i) => ({ pk, i })).find(x => x.pk.key === presetPkg);
+      if (presetRadio) {
+        const r = cardsWrap.querySelectorAll('input[name="packageChoice"]')[presetRadio.i];
+        if (r) { r.checked = true; pkgSelect.value = presetRadio.pk.key; effectivePkg = presetRadio.pk; }
+      }
+    }
     pkgGroup.style.display = '';
     // Show package contents hint from the description's package lines when present
     const descPkgLines = (program.description || '').split('\n').filter(l => /\u2022|BASIS|KOMFORT|\u00dcBERNACHTUNG/i.test(l));
@@ -543,8 +628,8 @@ function openModal(programId) {
   const submitLabel = document.getElementById('submit-label');
   if (submitLabel) submitLabel.textContent = bs('submitBtn');
 
-  // Set initial price (package-aware)
-  const initialPrice = pkgs.length > 1 ? pkgs[0].price : program.price;
+  // Set initial price (package-aware, respects deep-link preselect)
+  const initialPrice = pkgs.length > 1 ? effectivePkg.price : program.price;
   updatePriceDisplay(initialPrice);
 
   // Open overlay
@@ -896,6 +981,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Register buttons — open the native modal
   document.getElementById('programs-grid').addEventListener('click', function(e) {
+    var shareBtn = e.target.closest('.btn-share');
+    if (shareBtn) { handleShare(shareBtn.dataset.shareId, shareBtn); return; }
     var btn = e.target.closest('.btn-register');
     if (btn && !btn.disabled && btn.dataset.programId) openModal(btn.dataset.programId);
   });
@@ -963,18 +1050,52 @@ document.addEventListener('DOMContentLoaded', async () => {
       await Promise.all([ fetchPrograms(), fetchSessions() ]);
     }
     renderPrograms();
-    // Deep link: /booking/?program=SK-001 — scroll to and highlight the program card
+    // Deep link: /booking/?program=ID (legacy) or /booking/?p=<slug> (short links
+    // from /b/<slug>) — opens the booking modal directly, optionally pre-selecting
+    // a package via &pkg=. Fallback: scroll to + highlight the program card.
     const urlParams = new URLSearchParams(window.location.search);
-    const preselect = urlParams.get('program');
+    let preselect = urlParams.get('program');
+    const slugParam = (urlParams.get('p') || '').toLowerCase();
+    if (!preselect && slugParam) {
+      const slugMap = buildSlugMap(programs);
+      preselect = slugMap[slugParam] ||
+        (programs.find(x => x.id.toLowerCase() === slugParam) || {}).id || null;
+      // Human-friendly fallback: match the term as a whole word inside exactly
+      // one program slug (e.g. "maenner", "retreat") — ambiguous terms skip.
+      if (!preselect) {
+        const tok = slugParam.replace(/[^a-z0-9-]/g, '');
+        if (tok) {
+          const hits = programs.filter(p => ('-' + slugify(p.name) + '-').includes('-' + tok + '-'));
+          if (hits.length === 1) preselect = hits[0].id;
+        }
+      }
+    }
+    const pkgParam = (urlParams.get('pkg') || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
     if (preselect) {
       setTimeout(() => {
         const card = document.querySelector(`[data-id="${preselect}"]`);
-        if (card) {
+        if (!card) {
+          // Slug resolved to a known program whose card is not rendered
+          // (expired / inactive): show notice, list of current programs stays.
+          if (programs.some(x => x.id === preselect)) {
+            const note = document.getElementById('expired-notice');
+            if (note) {
+              note.textContent = bs('eventOverNotice');
+              note.style.display = 'block';
+            }
+            const grid = document.getElementById('programs-grid');
+            if (grid) grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+          return;
+        }
+        if (BOOKING_BACKEND_URL && !card.classList.contains('full')) {
+          openModal(preselect, pkgParam || null);
+        } else {
           card.scrollIntoView({ behavior: 'smooth', block: 'center' });
           card.classList.add('is-highlighted');
           setTimeout(() => card.classList.remove('is-highlighted'), 3000);
         }
-      }, 200);
+      }, 300);
     }
   } catch (err) {
     console.error('Failed to load booking data:', err);

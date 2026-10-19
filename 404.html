@@ -3,7 +3,22 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>404 — Page Not Found | InneREvolution Yoga</title>
+    <script>
+    // Short-link router: /b/<slug>[/package] -> /booking/?p=<slug>&lang=de[&pkg=...]
+    // Works for every program automatically (slugs derive from program names in
+    // booking.js). Unknown /b/ paths fall through to the normal 404 page.
+    (function () {
+      var m = location.pathname.match(/^\/b\/([a-z0-9-]+)(?:\/([a-zA-Z0-9]+))?\/?$/i);
+      if (m) {
+        var target = '/booking/?p=' + encodeURIComponent(m[1]) + '&lang=de';
+        if (m[2]) target += '&pkg=' + encodeURIComponent(m[2].toUpperCase());
+        location.replace(target);
+        return;
+      }
+      document.documentElement.style.visibility = 'visible';
+    })();
+  </script>
+  <title>404 — Page Not Found | InneREvolution Yoga</title>
     <meta name="description" content="The page you were looking for could not be found. Return to InneREvolution Yoga to explore classical Hatha Yoga programs." />
     <meta property="og:title" content="Page Not Found | InneREvolution Yoga" />
     <meta property="og:image" content="https://innerevolutionyoga.life/images/profile/NicoSchlagerYoga.jpg" />
