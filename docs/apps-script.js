@@ -22,7 +22,7 @@
  *       Script Properties → no duplicate Stripe products on re-edit.
  *   R8. Cancellation flow: signed `doGet(?action=cancel&id=BK-..&t=..)`
  *       marks booking cancelled, frees the spot, notifies instructor.
- *   R9. `logError()` helper writes to `📛 Error Log` sheet (created on
+ *   R9. `logError()` helper writes to `\u{1F4DB} Error Log` sheet (created on
  *       demand) + emails instructor on critical errors.
  *   R10. Friend referral matching now tries email first, then name.
  *
@@ -35,10 +35,10 @@
  *   - safeAlert() trigger-safe UI helper
  *
  * COLUMN MAPPINGS (see COLS constant below for single source of truth):
- *   🧘 Kursplanung (data starts row 4, 3 header rows)
- *   📋 Buchungen   (data starts row 2, 1 header row)
- *   🏷 Rabatte     (data starts row 3, title + header)
- *   📅 Sessions    (data starts row 2, 1 header row)
+ *   \u{1F9D8} Kursplanung (data starts row 4, 3 header rows)
+ *   \u{1F4CB} Buchungen   (data starts row 2, 1 header row)
+ *   \u{1F3F7} Rabatte     (data starts row 3, title + header)
+ *   \u{1F4C5} Sessions    (data starts row 2, 1 header row)
  *
  * Script Properties required:
  *   SHEET_ID, CALENDAR_ID, INSTRUCTOR_EMAIL,
@@ -197,9 +197,9 @@ function logError(context, err, extra) {
   try {
     var cfg = getConfig();
     var ss  = SpreadsheetApp.openById(cfg.SHEET_ID);
-    var sh  = ss.getSheetByName('📛 Error Log');
+    var sh  = ss.getSheetByName('\u{1F4DB} Error Log');
     if (!sh) {
-      sh = ss.insertSheet('📛 Error Log');
+      sh = ss.insertSheet('\u{1F4DB} Error Log');
       sh.appendRow(['Timestamp', 'Context', 'Error', 'Stack', 'Data']);
       sh.getRange(1, 1, 1, 5).setFontWeight('bold').setBackground('#5F1630').setFontColor('#ffffff');
       sh.setFrozenRows(1);
@@ -280,7 +280,7 @@ function handleCancellation(bookingId, token) {
   try {
     if (!lock.tryLock(10000)) return htmlPage('Server busy, please retry in a moment.', '#5F1630');
     var ss = SpreadsheetApp.openById(cfg.SHEET_ID);
-    var book = ss.getSheetByName('📋 Buchungen') || ss.getSheetByName('Bookings');
+    var book = ss.getSheetByName('\u{1F4CB} Buchungen') || ss.getSheetByName('Bookings');
     if (!book) return htmlPage('Booking sheet not found.', '#5F1630');
     var rows = book.getDataRange().getValues();
     var B = COLS.BUCHUNGEN;
@@ -367,7 +367,7 @@ function doPost(e) {
 }
 
 // ─── PACKAGE RESOLVER (sheet-driven, early-bird safe) ────────────────────────
-// Spec grammar in 🧘 Kursplanung column Z (PACKAGE_SPEC):
+// Spec grammar in \u{1F9D8} Kursplanung column Z (PACKAGE_SPEC):
 //   "BASIS:base|KOMFORT:+80|UEBERNACHTUNG:480"
 //   value 'base'   -> current sheet base price (early-bird formula auto-switches)
 //   value '+N'     -> base + N
@@ -425,9 +425,9 @@ function handleBooking(data) {
   var B   = COLS.BUCHUNGEN;
   var D   = COLS.RABATTE;
   var ss   = SpreadsheetApp.openById(cfg.SHEET_ID);
-  var prog = ss.getSheetByName('🧘 Kursplanung') || ss.getSheetByName('Programs');
-  var disc = ss.getSheetByName('🏷 Rabatte')      || ss.getSheetByName('Discount Codes');
-  var book = ss.getSheetByName('📋 Buchungen')     || ss.getSheetByName('Bookings');
+  var prog = ss.getSheetByName('\u{1F9D8} Kursplanung') || ss.getSheetByName('Programs');
+  var disc = ss.getSheetByName('\u{1F3F7} Rabatte')      || ss.getSheetByName('Discount Codes');
+  var book = ss.getSheetByName('\u{1F4CB} Buchungen')     || ss.getSheetByName('Bookings');
 
   if (!prog) return jsonResponse({ success: false, error: 'Sheet tab not found: Kursplanung' });
   if (!book) return jsonResponse({ success: false, error: 'Sheet tab not found: Buchungen' });
@@ -574,15 +574,18 @@ function handleBooking(data) {
     // Build formatted session list from Sessions tab for the confirmation email
     var sessionsStr = '';
     var S = COLS.SESSIONS;
-    var sessSheet   = ss.getSheetByName('📅 Sessions') || ss.getSheetByName('Sessions');
+    var sessSheet   = ss.getSheetByName('\u{1F4C5} Sessions') || ss.getSheetByName('Sessions');
     if (sessSheet) {
       var DAYS_DE   = ['So','Mo','Di','Mi','Do','Fr','Sa'];
       var MONTHS_DE = ['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
       var fmtTime = function(t) {
         if (t instanceof Date) return ('0'+t.getHours()).slice(-2)+':'+('0'+t.getMinutes()).slice(-2);
         if (typeof t === 'number') {
-          var h = Math.floor(t * 24);
-          var m = Math.round((t * 24 - h) * 60);
+          // Round total minutes first, then split — avoids float drift where
+          // exact hours (e.g. 17:00) compute as 16.9999... -> "16:60".
+          var totalMin = Math.round(t * 24 * 60);
+          var h = Math.floor(totalMin / 60) % 24;
+          var m = totalMin % 60;
           return ('0'+h).slice(-2)+':'+('0'+m).slice(-2);
         }
         if (typeof t === 'string' && /\d/.test(t)) return t.trim().substring(0,5);
@@ -710,7 +713,7 @@ function sendNewsletterNotification(email, lang, data) {
     var html =
       '<div style="font-family:Arial,sans-serif;max-width:600px;background:#fff;border-radius:8px;overflow:hidden">'
       + '<div style="background:#1F4E36;padding:20px 24px">'
-      + '<h2 style="color:#ffffff;margin:0;font-size:18px">📧 New newsletter signup</h2>'
+      + '<h2 style="color:#ffffff;margin:0;font-size:18px">\u{1F4E7} New newsletter signup</h2>'
       + '</div>'
       + '<div style="padding:24px">'
       + '<table style="border-collapse:collapse;width:100%;font-size:14px">'
@@ -719,12 +722,12 @@ function sendNewsletterNotification(email, lang, data) {
       + '<tr><td style="padding:8px 0;color:#666">Source</td><td style="padding:8px 0">' + source + '</td></tr>'
       + '<tr><td style="padding:8px 0;color:#666">Time (Vienna)</td><td style="padding:8px 0">' + timestamp + '</td></tr>'
       + '</table>'
-      + '<p style="margin-top:20px;font-size:13px;color:#666">The subscriber is recorded in the \u201C📧 Newsletter\u201D tab of your main spreadsheet.</p>'
+      + '<p style="margin-top:20px;font-size:13px;color:#666">The subscriber is recorded in the \u201C\u{1F4E7} Newsletter\u201D tab of your main spreadsheet.</p>'
       + '</div>'
       + '</div>';
 
     GmailApp.sendEmail(instructorEmail,
-      '📧 Newsletter signup: ' + email,
+      '\u{1F4E7} Newsletter signup: ' + email,
       'New newsletter signup\nEmail: ' + email + '\nLanguage: ' + lang + '\nSource: ' + source + '\nTime: ' + timestamp,
       { htmlBody: html, name: 'InneREvolution Website' }
     );
@@ -826,7 +829,7 @@ function sendClientConfirmation(data, programName, finalPrice, discountPct, payU
     + btnHtml
     + (payUrl
       ? '<p style="font-size:13px;color:#999;text-align:center;margin:0 0 24px">Zahle sofort und sichere deine Teilnahme.</p>'
-      : '<div style="background:#f8f5ff;border-radius:10px;padding:16px 20px;margin:0 0 24px;text-align:center"><p style="margin:0 0 4px;font-size:14px;color:#371964;font-weight:600">📝 Zahlung</p><p style="margin:0;font-size:13px;color:#555;line-height:1.6">Die Zahlungsdetails (Bankverbindung) schicke ich dir in Kürze separat per E-Mail zu. Dein Platz ist bereits reserviert.</p></div>')
+      : '<div style="background:#f8f5ff;border-radius:10px;padding:16px 20px;margin:0 0 24px;text-align:center"><p style="margin:0 0 4px;font-size:14px;color:#371964;font-weight:600">\u{1F4DD} Zahlung</p><p style="margin:0;font-size:13px;color:#555;line-height:1.6">Die Zahlungsdetails (Bankverbindung) schicke ich dir in Kürze separat per E-Mail zu. Dein Platz ist bereits reserviert.</p></div>')
     + '<div style="border-top:1px solid #eee;margin:24px 0"></div>'
     + '<p style="font-size:14px;color:#555;line-height:1.7">Hast du Fragen? Antworte einfach auf diese E-Mail — ich helfe dir gerne.</p>'
     + '<p style="font-size:15px;color:#371964;margin:24px 0 8px">Pranam,</p>'
@@ -834,7 +837,7 @@ function sendClientConfirmation(data, programName, finalPrice, discountPct, payU
     + '</div>'
     + '</div>';
   // Subject: use plain Unicode emoji — GmailApp handles UTF-8 subjects fine
-  GmailApp.sendEmail(data.email, '🙏 Anmeldung bestätigt — ' + programName,
+  GmailApp.sendEmail(data.email, '\u{1F64F} Anmeldung bestätigt — ' + programName,
     'Namaskaram ' + data.fullName + ', dein Platz in ' + programName + ' ist reserviert. Gesamtbetrag: EUR ' + finalPrice.toFixed(2) + (payUrl ? ' — Jetzt bezahlen: ' + payUrl : ''),
     { htmlBody: html });
   Logger.log('[EMAIL] Confirmation -> ' + data.email);
@@ -996,7 +999,7 @@ function handleStripeWebhook(event) {
     var email = (obj.customer_details && obj.customer_details.email) || obj.receipt_email || obj.customer_email || '';
 
     var ss   = SpreadsheetApp.openById(cfg.SHEET_ID);
-    var book = ss.getSheetByName('📋 Buchungen') || ss.getSheetByName('Bookings');
+    var book = ss.getSheetByName('\u{1F4CB} Buchungen') || ss.getSheetByName('Bookings');
     if (!book) return jsonResponse({ received: false, error: 'no_buchungen' });
     var B = COLS.BUCHUNGEN;
     var rows = book.getDataRange().getValues();
@@ -1049,22 +1052,22 @@ function onEdit(e) {
     var sheetName = sheet.getName();
 
     // Auto-color row by Program ID when editing relevant tabs
-    if (sheetName === '🧘 Kursplanung' || sheetName === 'Programs' ||
-        sheetName === '📅 Sessions' || sheetName === 'Sessions' ||
-        sheetName === '📋 Buchungen' || sheetName === 'Bookings') {
+    if (sheetName === '\u{1F9D8} Kursplanung' || sheetName === 'Programs' ||
+        sheetName === '\u{1F4C5} Sessions' || sheetName === 'Sessions' ||
+        sheetName === '\u{1F4CB} Buchungen' || sheetName === 'Bookings') {
       // Kursplanung: Isha Code col A (1); Buchungen: Instance ID col E (5); Sessions: Instance ID col A (1)
-      var pidCol = (sheetName === '📋 Buchungen' || sheetName === 'Bookings') ? 5 : 1;
+      var pidCol = (sheetName === '\u{1F4CB} Buchungen' || sheetName === 'Bookings') ? 5 : 1;
       var editedRow = e.range.getRow();
-      var minRow = (sheetName === '🧘 Kursplanung' || sheetName === 'Programs') ? 4 : 2;
+      var minRow = (sheetName === '\u{1F9D8} Kursplanung' || sheetName === 'Programs') ? 4 : 2;
       if (editedRow >= minRow) {
         colorRowByProgramId(sheet, editedRow, pidCol);
       }
-      if (sheetName === '📋 Buchungen' || sheetName === 'Bookings') return;
-      if (sheetName === '📅 Sessions' || sheetName === 'Sessions') return;
+      if (sheetName === '\u{1F4CB} Buchungen' || sheetName === 'Bookings') return;
+      if (sheetName === '\u{1F4C5} Sessions' || sheetName === 'Sessions') return;
     }
 
     // Bug #3 FIX: check correct sheet name (was 'Programs')
-    if (sheetName !== '🧘 Kursplanung' && sheetName !== 'Programs') return;
+    if (sheetName !== '\u{1F9D8} Kursplanung' && sheetName !== 'Programs') return;
     var row = e.range.getRow();
     var col = e.range.getColumn();
     if (row < 4) return; // Data starts at row 4
@@ -1150,19 +1153,19 @@ function colorRowByProgramId(sheet, rowIndex, colIndex) {
 function recolorAllRows() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   // Kursplanung — Isha Code col A (1), data starts row 4
-  var programs = ss.getSheetByName('🧘 Kursplanung') || ss.getSheetByName('Programs');
+  var programs = ss.getSheetByName('\u{1F9D8} Kursplanung') || ss.getSheetByName('Programs');
   if (programs) {
     var lastRow = programs.getLastRow();
     for (var r = 4; r <= lastRow; r++) { colorRowByProgramId(programs, r, 1); }
   }
   // Sessions — Instance ID col A (1), data starts row 2
-  var sessions = ss.getSheetByName('📅 Sessions') || ss.getSheetByName('Sessions');
+  var sessions = ss.getSheetByName('\u{1F4C5} Sessions') || ss.getSheetByName('Sessions');
   if (sessions) {
     var lastRow2 = sessions.getLastRow();
     for (var r = 2; r <= lastRow2; r++) { colorRowByProgramId(sessions, r, 1); }
   }
   // Buchungen — Instance ID col E (5), data starts row 2
-  var bookings = ss.getSheetByName('📋 Buchungen') || ss.getSheetByName('Bookings');
+  var bookings = ss.getSheetByName('\u{1F4CB} Buchungen') || ss.getSheetByName('Bookings');
   if (bookings) {
     var lastRow3 = bookings.getLastRow();
     for (var r = 2; r <= lastRow3; r++) { colorRowByProgramId(bookings, r, 5); }
@@ -1231,7 +1234,7 @@ function createStripePaymentLink(programName, priceInCents) {
 // ─── Bug #13 fix: correct tab name + column mapping for createAllStripeLinks ──
 function createAllStripeLinks() {
   var ss   = SpreadsheetApp.getActiveSpreadsheet();
-  var prog = ss.getSheetByName('🧘 Kursplanung') || ss.getSheetByName('Programs');
+  var prog = ss.getSheetByName('\u{1F9D8} Kursplanung') || ss.getSheetByName('Programs');
   var rows = prog.getDataRange().getValues();
   var created = 0;
   // Data starts at row 4 (index 3)
@@ -1256,16 +1259,16 @@ function formatSheet() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   // Bug #4 FIX: Use actual emoji tab names and correct column counts
   var TABS = {
-    '🧘 Kursplanung': { hdr: '#371964', alt: '#F2EDFF', nc: 24, frozen: 3 },
-    '📅 Sessions':    { hdr: '#123062', alt: '#E9F0FF', nc: 11, frozen: 1 },
-    '🏷 Rabatte':     { hdr: '#0A5A41', alt: '#E4F8EF', nc:  6, frozen: 2 },
-    '📋 Buchungen':   { hdr: '#5F1630', alt: '#FFEAF1', nc: 20, frozen: 1 },
+    '\u{1F9D8} Kursplanung': { hdr: '#371964', alt: '#F2EDFF', nc: 24, frozen: 3 },
+    '\u{1F4C5} Sessions':    { hdr: '#123062', alt: '#E9F0FF', nc: 11, frozen: 1 },
+    '\u{1F3F7} Rabatte':     { hdr: '#0A5A41', alt: '#E4F8EF', nc:  6, frozen: 2 },
+    '\u{1F4CB} Buchungen':   { hdr: '#5F1630', alt: '#FFEAF1', nc: 20, frozen: 1 },
   };
   var COL_WIDTHS = {
-    '🧘 Kursplanung': [105, 140, 100, 205, 100, 72, 72, 112, 90, 130, 72, 90, 90, 85, 65, 90, 85, 90, 72, 40, 160, 265, 90, 240],
-    '📅 Sessions':    [140, 205, 60, 112, 92, 92, 130, 60, 80, 265, 225],
-    '🏷 Rabatte':     [155, 85, 325, 112, 65, 85],
-    '📋 Buchungen':   [112, 152, 208, 122, 140, 188, 130, 75, 75, 85, 85, 95, 78, 95, 75, 215, 105, 155, 105, 155],
+    '\u{1F9D8} Kursplanung': [105, 140, 100, 205, 100, 72, 72, 112, 90, 130, 72, 90, 90, 85, 65, 90, 85, 90, 72, 40, 160, 265, 90, 240],
+    '\u{1F4C5} Sessions':    [140, 205, 60, 112, 92, 92, 130, 60, 80, 265, 225],
+    '\u{1F3F7} Rabatte':     [155, 85, 325, 112, 65, 85],
+    '\u{1F4CB} Buchungen':   [112, 152, 208, 122, 140, 188, 130, 75, 75, 85, 85, 95, 78, 95, 75, 215, 105, 155, 105, 155],
   };
   for (var tabName in TABS) {
     var cfg   = TABS[tabName];
@@ -1291,7 +1294,7 @@ function formatSheet() {
       for (var ci = 0; ci < widths.length; ci++) sheet.setColumnWidth(ci + 1, widths[ci]);
     }
   }
-  var dash = ss.getSheetByName('📊 Buchungs-Dashboard') || ss.getSheetByName('Dashboard');
+  var dash = ss.getSheetByName('\u{1F4CA} Buchungs-Dashboard') || ss.getSheetByName('Dashboard');
   if (dash) dash.setTabColor('#161737');
   applyConditionalFormatting(ss);
   applyDataValidations(ss);
@@ -1300,8 +1303,8 @@ function formatSheet() {
 
 // ─── 6. CONDITIONAL FORMATTING (Bug #5 fix: correct column positions) ─────────
 function applyConditionalFormatting(ss) {
-  var prog = ss.getSheetByName('🧘 Kursplanung') || ss.getSheetByName('Programs');
-  var book = ss.getSheetByName('📋 Buchungen')    || ss.getSheetByName('Bookings');
+  var prog = ss.getSheetByName('\u{1F9D8} Kursplanung') || ss.getSheetByName('Programs');
+  var book = ss.getSheetByName('\u{1F4CB} Buchungen')    || ss.getSheetByName('Bookings');
   if (!prog || !book) return;
   function cfText(range, text, bg, fg) {
     return SpreadsheetApp.newConditionalFormatRule()
@@ -1357,8 +1360,8 @@ function applyConditionalFormatting(ss) {
 
 // ─── 7. DATA VALIDATIONS (Bug #6 fix: correct tab names + positions) ──────────
 function applyDataValidations(ss) {
-  var prog = ss.getSheetByName('🧘 Kursplanung') || ss.getSheetByName('Programs');
-  var book = ss.getSheetByName('📋 Buchungen')    || ss.getSheetByName('Bookings');
+  var prog = ss.getSheetByName('\u{1F9D8} Kursplanung') || ss.getSheetByName('Programs');
+  var book = ss.getSheetByName('\u{1F4CB} Buchungen')    || ss.getSheetByName('Bookings');
   if (!prog || !book) return;
   var n = 997; // rows of validation
   function dv(vals, strict) {
@@ -1385,7 +1388,7 @@ function applyDataValidations(ss) {
 // ─── 8. DASHBOARD (Bug #7 fix: correct formula references with emoji tab names) ─
 function buildDashboard() {
   var ss   = SpreadsheetApp.getActiveSpreadsheet();
-  var dash = ss.getSheetByName('📊 Buchungs-Dashboard') || ss.getSheetByName('Dashboard');
+  var dash = ss.getSheetByName('\u{1F4CA} Buchungs-Dashboard') || ss.getSheetByName('Dashboard');
   if (!dash) { safeAlert('InneREvolution', 'Dashboard tab not found.'); return; }
   dash.clearContents(); dash.clearFormats();
   dash.setTabColor('#161737'); dash.setFrozenRows(0);
@@ -1422,11 +1425,11 @@ function buildDashboard() {
   // Buchungen: B=Name, K=Final EUR, M=Bezahlt, E=Instance ID, O=Freunde Anz, Q=Freunde verif, R=Empfehlung, S=Empfehler best, N=Intake
   // Kursplanung: B=Instance ID, O=Website?, W=Freie Plätze
   var kpis = [
-    { c: 2,  label: 'TOTAL BOOKINGS',    formula: "=COUNTA('📋 Buchungen'!B2:B)",                                                color: '#371964' },
-    { c: 4,  label: 'CONFIRMED PAID',    formula: "=COUNTIF('📋 Buchungen'!M2:M;\"YES\")",                                       color: '#0A5A41' },
-    { c: 6,  label: 'AWAITING PAYMENT',  formula: "=COUNTIF('📋 Buchungen'!M2:M;\"NO\")",                                        color: '#5F1630' },
-    { c: 8,  label: 'ACTIVE PROGRAMS',   formula: "=COUNTIF('🧘 Kursplanung'!O4:O;\"Yes\")",                                     color: '#123062' },
-    { c: 10, label: 'REVENUE COLLECTED', formula: "=TEXT(SUMIF('📋 Buchungen'!M2:M;\"YES\";'📋 Buchungen'!K2:K);\"EUR #.##0,00\")", color: '#5C3A00' },
+    { c: 2,  label: 'TOTAL BOOKINGS',    formula: "=COUNTA('\u{1F4CB} Buchungen'!B2:B)",                                                color: '#371964' },
+    { c: 4,  label: 'CONFIRMED PAID',    formula: "=COUNTIF('\u{1F4CB} Buchungen'!M2:M;\"YES\")",                                       color: '#0A5A41' },
+    { c: 6,  label: 'AWAITING PAYMENT',  formula: "=COUNTIF('\u{1F4CB} Buchungen'!M2:M;\"NO\")",                                        color: '#5F1630' },
+    { c: 8,  label: 'ACTIVE PROGRAMS',   formula: "=COUNTIF('\u{1F9D8} Kursplanung'!O4:O;\"Yes\")",                                     color: '#123062' },
+    { c: 10, label: 'REVENUE COLLECTED', formula: "=TEXT(SUMIF('\u{1F4CB} Buchungen'!M2:M;\"YES\";'\u{1F4CB} Buchungen'!K2:K);\"EUR #.##0,00\")", color: '#5C3A00' },
   ];
   kpis.forEach(function(k) {
     cell(3, k.c, k.label,   k.color, '#ffffff',  8, true, 'center', 2);
@@ -1446,15 +1449,15 @@ function buildDashboard() {
     // Bug #7 FIX: Correct column references for Kursplanung
     // B=Instance ID, D=Kursname, W=Freie Plätze, O=Website?, R=Sprache, H=Datum, J=Ort
     var pf = [
-      "=IF('🧘 Kursplanung'!B"+sr+"<>\"\",'🧘 Kursplanung'!B"+sr+",\"\")",
-      "=IF('🧘 Kursplanung'!B"+sr+"<>\"\",'🧘 Kursplanung'!D"+sr+",\"\")",
-      "=IF('🧘 Kursplanung'!B"+sr+"<>\"\",'🧘 Kursplanung'!W"+sr+",\"\")",
-      "=IF('🧘 Kursplanung'!B"+sr+"<>\"\",COUNTIF('📋 Buchungen'!E:E;'🧘 Kursplanung'!B"+sr+"),\"\")",
-      "=IF('🧘 Kursplanung'!B"+sr+"<>\"\",TEXT(SUMIF('📋 Buchungen'!E:E;'🧘 Kursplanung'!B"+sr+";'📋 Buchungen'!K:K);\"EUR #.##0,00\"),\"\")",
-      "=IF('🧘 Kursplanung'!B"+sr+"<>\"\",'🧘 Kursplanung'!O"+sr+",\"\")",
-      "=IF('🧘 Kursplanung'!B"+sr+"<>\"\",'🧘 Kursplanung'!R"+sr+",\"\")",
-      "=IF('🧘 Kursplanung'!B"+sr+"<>\"\",TEXT('🧘 Kursplanung'!H"+sr+",\"dd mmm yyyy\"),\"\")",
-      "=IF('🧘 Kursplanung'!B"+sr+"<>\"\",'🧘 Kursplanung'!J"+sr+",\"\")",
+      "=IF('\u{1F9D8} Kursplanung'!B"+sr+"<>\"\",'\u{1F9D8} Kursplanung'!B"+sr+",\"\")",
+      "=IF('\u{1F9D8} Kursplanung'!B"+sr+"<>\"\",'\u{1F9D8} Kursplanung'!D"+sr+",\"\")",
+      "=IF('\u{1F9D8} Kursplanung'!B"+sr+"<>\"\",'\u{1F9D8} Kursplanung'!W"+sr+",\"\")",
+      "=IF('\u{1F9D8} Kursplanung'!B"+sr+"<>\"\",COUNTIF('\u{1F4CB} Buchungen'!E:E;'\u{1F9D8} Kursplanung'!B"+sr+"),\"\")",
+      "=IF('\u{1F9D8} Kursplanung'!B"+sr+"<>\"\",TEXT(SUMIF('\u{1F4CB} Buchungen'!E:E;'\u{1F9D8} Kursplanung'!B"+sr+";'\u{1F4CB} Buchungen'!K:K);\"EUR #.##0,00\"),\"\")",
+      "=IF('\u{1F9D8} Kursplanung'!B"+sr+"<>\"\",'\u{1F9D8} Kursplanung'!O"+sr+",\"\")",
+      "=IF('\u{1F9D8} Kursplanung'!B"+sr+"<>\"\",'\u{1F9D8} Kursplanung'!R"+sr+",\"\")",
+      "=IF('\u{1F9D8} Kursplanung'!B"+sr+"<>\"\",TEXT('\u{1F9D8} Kursplanung'!H"+sr+",\"dd mmm yyyy\"),\"\")",
+      "=IF('\u{1F9D8} Kursplanung'!B"+sr+"<>\"\",'\u{1F9D8} Kursplanung'!J"+sr+",\"\")",
     ];
     pf.forEach(function(f, fi) {
       dash.getRange(pr, 2+fi).setFormula(f).setBackground(bg).setHorizontalAlignment('center').setFontSize(9);
@@ -1471,20 +1474,20 @@ function buildDashboard() {
   cell(23, 11,'Count',  '#8B2040', '#ffffff', 9, true, 'center', 1);
   // Bug #7 FIX: Correct column letters for Buchungen
   var refs = [
-    ['Bookings with friends invited',  "=COUNTIF('📋 Buchungen'!O2:O;\">0\")"],
-    ['Total friend spots promised',    "=SUMIF('📋 Buchungen'!O2:O;\">0\";'📋 Buchungen'!O2:O)"],
-    ['Friends verified as joined',     "=COUNTIF('📋 Buchungen'!Q2:Q;\"YES\")"],
-    ['Friends partially verified',     "=COUNTIF('📋 Buchungen'!Q2:Q;\"PARTIAL\")"],
-    ['Bookings listing a referrer',    "=COUNTIFS('📋 Buchungen'!R2:R;\"<>\")"],
-    ['Referrers confirmed in system',  "=COUNTIF('📋 Buchungen'!S2:S;\"YES\")"],
+    ['Bookings with friends invited',  "=COUNTIF('\u{1F4CB} Buchungen'!O2:O;\">0\")"],
+    ['Total friend spots promised',    "=SUMIF('\u{1F4CB} Buchungen'!O2:O;\">0\";'\u{1F4CB} Buchungen'!O2:O)"],
+    ['Friends verified as joined',     "=COUNTIF('\u{1F4CB} Buchungen'!Q2:Q;\"YES\")"],
+    ['Friends partially verified',     "=COUNTIF('\u{1F4CB} Buchungen'!Q2:Q;\"PARTIAL\")"],
+    ['Bookings listing a referrer',    "=COUNTIFS('\u{1F4CB} Buchungen'!R2:R;\"<>\")"],
+    ['Referrers confirmed in system',  "=COUNTIF('\u{1F4CB} Buchungen'!S2:S;\"YES\")"],
   ];
   var actions = [
-    ['Unpaid bookings',                 "=COUNTIF('📋 Buchungen'!M2:M;\"NO\")"],
-    ['Intake forms not yet sent',       "=COUNTIF('📋 Buchungen'!N2:N;\"NO\")"],
-    ['Programs fully booked (0 spots)', "=COUNTIF('🧘 Kursplanung'!W4:W;0)"],
-    ['Programs with 1-3 spots left',    "=COUNTIFS('🧘 Kursplanung'!W4:W;\"<=3\";'🧘 Kursplanung'!W4:W;\">0\")"],
-    ['Friend referrals unverified',     "=COUNTIF('📋 Buchungen'!Q2:Q;\"NO\")"],
-    ['Referrers unconfirmed',           "=COUNTIF('📋 Buchungen'!S2:S;\"NO\")"],
+    ['Unpaid bookings',                 "=COUNTIF('\u{1F4CB} Buchungen'!M2:M;\"NO\")"],
+    ['Intake forms not yet sent',       "=COUNTIF('\u{1F4CB} Buchungen'!N2:N;\"NO\")"],
+    ['Programs fully booked (0 spots)', "=COUNTIF('\u{1F9D8} Kursplanung'!W4:W;0)"],
+    ['Programs with 1-3 spots left',    "=COUNTIFS('\u{1F9D8} Kursplanung'!W4:W;\"<=3\";'\u{1F9D8} Kursplanung'!W4:W;\">0\")"],
+    ['Friend referrals unverified',     "=COUNTIF('\u{1F4CB} Buchungen'!Q2:Q;\"NO\")"],
+    ['Referrers unconfirmed',           "=COUNTIF('\u{1F4CB} Buchungen'!S2:S;\"NO\")"],
   ];
   for (var ri = 0; ri < 6; ri++) {
     var tr = 24 + ri; dash.setRowHeight(tr, 25);
@@ -1507,7 +1510,7 @@ function checkFriendReferrals() {
   if (MANUAL_MODE) return;
   var cfg  = getConfig();
   var ss   = SpreadsheetApp.openById(cfg.SHEET_ID);
-  var book = ss.getSheetByName('📋 Buchungen') || ss.getSheetByName('Bookings');
+  var book = ss.getSheetByName('\u{1F4CB} Buchungen') || ss.getSheetByName('Bookings');
   var data = book.getDataRange().getValues();
   // Bug #8 FIX: verified column indices match Buchungen layout
   // [1]=Name, [14]=Freunde Anz, [15]=Freunde Namen, [16]=Freunde verifiziert
@@ -1543,8 +1546,8 @@ function sendPaymentReminders() {
   if (MANUAL_MODE) return;
   var cfg  = getConfig();
   var ss   = SpreadsheetApp.openById(cfg.SHEET_ID);
-  var book = ss.getSheetByName('📋 Buchungen')   || ss.getSheetByName('Bookings');
-  var prog = ss.getSheetByName('🧘 Kursplanung') || ss.getSheetByName('Programs');
+  var book = ss.getSheetByName('\u{1F4CB} Buchungen')   || ss.getSheetByName('Bookings');
+  var prog = ss.getSheetByName('\u{1F9D8} Kursplanung') || ss.getSheetByName('Programs');
   // Bug #9 FIX: Build stripe link map from Kursplanung
   // Instance ID = col B ([1]), Stripe Link = col V ([21]). Data starts at index 3 (row 4).
   var stripeLinks = {};
@@ -1588,8 +1591,8 @@ function sendDailyReport() {
   var cfg = getConfig();
   if (!cfg.INSTRUCTOR_EMAIL) { safeAlert('InneREvolution', 'Set INSTRUCTOR_EMAIL in Script Properties first.'); return; }
   var ss   = SpreadsheetApp.openById(cfg.SHEET_ID);
-  var book = ss.getSheetByName('📋 Buchungen')   || ss.getSheetByName('Bookings');
-  var prog = ss.getSheetByName('🧘 Kursplanung') || ss.getSheetByName('Programs');
+  var book = ss.getSheetByName('\u{1F4CB} Buchungen')   || ss.getSheetByName('Bookings');
+  var prog = ss.getSheetByName('\u{1F9D8} Kursplanung') || ss.getSheetByName('Programs');
   var today = new Date(); today.setHours(0, 0, 0, 0);
   var rows  = book.getDataRange().getValues();
   var newToday = [], unpaid = [], totalRev = 0, paidCount = 0;
@@ -1668,7 +1671,7 @@ function authorizeAndTest() {
   var ok = [], errors = [];
   try {
     var ss = SpreadsheetApp.openById(cfg.SHEET_ID);
-    var bookSheet = ss.getSheetByName('📋 Buchungen') || ss.getSheetByName('Bookings');
+    var bookSheet = ss.getSheetByName('\u{1F4CB} Buchungen') || ss.getSheetByName('Bookings');
     var n = bookSheet ? bookSheet.getLastRow() : 0;
     ok.push('[OK] Sheets: ' + n + ' rows in Buchungen');
   } catch(e) { errors.push('[FAIL] Sheets: ' + e.message); }
@@ -1691,8 +1694,8 @@ function syncSessionsToCalendar() {
   var cfg = getConfig();
   if (!cfg.CALENDAR_ID) { safeAlert('InneREvolution', 'CALENDAR_ID not set in Script Properties.'); return; }
   var ss      = SpreadsheetApp.openById(cfg.SHEET_ID);
-  var sesSh   = ss.getSheetByName('📅 Sessions')    || ss.getSheetByName('Sessions');
-  var progSh  = ss.getSheetByName('🧘 Kursplanung') || ss.getSheetByName('Programs');
+  var sesSh   = ss.getSheetByName('\u{1F4C5} Sessions')    || ss.getSheetByName('Sessions');
+  var progSh  = ss.getSheetByName('\u{1F9D8} Kursplanung') || ss.getSheetByName('Programs');
   var sesData = sesSh.getDataRange().getValues();
   var cal     = CalendarApp.getCalendarById(cfg.CALENDAR_ID);
   if (!cal) { safeAlert('InneREvolution', 'Calendar not found — check CALENDAR_ID.'); return; }
@@ -1775,7 +1778,7 @@ function buildDateTime(base, timeVal) {
 // ─── 14. GOOGLE FORMS BRIDGE (form-link mode — Option A) ─────────────────────
 // The website runs in "form-link mode": the Register button opens an external
 // Google Form, while the old payment pipeline (doPost) stays disabled via
-// MANUAL_MODE. This bridge imports every form response into 📋 Buchungen so
+// MANUAL_MODE. This bridge imports every form response into \u{1F4CB} Buchungen so
 // capacity (Freie Plätze), duplicate detection, reporting and the dashboard
 // stay consistent. It is INDEPENDENT of MANUAL_MODE and controlled only by
 // the FORM_BRIDGE flag below.
@@ -1905,7 +1908,7 @@ function setupFormBridge() {
     if (t.getHandlerFunction() === 'handleFormResponse') ScriptApp.deleteTrigger(t);
   });
   ScriptApp.newTrigger('handleFormResponse').forSpreadsheet(respSsId).onFormSubmit().create();
-  safeAlert('Form Bridge', 'Trigger installiert.\n\nJede neue Formular-Antwort wird jetzt automatisch in 📋 Buchungen importiert, Freie Plätze aktualisiert und du erhältst eine Benachrichtigungs-E-Mail.');
+  safeAlert('Form Bridge', 'Trigger installiert.\n\nJede neue Formular-Antwort wird jetzt automatisch in \u{1F4CB} Buchungen importiert, Freie Plätze aktualisiert und du erhältst eine Benachrichtigungs-E-Mail.');
 }
 
 // Dry run: shows how the current response sheet would be mapped and parsed.
@@ -1973,10 +1976,10 @@ function handleFormResponse(e) {
     }
 
     var ss   = SpreadsheetApp.openById(cfg.SHEET_ID);
-    var prog = ss.getSheetByName('🧘 Kursplanung') || ss.getSheetByName('Programs');
-    var book = ss.getSheetByName('📋 Buchungen')  || ss.getSheetByName('Bookings');
+    var prog = ss.getSheetByName('\u{1F9D8} Kursplanung') || ss.getSheetByName('Programs');
+    var book = ss.getSheetByName('\u{1F4CB} Buchungen')  || ss.getSheetByName('Bookings');
     if (!prog || !book) {
-      sendErrorAlert('Form Bridge', new Error('Tab 📋 Buchungen oder 🧘 Kursplanung fehlt'), data);
+      sendErrorAlert('Form Bridge', new Error('Tab \u{1F4CB} Buchungen oder \u{1F9D8} Kursplanung fehlt'), data);
       return;
     }
 
