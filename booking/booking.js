@@ -145,6 +145,13 @@ let activeDiscount = { pct: 0, code: '', description: '' };
 let friendsDiscount = { pct: 0, count: 0 }; // auto-discount: 10% × friends count
 
 // ─── Sheets API helper ────────────────────────────────────────────────────────
+// Resolved backend URL — CI-generated config.js may lack APPS_SCRIPT_URL until the
+// deploy.yml update is pushed; NEWSLETTER_URL points to the same backend, and the
+// live /exec deployment is the last-resort constant.
+const BOOKING_BACKEND_URL = (typeof CONFIG !== 'undefined') ?
+  (CONFIG.APPS_SCRIPT_URL || CONFIG.NEWSLETTER_URL ||
+   'https://script.google.com/macros/s/AKfycbw3WLYvoodMPphob0cyNrny6m-JzuEV6xBZDHJXHmuDHpzprcnLASbm_s3y0JvW9vKJ/exec') : '';
+
 async function fetchSheet(range) {
   const url = `https://sheets.googleapis.com/v4/spreadsheets/${CONFIG.SHEET_ID}/values/${encodeURIComponent(range)}?key=${CONFIG.SHEETS_API_KEY}&valueRenderOption=UNFORMATTED_VALUE&dateTimeRenderOption=SERIAL_NUMBER`;
   const res = await fetch(url);
@@ -348,7 +355,7 @@ function buildCard(p) {
             : (() => {
                 // Native modal is the primary booking path (backend doPost pipeline).
                 // External form link is the fallback when no backend is configured.
-                if (CONFIG.APPS_SCRIPT_URL) {
+                if (BOOKING_BACKEND_URL) {
                   return `<button class="btn-register" data-program-id="${p.id}">${bs('registerBtn')}</button>`;
                 }
                 const formUrl = p.formUrl || CONFIG.DEFAULT_FORM_URL || '';
@@ -682,10 +689,7 @@ function postBooking(payload, timeoutMs) {
     var timer = setTimeout(function () { if (controller) controller.abort(); }, timeoutMs || 15000);
     var finish = function (res) { clearTimeout(timer); resolve(res); };
 
-    // Robustness fallback chain: CI-regenerated config may lack APPS_SCRIPT_URL;
-    // NEWSLETTER_URL points to the same backend; live /exec URL as last resort.
-    const backendUrl = CONFIG.APPS_SCRIPT_URL || CONFIG.NEWSLETTER_URL ||
-      'https://script.google.com/macros/s/AKfycbw3WLYvoodMPphob0cyNrny6m-JzuEV6xBZDHJXHmuDHpzprcnLASbm_s3y0JvW9vKJ/exec';
+    const backendUrl = BOOKING_BACKEND_URL;
 
     fetch(backendUrl, {
       method: 'POST',
@@ -720,7 +724,7 @@ async function handleSubmit(event) {
   event.preventDefault();
 
   // Guard: Apps Script URL not configured
-  if (!CONFIG.APPS_SCRIPT_URL) {
+  if (!BOOKING_BACKEND_URL) {
     alert(bs('alertNoConfig'));
     return;
   }
