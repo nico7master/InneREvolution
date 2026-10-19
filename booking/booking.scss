@@ -599,9 +599,8 @@ a {
   }
 }
 
-// ─── Modal Overlay — DISABLED (booking now uses external form links) ──────────
+// ─── Modal Overlay ────────────────────────────────────────────────────────────
 .modal-overlay {
-  display: none !important;  // Force-hide: no modal can ever open
   position: fixed;
   inset: 0;
   background: rgba($color-darkest-gray, 0.85);
@@ -620,6 +619,32 @@ a {
     opacity: 1;
     pointer-events: all;
   }
+}
+
+// Honeypot field — visually hidden, must stay invisible to humans
+.hp-field {
+  position: absolute;
+  left: -9999px;
+  top: -9999px;
+  height: 0;
+  width: 0;
+  overflow: hidden;
+  opacity: 0;
+}
+
+// Package selector detail hint (contents line from sheet description)
+.package-detail {
+  font-size: 0.85em;
+  color: rgba(241, 224, 255, 0.65);
+  margin-top: 0.4em;
+  line-height: 1.4;
+}
+
+// Direct payment button on success state
+.success-pay-btn {
+  display: inline-block;
+  margin-top: 1em;
+  text-decoration: none;
 }
 
 .modal {

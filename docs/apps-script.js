@@ -51,7 +51,7 @@
 // ─── MANUAL MODE — Set to true to disable ALL automations (emails, Stripe, triggers) ──
 // When true: onEdit, doPost, doGet, all triggers are short-circuited.
 // Set to false to re-enable full automation.
-var MANUAL_MODE = true;
+var MANUAL_MODE = false; // native booking modal is the primary booking path (re-enabled 2026-10)
 
 // ─── NEWSLETTER OWNER NOTIFICATION — email me when someone signs up (user-requested) ──
 // Set to false to stop notification emails. Signups are always recorded in the sheet.
@@ -84,6 +84,7 @@ var COLS = {
     STRIPE_TEST: 20, // U
     STRIPE_LINK: 21, // V
     FREIE_PLATZE: 22,// W (AUTO K-N)
+    PACKAGE_SPEC: 25,  // Z (NEW: sheet-driven packages spec, e.g. "BASIS:base|KOMFORT:+80|UEBERNACHTUNG:480")
     BESCHREIBUNG: 23 // X
   },
   BUCHUNGEN: {
@@ -248,19 +249,8 @@ function onOpen() {
 function doGet(e) {
   // TEMPORARY one-time admin wipe — will be removed right after use
   var paramsW = (e && e.parameter) ? e.parameter : {};
-  if (paramsW.action === 'newsletter_wipe' && paramsW.key === 'TEMP-WIPE-7f3k9qzX') {
-    var cfgW = getConfig();
-    var ssW = SpreadsheetApp.openById(cfgW.SHEET_ID);
-    var shW = ssW.getSheetByName(NEWSLETTER_TAB) || ssW.getSheetByName('Newsletter');
-    if (!shW) return jsonResponse({ success: false, error: 'no tab' });
-    var last = shW.getLastRow();
-    var removed = 0;
-    if (last > 1) { shW.deleteRows(2, last - 1); removed = last - 1; }
-    var left = shW.getLastRow() - 1;
-    Logger.log('[ADMIN] newsletter wipe: removed ' + removed + ', left ' + left);
-    return jsonResponse({ success: true, removed: removed, remainingRows: left });
-  }
-
+  // TEMPORARY admin actions for native-booking rollout — removed right after use
+  var paramsP = (e && e.parameter) ? e.parameter : {};
   if (MANUAL_MODE) { return ContentService.createTextOutput('InneREvolution — MANUAL MODE (automations disabled)'); }
   try {
     var params = (e && e.parameter) ? e.parameter : {};
@@ -349,20 +339,6 @@ function doPost(e) {
       return handleNewsletter(data);
     }
 
-    // TEMPORARY one-time admin action — will be removed right after use
-    if (data.action === 'newsletter_wipe' && data.key === 'TEMP-WIPE-7f3k9qzX') {
-      var cfgW = getConfig();
-      var ssW = SpreadsheetApp.openById(cfgW.SHEET_ID);
-      var shW = ssW.getSheetByName(NEWSLETTER_TAB) || ssW.getSheetByName('Newsletter');
-      if (!shW) return jsonResponse({ success: false, error: 'no tab' });
-      var last = shW.getLastRow();
-      var removed = 0;
-      if (last > 1) { shW.deleteRows(2, last - 1); removed = last - 1; }
-      var left = shW.getLastRow() - 1;
-      Logger.log('[ADMIN] newsletter wipe: removed ' + removed + ', left ' + left);
-      return jsonResponse({ success: true, removed: removed, remainingRows: left });
-    }
-
     if (MANUAL_MODE) { Logger.log('[MANUAL_MODE] doPost blocked'); return jsonResponse({ success: false, error: 'Booking system is in manual mode. Please contact us directly.' }); }
 
     // Route: Stripe webhook events (authenticity re-verified inside)
@@ -398,12 +374,58 @@ function doPost(e) {
   }
 }
 
+// ─── PACKAGE RESOLVER (sheet-driven, early-bird safe) ────────────────────────
+// Spec grammar in 🧘 Kursplanung column Z (PACKAGE_SPEC):
+//   "BASIS:base|KOMFORT:+80|UEBERNACHTUNG:480"
+//   value 'base'   -> current sheet base price (early-bird formula auto-switches)
+//   value '+N'     -> base + N
+//   value 'N'      -> flat price
+// Empty spec -> single implicit package = base price (no selector shown).
+function resolvePackages_(spec, basePrice) {
+  var out = [];
+  if (!spec) return out;
+  String(spec).split('|').forEach(function (part) {
+    part = part.trim();
+    if (!part) return;
+    var m = part.match(/^([^:]+):(.+)$/);
+    if (!m) return;
+    var label = m[1].trim();
+    var val = m[2].trim().toLowerCase();
+    var price;
+    if (val === 'base' || val === 'basis') price = basePrice;
+    else if (val.charAt(0) === '+') price = basePrice + (parseFloat(val.slice(1).replace(',', '.')) || 0);
+    else price = parseFloat(val.replace(',', '.')) || 0;
+    if (isNaN(price)) return;
+    out.push({
+      key: label.toUpperCase().replace(/Ü/g, 'UE').replace(/Ä/g, 'AE').replace(/Ö/g, 'OE').replace(/ß/g, 'SS').replace(/[^A-Z0-9]/g, ''),
+      label: label,
+      price: Math.round(price * 100) / 100
+    });
+  });
+  return out;
+}
+
 function handleBooking(data) {
   Logger.log('[BOOKING] === START === programId=' + data.programId + ' name=' + data.fullName + ' email=' + data.email);
 
   if (data.email && !isValidEmail(data.email)) {
     Logger.log('[BOOKING] FAIL: invalid email: ' + data.email);
     return jsonResponse({ success: false, error: 'Invalid email address format.' });
+  }
+
+  // Honeypot: hidden field must stay empty. Bots fill it -> fake success, no write.
+  if (data.website) {
+    Logger.log('[BOOKING] Honeypot triggered — silent drop');
+    return jsonResponse({ success: true, honeypot: true });
+  }
+  // Time-trap: humans need >2s to fill the form; instant submits are bots.
+  if (data.formLoadedAt) {
+    var elapsed = 0;
+    try { elapsed = Date.now() - new Date(data.formLoadedAt).getTime(); } catch (eT) {}
+    if (elapsed >= 0 && elapsed < 2000) {
+      Logger.log('[BOOKING] Time-trap rejected (' + elapsed + 'ms)');
+      return jsonResponse({ success: false, error: 'Too fast — please try again.' });
+    }
   }
 
   var cfg = getConfig();
@@ -443,8 +465,26 @@ function handleBooking(data) {
       return jsonResponse({ success: false, error: 'Program not found: ' + data.programId });
     }
 
-    // Duplicate booking check (exclude cancelled) + preload email index for M1
+    // Idempotent retry: if this client bookingId already exists, return the stored result
     var bookData = book.getDataRange().getValues();
+    var clientBid = String(data.bookingId || '').trim();
+    if (clientBid) {
+      for (var ib = 1; ib < bookData.length; ib++) {
+        if (String(bookData[ib][B.BOOKING_ID]).trim() === clientBid) {
+          var stI = String(bookData[ib][B.STATUS] || 'active').toLowerCase();
+          if (stI !== 'cancelled') {
+            Logger.log('[BOOKING] Idempotent replay for ' + clientBid);
+            var payI = String(progRow[K.STRIPE_LINK] || '');
+            if (payI) {
+              payI += (payI.indexOf('?') >= 0 ? '&' : '?') + 'client_reference_id=' + encodeURIComponent(clientBid) +
+                      '&prefilled_email=' + encodeURIComponent(String(data.email || ''));
+            }
+            return jsonResponse({ success: true, idempotent: true, bookingId: clientBid, paymentUrl: payI,
+                                  programName: progRow[K.KURSNAME], finalPrice: parseFloat(bookData[ib][B.FINAL_EUR]) || 0 });
+          }
+        }
+      }
+    }
     var emailKey = String(data.email).toLowerCase().trim();
     var pidKey   = String(data.programId).trim();
     for (var b = 1; b < bookData.length; b++) {
@@ -460,6 +500,20 @@ function handleBooking(data) {
     var spotsLeft   = parseInt(progRow[K.FREIE_PLATZE]);
     var programName = progRow[K.KURSNAME];
     var stripeLink  = progRow[K.STRIPE_LINK] || '';
+
+    // Package selection (sheet-driven spec) — server-side price is authoritative
+    var packageLabel = '';
+    var packages = resolvePackages_(progRow[K.PACKAGE_SPEC], basePrice);
+    if (packages.length && data.packageKey) {
+      var wantKey = String(data.packageKey).toUpperCase().trim();
+      for (var pk = 0; pk < packages.length; pk++) {
+        if (packages[pk].key === wantKey) {
+          basePrice = packages[pk].price;      // package price IS the new base for discounts
+          packageLabel = packages[pk].label;
+          break;
+        }
+      }
+    }
     Logger.log('[BOOKING] Data: price=' + basePrice + ' spots=' + spotsLeft + ' name="' + programName + '" stripe=' + (stripeLink ? 'YES' : 'NONE'));
 
     if (!isNaN(spotsLeft) && spotsLeft <= 0) {
@@ -511,17 +565,21 @@ function handleBooking(data) {
       'NO',                    // Q: Freunde verifiziert
       data.referredBy   || '', // R: Empfehlung von
       'NO',                    // S: Empfehler bestätigt
-      bookingId,               // T: Booking ID
-      'active'                 // U: Status (R8 — new column)
+      (clientBid || bookingId),// T: Booking ID (client-provided ID wins — retry-safe)
+      'active',                // U: Status (R8 — new column)
+      packageLabel             // V: Paket (NEW — native modal + form bridge)
     ]);
-    Logger.log('[BOOKING] Row written (ID: ' + bookingId + ')');
+    Logger.log('[BOOKING] Row written (ID: ' + (clientBid || bookingId) + ')');
 
-    // R3: append client_reference_id (=bookingId) + prefilled_email to pay URL
-    // so Stripe Checkout echoes bookingId back in webhook event.
+    // Capacity decrement (ANGEMELDET +1 / FREIE_PLATZE -1, respects formulas)
+    updateCapacityAfterBooking_(prog, progRowIndex);
+
+    // R3: append client_reference_id (=stored bookingId) + prefilled_email to pay URL
+    // so Stripe Checkout echoes the SAME id back in webhook event.
     var payUrl = stripeLink;
     if (payUrl) {
       var sep = payUrl.indexOf('?') >= 0 ? '&' : '?';
-      payUrl += sep + 'client_reference_id=' + encodeURIComponent(bookingId);
+      payUrl += sep + 'client_reference_id=' + encodeURIComponent(clientBid || bookingId);
       if (data.email) payUrl += '&prefilled_email=' + encodeURIComponent(data.email);
     }
 

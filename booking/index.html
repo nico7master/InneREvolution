@@ -160,8 +160,8 @@
     </noscript>
     </main>
 
-    <!-- Registration Modal — DISABLED (booking now uses external form links) -->
-    <div id="modal-overlay" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title" style="display:none;">
+    <!-- Registration Modal — native booking (backend doPost pipeline) -->
+    <div id="modal-overlay" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
       <div class="modal">
 
         <!-- Orange top accent stripe -->
@@ -181,6 +181,19 @@
           <input type="hidden" id="field-program-id"    name="programId" />
           <input type="hidden" id="field-program-name"  name="programName" />
           <input type="hidden" id="field-program-price" name="programPrice" />
+
+          <!-- Honeypot: must stay empty (bots fill it) -->
+          <div class="hp-field" aria-hidden="true">
+            <label for="field-website">Website</label>
+            <input type="text" id="field-website" name="website" tabindex="-1" autocomplete="off" />
+          </div>
+
+          <!-- Package selector — dynamically rendered from sheet spec -->
+          <div class="form-group" id="package-group" style="display:none;">
+            <label for="field-package">Package <span class="required">*</span></label>
+            <select id="field-package" name="packageKey"></select>
+            <div id="package-detail" class="package-detail" aria-live="polite"></div>
+          </div>
 
           <div class="form-group">
             <label for="field-name">Full Name <span class="required">*</span></label>
@@ -273,7 +286,7 @@
     </div>
 
     <script src="./config.js"></script>
-    <script src="./booking.js?v=202610181"></script>
+    <script src="./booking.js?v=202610192"></script>
 
     <script src="/assets/js/topbar-scroll.js?v=202608292"></script>
   </body>

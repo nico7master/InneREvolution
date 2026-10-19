@@ -58,6 +58,7 @@ var BOOKING_STRINGS = {
     successFallback:    function(e) { return 'Check your inbox at ' + e + ' for your payment link and confirmation.'; },
     successSpamTip:     'If nothing arrives within 2 minutes, please check your spam folder.',
     successContactFallback: function(mail) { return 'Still nothing? Email us directly at ' + mail + '.'; },
+    payNowBtn: 'Pay now & confirm your spot',
     alertTimeout:       'The request is taking longer than expected. Your booking may still go through \u2014 please check your email in a few minutes before retrying.',
     alertNetwork:       'We couldn\u2019t reach the booking server. Please check your internet connection and try again.',
     alertInvalidEmail:  'Please enter a valid email address (e.g. name@example.com).',
@@ -115,6 +116,7 @@ var BOOKING_STRINGS = {
     successFallback:    function(e) { return 'Schau in dein Postfach (' + e + ') f\u00fcr deinen Zahlungslink und deine Best\u00e4tigung.'; },
     successSpamTip:     'Falls innerhalb von 2 Minuten nichts ankommt, schau bitte auch im Spam-Ordner nach.',
     successContactFallback: function(mail) { return 'Immer noch nichts? Schreib uns direkt an ' + mail + '.'; },
+    payNowBtn: 'Jetzt zahlen & Platz sichern',
     alertTimeout:       'Die Anfrage dauert l\u00e4nger als gewohnt. Deine Buchung k\u00f6nnte trotzdem durchgehen \u2014 bitte pr\u00fcfe in ein paar Minuten dein Postfach, bevor du es erneut versuchst.',
     alertNetwork:       'Der Buchungsserver ist gerade nicht erreichbar. Bitte pr\u00fcfe deine Internetverbindung und versuche es erneut.',
     alertInvalidEmail:  'Bitte gib eine g\u00fcltige E-Mail-Adresse ein (z.\u202fB. name@beispiel.com).',
@@ -176,7 +178,7 @@ async function fetchPrograms() {
   //   F=Active, G=StartDate, H=Sessions, I=Std/Sess, J=TotalHours,
   //   K=Description, L=Location, M=Language
   // Row 1=title, Row 2=header(emoji), Row 3+=data
-  const rows = await fetchSheet('Programs!A3:N');  // A–M = program data, N = formUrl
+  const rows = await fetchSheet('Programs!A3:O');  // A–M = program data, N = formUrl, O = packageSpec
   programs = rows.map(r => ({
     id:               (r[0] || '').toString().trim(),
     name:             r[1] || '',
@@ -194,6 +196,7 @@ async function fetchPrograms() {
     location:         r[11] || '',
     language:         r[12] || '',
     formUrl:          r[13] || '',   // Column N — external registration form URL
+    packageSpec:      r[14] || '',   // Column O — sheet-driven packages spec (native modal)
     image:            '',
     format:           '',
   }));
@@ -343,6 +346,11 @@ function buildCard(p) {
           ${isFull
             ? `<button class="btn-register" disabled aria-disabled="true">${bs('soldOutBtn')}</button>`
             : (() => {
+                // Native modal is the primary booking path (backend doPost pipeline).
+                // External form link is the fallback when no backend is configured.
+                if (CONFIG.APPS_SCRIPT_URL) {
+                  return `<button class="btn-register" data-program-id="${p.id}">${bs('registerBtn')}</button>`;
+                }
                 const formUrl = p.formUrl || CONFIG.DEFAULT_FORM_URL || '';
                 if (formUrl) {
                   // Append program name as query param for form pre-fill
@@ -441,10 +449,64 @@ function openModal(programId) {
   activeDiscount  = { pct: 0, code: '', description: '' };
   friendsDiscount = { pct: 0, count: 0 };
 
+  // Anti-spam timestamps: honeypot (server drops fills) + time-trap (<2s = bot)
+  window._bookingFormLoadedAt = new Date().toISOString();
+
   // Populate hidden fields
   document.getElementById('field-program-id').value    = program.id;
   document.getElementById('field-program-name').value  = program.name;
   document.getElementById('field-program-price').value = program.price;
+
+  // ── Package selector: rendered dynamically from the sheet-driven spec ──
+  // Same grammar as backend resolvePackages_: "LABEL:base|LABEL:+80|LABEL:480"
+  const pkgGroup  = document.getElementById('package-group');
+  const pkgSelect = document.getElementById('field-package');
+  const pkgDetail = document.getElementById('package-detail');
+  pkgSelect.innerHTML = '';
+  pkgDetail.textContent = '';
+  const pkgs = (function (spec, base) {
+    const out = [];
+    if (!spec) return out;
+    String(spec).split('|').forEach(part => {
+      part = part.trim();
+      if (!part) return;
+      const m = part.match(/^([^:]+):(.+)$/);
+      if (!m) return;
+      const label = m[1].trim();
+      const val = m[2].trim().toLowerCase();
+      let price;
+      if (val === 'base' || val === 'basis') price = base;
+      else if (val.charAt(0) === '+') price = base + (parseFloat(val.slice(1).replace(',', '.')) || 0);
+      else price = parseFloat(val.replace(',', '.')) || 0;
+      if (isNaN(price)) return;
+      out.push({
+        key: label.toUpperCase()
+          .replace(/\u00dc/g, 'UE').replace(/\u00c4/g, 'AE').replace(/\u00d6/g, 'OE').replace(/\u00df/g, 'SS')
+          .replace(/[^A-Z0-9]/g, ''),
+        label: label,
+        price: Math.round(price * 100) / 100
+      });
+    });
+    return out;
+  })(program.packageSpec, program.price);
+
+  if (pkgs.length > 1) {
+    pkgs.forEach((pk, i) => {
+      const opt = document.createElement('option');
+      opt.value = pk.key;
+      opt.dataset.price = pk.price;
+      opt.textContent = `${pk.label} \u2014 \u20AC${pk.price.toFixed(2)}`;
+      pkgSelect.appendChild(opt);
+    });
+    pkgGroup.style.display = '';
+    // Show package contents hint from the description's package lines when present
+    const descPkgLines = (program.description || '').split('\n').filter(l => /\u2022|BASIS|KOMFORT|\u00dcBERNACHTUNG/i.test(l));
+    if (descPkgLines.length) pkgDetail.textContent = descPkgLines.join(' ');
+  } else {
+    // Single/implicit price — no selector
+    pkgGroup.style.display = 'none';
+  }
+  window._modalPackages = pkgs;
 
   // Set modal title and program name
   document.getElementById('modal-title').textContent = bs('modalTitle');
@@ -455,8 +517,9 @@ function openModal(programId) {
   const submitLabel = document.getElementById('submit-label');
   if (submitLabel) submitLabel.textContent = bs('submitBtn');
 
-  // Set initial price
-  updatePriceDisplay(program.price);
+  // Set initial price (package-aware)
+  const initialPrice = pkgs.length > 1 ? pkgs[0].price : program.price;
+  updatePriceDisplay(initialPrice);
 
   // Open overlay
   document.getElementById('modal-overlay').classList.add('is-open');
@@ -598,12 +661,61 @@ function isValidEmailFormat(value) {
 }
 
 // ─── Form submission ──────────────────────────────────────────────────────────
-// NOTE: We use `fetch(..., { mode: 'no-cors' })` because Google Apps Script web
-// apps 302-redirect to googleusercontent.com without Access-Control-Allow-Origin
-// headers, which the browser blocks on a cross-origin POST from innerevolutionyoga.life.
-// Tradeoff: the response is OPAQUE — we cannot read Apps Script's JSON reply.
-// Mitigation: pre-validate aggressively here; Apps Script sends all confirmation,
-// error and admin-alert emails server-side.
+// Transport strategy (mirrors newsletter.js): try a READABLE POST first
+// (Content-Type: text/plain avoids the CORS preflight; Apps Script returns
+// JSON the browser can read when the redirect chain cooperates). If the
+// browser blocks it (opaque redirect), fall back to a no-cors POST.
+// Both paths are safe to retry: the payload carries a client-side bookingId
+// and the backend replies idempotently for known IDs (no duplicate rows).
+function makeBookingId() {
+  var d = new Date();
+  var pad = function (n) { return ('0' + n).slice(-2); };
+  var stamp = '' + d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()) + '-' + pad(d.getHours()) + pad(d.getMinutes()) + pad(d.getSeconds());
+  var rnd = Math.random().toString(36).slice(2, 6).toUpperCase();
+  return 'BK-' + stamp + '-' + rnd;
+}
+
+// Single POST attempt. Resolves { ok, data?, opaque? } — never throws.
+function postBooking(payload, timeoutMs) {
+  return new Promise(function (resolve) {
+    var controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+    var timer = setTimeout(function () { if (controller) controller.abort(); }, timeoutMs || 15000);
+    var finish = function (res) { clearTimeout(timer); resolve(res); };
+
+    // Robustness fallback chain: CI-regenerated config may lack APPS_SCRIPT_URL;
+    // NEWSLETTER_URL points to the same backend; live /exec URL as last resort.
+    const backendUrl = CONFIG.APPS_SCRIPT_URL || CONFIG.NEWSLETTER_URL ||
+      'https://script.google.com/macros/s/AKfycbw3WLYvoodMPphob0cyNrny6m-JzuEV6xBZDHJXHmuDHpzprcnLASbm_s3y0JvW9vKJ/exec';
+
+    fetch(backendUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // no preflight
+      redirect: 'follow',
+      body: JSON.stringify(payload),
+      signal: controller ? controller.signal : undefined,
+    })
+      .then(function (res) {
+        // Readable response — parse the real backend verdict
+        return res.json().then(function (data) {
+          finish({ ok: res.ok && !!data.success, data: data });
+        }, function () {
+          finish({ ok: res.ok, data: null });
+        });
+      })
+      .catch(function () {
+        // Network error OR opaque CORS block — one opaque fallback attempt
+        fetch(backendUrl, {
+          method: 'POST',
+          mode: 'no-cors',
+          redirect: 'follow',
+          body: JSON.stringify(payload),
+        })
+          .then(function () { finish({ ok: true, opaque: true }); })
+          .catch(function () { finish({ ok: false }); });
+      });
+  });
+}
+
 async function handleSubmit(event) {
   event.preventDefault();
 
@@ -617,11 +729,12 @@ async function handleSubmit(event) {
   const label   = document.getElementById('submit-label');
   const spinner = document.getElementById('submit-spinner');
 
-  // ── Pre-submit validation (critical — we can't read server response) ──
+  // ── Pre-submit validation (fast feedback; backend re-validates anyway) ──
   const name  = document.getElementById('field-name').value.trim();
   const email = document.getElementById('field-email').value.trim();
+  const phone = document.getElementById('field-phone').value.trim();
 
-  if (!name || !email) {
+  if (!name || !email || !phone) {
     alert(bs('alertFillIn'));
     return;
   }
@@ -641,65 +754,74 @@ async function handleSubmit(event) {
   const finalPrice = totalPct > 0 ? basePrice * (1 - totalPct / 100) : basePrice;
 
   const bringingFriends = document.querySelector('input[name="bringingFriends"]:checked')?.value === 'yes';
+  const pkgSelect = document.getElementById('field-package');
+  const pkgKey    = (pkgSelect && pkgSelect.offsetParent !== null && pkgSelect.value) ? pkgSelect.value : '';
+  // Package price overrides the card base price for discount math (parity with backend)
+  const effectiveBase = (pkgKey && window._modalPackages) ?
+    ((window._modalPackages.find(pk => pk.key === pkgKey) || {}).price || basePrice) : basePrice;
+  const effectiveFinal = totalPct > 0 ? effectiveBase * (1 - totalPct / 100) : effectiveBase;
 
   const payload = {
+    action:             'booking',
+    bookingId:          makeBookingId(),          // idempotent retry key (server replays)
     programId:          document.getElementById('field-program-id').value,
     programName:        document.getElementById('field-program-name').value,
-    basePrice:          basePrice,
-    finalPrice:         parseFloat(finalPrice.toFixed(2)),
+    packageKey:         pkgKey,
+    basePrice:          effectiveBase,
+    finalPrice:         parseFloat(effectiveFinal.toFixed(2)),
     discountCode:       activeDiscount.code,
     discountPct:        activeDiscount.pct,
     friendsDiscountPct: friendsDiscount.pct,
     totalDiscountPct:   totalPct,
     fullName:           name,
     email:              email,
-    phone:              document.getElementById('field-phone').value.trim(),
+    phone:              phone,
     bringingFriends:    bringingFriends,
     friendsCount:       bringingFriends ? (document.getElementById('field-friends-count').value || '') : '',
     friendsNames:       bringingFriends ? (document.getElementById('field-friends-names').value.trim() || '') : '',
     comments:           document.getElementById('field-comments').value.trim(),
+    website:            document.getElementById('field-website').value,  // honeypot (must stay empty)
+    formLoadedAt:       window._bookingFormLoadedAt || '',               // time-trap reference
     lang:               window._bookingLang || 'en',
     submittedAt:        new Date().toISOString(),
   };
 
-  // ── Fire the request with a 15-second abort timeout ──
-  const controller = new AbortController();
-  const timeoutId  = setTimeout(() => controller.abort(), 15000);
+  // First attempt, then ONE automatic retry (idempotent — same bookingId)
+  let result = await postBooking(payload, 15000);
+  if (!result.ok || result.opaque) {
+    payload.bookingId = payload.bookingId; // keep the SAME id — server replays if the first attempt landed
+    result = await postBooking(payload, 20000);
+  }
 
-  try {
-    await fetch(CONFIG.APPS_SCRIPT_URL, {
-      method:   'POST',
-      mode:     'no-cors',
-      redirect: 'follow',
-      body:     JSON.stringify(payload),
-      signal:   controller.signal,
-    });
-    clearTimeout(timeoutId);
-
-    // Request completed without network error — assume success.
-    // Apps Script is now responsible for ALL success/failure communication via email.
+  if (result.ok) {
     document.getElementById('booking-form').style.display = 'none';
     document.getElementById('form-success').style.display = '';
-    document.getElementById('success-detail').textContent =
-      bs('successFallback')(email) + ' ' +
-      bs('successSpamTip')  + ' ' +
-      bs('successContactFallback')(INSTRUCTOR_CONTACT_EMAIL);
-
-  } catch (err) {
-    clearTimeout(timeoutId);
-    console.error('Booking submission failed:', err);
-
-    // Classify the failure for a useful user message
-    let userMsg;
-    if (err.name === 'AbortError') {
-      userMsg = bs('alertTimeout');
+    const payUrl = result.data && result.data.paymentUrl;
+    const detail = document.getElementById('success-detail');
+    if (payUrl) {
+      detail.textContent = bs('successPayLink')(email);
+      // Direct payment button — saves the user a mailbox round-trip
+      let payBtn = document.getElementById('success-pay-btn');
+      if (!payBtn) {
+        payBtn = document.createElement('a');
+        payBtn.id = 'success-pay-btn';
+        payBtn.className = 'btn-primary success-pay-btn';
+        payBtn.target = '_blank';
+        payBtn.rel = 'noopener';
+        detail.parentNode.insertBefore(payBtn, detail.nextSibling);
+      }
+      payBtn.href = payUrl;
+      payBtn.style.display = '';
+      payBtn.textContent = bs('payNowBtn');
     } else {
-      // TypeError 'Failed to fetch' = network / DNS / offline
-      userMsg = bs('alertNetwork');
+      detail.textContent = bs('successFallback')(email) + ' ' + bs('successSpamTip') + ' ' + bs('successContactFallback')(INSTRUCTOR_CONTACT_EMAIL);
+      const staleBtn = document.getElementById('success-pay-btn');
+      if (staleBtn) staleBtn.style.display = 'none';
     }
-    alert(userMsg + '\n\n' + bs('successContactFallback')(INSTRUCTOR_CONTACT_EMAIL));
-
-    // Re-enable the button so the user can retry
+  } else {
+    // Real backend verdict or total network failure — tell the user honestly
+    const serverMsg = result.data && result.data.error ? result.data.error : '';
+    alert((serverMsg ? serverMsg : bs('alertNetwork')) + '\n\n' + bs('successContactFallback')(INSTRUCTOR_CONTACT_EMAIL));
     btn.disabled          = false;
     label.style.display   = '';
     spinner.style.display = 'none';
@@ -711,38 +833,47 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Apply language translations first
   applyStaticTranslations();
 
-  // ── DISABLED: Modal, discount, friends, form submit — booking now uses external form links ──
+  // ── Modal, discount, friends, form submit — native booking re-enabled ──
   // Modal close listeners
-  // document.getElementById('modal-close').addEventListener('click', closeModal);
-  // document.getElementById('modal-overlay').addEventListener('click', e => {
-  //   if (e.target === e.currentTarget) closeModal();
-  // });
-  // document.addEventListener('keydown', e => {
-  //   if (e.key === 'Escape') closeModal();
-  // });
+  document.getElementById('modal-close').addEventListener('click', closeModal);
+  document.getElementById('modal-overlay').addEventListener('click', e => {
+    if (e.target === e.currentTarget) closeModal();
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeModal();
+  });
 
   // Discount input
-  // document.getElementById('field-discount').addEventListener('input', onDiscountInput);
+  document.getElementById('field-discount').addEventListener('input', onDiscountInput);
 
   // Discount toggle button
-  // document.getElementById('discount-toggle-btn').addEventListener('click', toggleDiscountField);
+  document.getElementById('discount-toggle-btn').addEventListener('click', toggleDiscountField);
 
   // Friends radio buttons
-  // document.querySelectorAll('input[name="bringingFriends"]').forEach(function(radio) {
-  //   radio.addEventListener('change', function() { toggleFriends(this.value === 'yes'); });
-  // });
+  document.querySelectorAll('input[name="bringingFriends"]').forEach(function(radio) {
+    radio.addEventListener('change', function() { toggleFriends(this.value === 'yes'); });
+  });
 
   // Friends count input
-  // document.getElementById('field-friends-count').addEventListener('input', onFriendsCountChange);
+  document.getElementById('field-friends-count').addEventListener('input', onFriendsCountChange);
 
-  // Register buttons — no longer needed, buttons are now <a> links
-  // document.getElementById('programs-grid').addEventListener('click', function(e) {
-  //   var btn = e.target.closest('.btn-register');
-  //   if (btn && !btn.disabled) openModal(btn.dataset.programId);
-  // });
+  // Package selector — live price updates when switching packages
+  const pkgSel = document.getElementById('field-package');
+  if (pkgSel) {
+    pkgSel.addEventListener('change', function () {
+      const pk = (window._modalPackages || []).find(p => p.key === this.value);
+      if (pk) updatePriceDisplay(pk.price);
+    });
+  }
+
+  // Register buttons — open the native modal
+  document.getElementById('programs-grid').addEventListener('click', function(e) {
+    var btn = e.target.closest('.btn-register');
+    if (btn && !btn.disabled && btn.dataset.programId) openModal(btn.dataset.programId);
+  });
 
   // Form submit
-  // document.getElementById('booking-form').addEventListener('submit', handleSubmit);
+  document.getElementById('booking-form').addEventListener('submit', handleSubmit);
 
   // Local dev detection: Five Server, Live Server, file:// etc.
   // Skip Sheets API on local servers (blocked by API key domain restrictions / Brave Shields)
@@ -776,6 +907,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           location:         r[11] || '',
           language:         r[12] || '',
           formUrl:          r[13] || '',   // Column N — external registration form URL
+          packageSpec:      r[14] || '',   // Column O — sheet-driven packages spec (native modal)
           image: '', format: '',
         }));
         sessions = sessRows.map(r => ({
