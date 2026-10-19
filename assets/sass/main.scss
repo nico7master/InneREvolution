@@ -18665,12 +18665,33 @@ section.carousel-shell > .inner,
   padding-right: 0;
 }
 
-/* Per-card booking CTA inside program cards */
+/* Per-card booking CTA inside program cards — glassy pill matching
+   the site's standard button design (same family as .programs-empty-btn) */
 #program-calendar .program-card-book {
   display: inline-block;
   margin-top: 0.9rem;
-  padding: 0.55em 1.8em;
+  padding: 0.75em 2.1em;
   font-size: 0.85em;
+  font-family: "FedraSansPro", sans-serif;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  line-height: 1;
+  text-transform: uppercase;
+  text-decoration: none;
+  border-radius: 999px;
+  border: 1px solid rgba(231, 220, 198, 0.58);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.42));
+  color: #f8efe3;
+  box-shadow: 0 14px 32px rgba(18, 22, 18, 0.22);
+  transition: transform 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease, background 0.28s ease, color 0.28s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    border-color: rgba(250, 241, 227, 0.82);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.10));
+    color: #fff7ed;
+    box-shadow: 0 18px 38px rgba(18, 22, 18, 0.28);
+  }
 }
 
 #program-calendar .programs-feed-status .programs-empty-msg {
@@ -19968,16 +19989,11 @@ section#Bio,
   flex: 1;              /* fills remaining card height */
   width: 100% !important; /* prevent align-items:center on showcase from shrinking below card width */
   min-height: 0;
-  overflow-y: auto;
+  overflow-y: visible;  /* full text visible — cards grow instead of clipping into a scrollbar */
   margin: 0;            /* no extra margins */
   color: #f5ede3;
   font-size: 0.9em;
   text-shadow: none;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 183, 101, 0.35) transparent;
-  &::-webkit-scrollbar { width: 4px; }
-  &::-webkit-scrollbar-track { background: transparent; }
-  &::-webkit-scrollbar-thumb { background: rgba(255, 183, 101, 0.35); border-radius: 2px; }
 }
 
 #program-calendar .program-card-actions {
@@ -20540,7 +20556,10 @@ section#Bio,
   flex: 0 0 290px !important;
   min-width: 290px !important;
   max-width: 290px !important;
-  height: 560px;
+  /* min-height instead of fixed height: cards grow with their content
+     (descriptions are no longer clipped into scrollbars) */
+  min-height: 560px;
+  height: auto;
   flex-shrink: 0;
 }
 

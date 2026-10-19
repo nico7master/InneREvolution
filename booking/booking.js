@@ -136,13 +136,19 @@ var BOOKING_STRINGS = {
   }
 };
 
-/* Detect language: ?lang= URL param → localStorage key 'innerevolution_lang' → default EN */
+/* Detect language: ?lang= URL param → localStorage → browser language → default EN */
 (function () {
   var params = new URLSearchParams(window.location.search);
   var urlLang = params.get('lang');
   if (urlLang === 'de' || urlLang === 'en') localStorage.setItem('innerevolution_lang', urlLang);
   var stored = localStorage.getItem('innerevolution_lang');
-  window._bookingLang = (stored === 'de') ? 'de' : 'en';
+  if (stored === 'de' || stored === 'en') {
+    window._bookingLang = stored;
+  } else {
+    /* No explicit choice: auto-detect from the visitor's browser language */
+    var browser = (navigator.language || navigator.userLanguage || 'en').toLowerCase();
+    window._bookingLang = browser.indexOf('de') === 0 ? 'de' : 'en';
+  }
 })();
 
 /* Shorthand getter — bs('key') returns string or function */
@@ -205,8 +211,9 @@ function programSlug(p, list) {
 function handleShare(programId, btn) {
   const p = programs.find(x => x.id === programId);
   if (!p) return;
-  const lang = window._bookingLang === 'de' ? 'de' : 'en';
-  const url = 'https://innerevolutionyoga.life/b/' + programSlug(p, programs) + '?lang=' + lang;
+  /* Language-free share URL: the booking page auto-detects each recipient's
+     browser language, so no ?lang= parameter is needed (old links still work). */
+  const url = 'https://innerevolutionyoga.life/b/' + programSlug(p, programs);
   const title = p.name;
   const done = () => { if (window.toastAlert) toastAlert(bs('shareCopied')); else alert(bs('shareCopied')); };
   if (navigator.share) {
@@ -392,7 +399,8 @@ function buildCard(p) {
     p.totalHours   ? `${p.totalHours}${bs('hrsLabel')}` : ''
   ].filter(Boolean).map(v => `<span class="program-card-badge program-card-info">${v}</span>`).join('');
 
-  const metaHtml = [p.format, p.language, p.location].filter(Boolean)
+  /* Language badge removed: site language is implicit (DE default), tag was redundant */
+  const metaHtml = [p.format, p.location].filter(Boolean)
     .map(v => `<span class="program-card-badge">${v}</span>`).join('');
 
   // Group sessions by date for compact display

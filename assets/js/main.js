@@ -743,12 +743,7 @@ updateActiveDot();
     var metaList = createElement('ul', 'program-card-meta');
     var hasMeta  = false;
     if (program.format)   { hasMeta = true; metaList.appendChild(createElement('li', 'program-card-format', program.format)); }
-    if (program.language) {
-      hasMeta = true;
-      var langLi = createElement('li', 'program-card-lang', program.language);
-      langLi.setAttribute('data-lang', program.language.toLowerCase());
-      metaList.appendChild(langLi);
-    }
+    /* Language badge removed: site language is implicit (DE default), tag was redundant */
     if (program.location) { hasMeta = true; metaList.appendChild(createElement('li', 'program-card-location', program.location)); }
     if (hasMeta) card.appendChild(metaList);
 
@@ -762,8 +757,16 @@ updateActiveDot();
     /* Footer: spots count + per-card booking CTA (only when bookable) */
     var footer = createElement('div', 'program-card-actions');
     if (program.spotsLeft !== null) {
-      footer.appendChild(createElement('span', 'program-card-note',
-        isFull ? 'Sold out' : program.spotsLeft + ' spot' + (program.spotsLeft === 1 ? '' : 's') + ' left'));
+      var isDePage = window.location.pathname.indexOf('/de/') !== -1;
+      var spotsText;
+      if (isFull) {
+        spotsText = isDePage ? 'Ausverkauft' : 'Sold out';
+      } else {
+        spotsText = isDePage
+          ? program.spotsLeft + (program.spotsLeft === 1 ? ' Platz frei' : ' Plätze frei')
+          : program.spotsLeft + ' spot' + (program.spotsLeft === 1 ? '' : 's') + ' left';
+      }
+      footer.appendChild(createElement('span', 'program-card-note', spotsText));
     }
     if (!isFull) {
       var isDe = window.location.pathname.indexOf('/de/') !== -1;

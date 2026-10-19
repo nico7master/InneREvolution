@@ -4,13 +4,14 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script>
-    // Short-link router: /b/<slug>[/package] -> /booking/?p=<slug>&lang=de[&pkg=...]
+    // Short-link router: /b/<slug>[/package] -> /booking/?p=<slug>[&pkg=...]
+    // (language auto-detected from the visitor's browser on the booking page)
     // Works for every program automatically (slugs derive from program names in
     // booking.js). Unknown /b/ paths fall through to the normal 404 page.
     (function () {
       var m = location.pathname.match(/^\/b\/([a-z0-9-]+)(?:\/([a-zA-Z0-9]+))?\/?$/i);
       if (m) {
-        var target = '/booking/?p=' + encodeURIComponent(m[1]) + '&lang=de';
+        var target = '/booking/?p=' + encodeURIComponent(m[1]);
         if (m[2]) target += '&pkg=' + encodeURIComponent(m[2].toUpperCase());
         location.replace(target);
         return;
