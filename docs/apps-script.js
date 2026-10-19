@@ -1,6 +1,6 @@
 /**
  * InneREvolution — Google Apps Script (Full Suite v5 / deploy v75)
- * ─────────────────────────────────────────────────────
+ * \u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}
  * Version: v5 (2026-04-22)   —   Robustness overhaul
  *
  * NEW IN v75 (vs v74 / code version v4):
@@ -19,7 +19,7 @@
  *       to block anonymous bots. Webhook path is exempt (verified via R1).
  *   R6. Global rate-limit via CacheService (30 bookings / minute max).
  *   R7. `createStripePaymentLink` caches product IDs by program name in
- *       Script Properties → no duplicate Stripe products on re-edit.
+ *       Script Properties \u{2192} no duplicate Stripe products on re-edit.
  *   R8. Cancellation flow: signed `doGet(?action=cancel&id=BK-..&t=..)`
  *       marks booking cancelled, frees the spot, notifies instructor.
  *   R9. `logError()` helper writes to `\u{1F4DB} Error Log` sheet (created on
@@ -31,7 +31,7 @@
  *     intake, payment reminder, daily report)
  *   - LockService concurrency protection on bookings
  *   - Duplicate booking prevention (email + programId)
- *   - Tab-name fallbacks (emoji ↔ English)
+ *   - Tab-name fallbacks (emoji \u{2194} English)
  *   - safeAlert() trigger-safe UI helper
  *
  * COLUMN MAPPINGS (see COLS constant below for single source of truth):
@@ -48,16 +48,16 @@
  *   CANCELLATION_SECRET (HMAC key for cancel URLs)
  */
 
-// ─── MANUAL MODE — Set to true to disable ALL automations (emails, Stripe, triggers) ──
+// \u{2500}\u{2500}\u{2500} MANUAL MODE — Set to true to disable ALL automations (emails, Stripe, triggers) \u{2500}\u{2500}
 // When true: onEdit, doPost, doGet, all triggers are short-circuited.
 // Set to false to re-enable full automation.
 var MANUAL_MODE = false; // native booking modal is the primary booking path (re-enabled 2026-10)
 
-// ─── NEWSLETTER OWNER NOTIFICATION — email me when someone signs up (user-requested) ──
+// \u{2500}\u{2500}\u{2500} NEWSLETTER OWNER NOTIFICATION — email me when someone signs up (user-requested) \u{2500}\u{2500}
 // Set to false to stop notification emails. Signups are always recorded in the sheet.
 var NEWSLETTER_NOTIFY = true;
 
-// ─── 0. COLUMN MAPS — SINGLE SOURCE OF TRUTH (R4) ────────────────────────────
+// \u{2500}\u{2500}\u{2500} 0. COLUMN MAPS — SINGLE SOURCE OF TRUTH (R4) \u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}
 var COLS = {
   KURSPLANUNG: {
     FIRST_DATA_ROW: 4,  // row 1 title, row 2 colors, row 3 headers
@@ -123,7 +123,7 @@ var COLS = {
   }
 };
 
-// ─── 0a. CONFIG ───────────────────────────────────────────────────────────────
+// \u{2500}\u{2500}\u{2500} 0a. CONFIG \u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}
 function getConfig() {
   var p = PropertiesService.getScriptProperties().getProperties();
   var testMode = (p.TEST_MODE || 'true').toString().toLowerCase() === 'true';
@@ -144,7 +144,7 @@ function getConfig() {
   };
 }
 
-// ─── SAFE ALERT (trigger-safe UI helper) ──────────────────────────────────────
+// \u{2500}\u{2500}\u{2500} SAFE ALERT (trigger-safe UI helper) \u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}
 function safeAlert(title, message, buttons) {
   try {
     var ui = SpreadsheetApp.getUi();
@@ -154,12 +154,12 @@ function safeAlert(title, message, buttons) {
   }
 }
 
-// ─── EMAIL VALIDATION ─────────────────────────────────────────────────────────
+// \u{2500}\u{2500}\u{2500} EMAIL VALIDATION \u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}
 function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email).trim());
 }
 
-// ─── HMAC-SHA256 HELPER (R8 — cancellation token signing) ─────────────────────
+// \u{2500}\u{2500}\u{2500} HMAC-SHA256 HELPER (R8 — cancellation token signing) \u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}
 function hmacSign(message, secret) {
   var raw = Utilities.computeHmacSha256Signature(String(message), String(secret));
   return raw.map(function(b) {
@@ -175,7 +175,7 @@ function constantTimeEquals(a, b) {
   return r === 0;
 }
 
-// ─── RATE LIMIT (R6) — global N-per-minute using CacheService ────────────────
+// \u{2500}\u{2500}\u{2500} RATE LIMIT (R6) — global N-per-minute using CacheService \u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}
 function checkRateLimit(bucket, maxPerMinute) {
   try {
     var cache = CacheService.getScriptCache();
@@ -192,7 +192,7 @@ function checkRateLimit(bucket, maxPerMinute) {
   }
 }
 
-// ─── ERROR LOG (R9) — persistent log sheet + optional email alert ────────────
+// \u{2500}\u{2500}\u{2500} ERROR LOG (R9) — persistent log sheet + optional email alert \u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}
 function logError(context, err, extra) {
   try {
     var cfg = getConfig();
@@ -220,7 +220,7 @@ function logError(context, err, extra) {
 }
 
 
-// ─── 1. MENU ──────────────────────────────────────────────────────────────────
+// \u{2500}\u{2500}\u{2500} 1. MENU \u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}
 function onOpen() {
   SpreadsheetApp.getUi()
     .createMenu('InneREvolution')
@@ -245,7 +245,7 @@ function onOpen() {
 }
 
 
-// ─── 2. WEB APP ───────────────────────────────────────────────────────────────
+// \u{2500}\u{2500}\u{2500} 2. WEB APP \u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}
 function doGet(e) {
   // TEMPORARY one-time admin wipe — will be removed right after use
   var paramsW = (e && e.parameter) ? e.parameter : {};
@@ -266,7 +266,7 @@ function doGet(e) {
   return ContentService.createTextOutput('InneREvolution Booking API v75 — OK');
 }
 
-// ─── CANCELLATION (R8) — signed link handler ─────────────────────────────────
+// \u{2500}\u{2500}\u{2500} CANCELLATION (R8) — signed link handler \u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}
 function handleCancellation(bookingId, token) {
   var cfg = getConfig();
   if (!cfg.CANCELLATION_SECRET) {
@@ -366,7 +366,7 @@ function doPost(e) {
   }
 }
 
-// ─── PACKAGE RESOLVER (sheet-driven, early-bird safe) ────────────────────────
+// \u{2500}\u{2500}\u{2500} PACKAGE RESOLVER (sheet-driven, early-bird safe) \u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}
 // Spec grammar in \u{1F9D8} Kursplanung column Z (PACKAGE_SPEC):
 //   "BASIS:base|KOMFORT:+80|UEBERNACHTUNG:480"
 //   value 'base'   -> current sheet base price (early-bird formula auto-switches)
@@ -620,7 +620,7 @@ function handleBooking(data) {
 
 
 
-// ─── NEWSLETTER SIGNUP (N-series) ────────────────────────────────────────────
+// \u{2500}\u{2500}\u{2500} NEWSLETTER SIGNUP (N-series) \u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}
 // Passive email capture for the website "get notified" signup form.
 // Writes new rows to the NEWSLETTER_TAB in the MAIN sheet. Exempt from
 // MANUAL_MODE because it performs no emails, Stripe actions or triggers (N1).
@@ -741,7 +741,7 @@ function sendNewsletterNotification(email, lang, data) {
 
 
 
-// ─── ERROR ALERTS ─────────────────────────────────────────────────────────────
+// \u{2500}\u{2500}\u{2500} ERROR ALERTS \u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}
 function sendErrorAlert(context, err, data) {
   try {
     var cfg           = getConfig();
@@ -754,7 +754,7 @@ function sendErrorAlert(context, err, data) {
     var html =
       '<div style="font-family:Arial,sans-serif;max-width:600px;background:#fff;border-radius:8px;overflow:hidden">'
       + '<div style="background:#c0392b;padding:20px 24px">'
-      + '<h2 style="color:#fff;margin:0;font-size:18px">⚠️ Apps Script Error</h2>'
+      + '<h2 style="color:#fff;margin:0;font-size:18px">\u{26A0}\u{FE0F} Apps Script Error</h2>'
       + '<p style="color:#f5a8a8;margin:6px 0 0;font-size:13px">InneREvolution Booking System — ' + timestamp + '</p>'
       + '</div>'
       + '<div style="padding:24px;background:#fafafa">'
@@ -768,7 +768,7 @@ function sendErrorAlert(context, err, data) {
       + '</div>'
       + '</div>';
     GmailApp.sendEmail(instructorEmail,
-      '[⚠️ BOOKING ERROR] ' + context + ' — ' + err.message.substring(0, 80),
+      '[\u{26A0}\u{FE0F} BOOKING ERROR] ' + context + ' — ' + err.message.substring(0, 80),
       'Error in ' + context + ': ' + err.message + '\n\nData: ' + dataStr,
       { htmlBody: html });
     Logger.log('[ERROR ALERT] Sent to ' + instructorEmail);
@@ -777,7 +777,7 @@ function sendErrorAlert(context, err, data) {
   }
 }
 
-// ─── 3. EMAILS ────────────────────────────────────────────────────────────────
+// \u{2500}\u{2500}\u{2500} 3. EMAILS \u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}
 function sendClientConfirmation(data, programName, finalPrice, discountPct, payUrl, sessionsStr, ort) {
   // Build booking info rows — use real UTF-8 emoji (GS V8 handles them; HTML entities don't render in email subjects)
   var infoRows = '';
@@ -817,7 +817,7 @@ function sendClientConfirmation(data, programName, finalPrice, discountPct, payU
     + '<div style="background:#371964;padding:40px 32px;text-align:center">'
     + '<p style="color:#c8b8ef;margin:0 0 8px;font-size:12px;letter-spacing:3px;text-transform:uppercase">InneREvolution Yoga</p>'
     + '<h1 style="color:#ffffff;margin:0;font-size:26px;font-weight:300;letter-spacing:1px">Anmeldung bestätigt</h1>'
-    + '<p style="color:#e0d4f7;margin:12px 0 0;font-size:15px">✨ Dein Platz ist reserviert</p>'
+    + '<p style="color:#e0d4f7;margin:12px 0 0;font-size:15px">\u{2728} Dein Platz ist reserviert</p>'
     + '</div>'
     + '<div style="padding:36px 32px">'
     + '<p style="font-size:16px;color:#333;margin:0 0 8px">Namaskaram <strong>' + data.fullName + '</strong> &#x1F64F;</p>'
@@ -935,13 +935,13 @@ function sendIntakeForm(name, email, programName) {
     + '</div>'
     + '</div>';
   GmailApp.sendEmail(email,
-    '✅ Zahlung bestätigt — Willkommen bei ' + programName + '!',
+    '\u{2705} Zahlung bestätigt — Willkommen bei ' + programName + '!',
     'Namaskaram ' + name + ', deine Zahlung fuer ' + programName + ' wurde bestaetigt. Bitte fuelle das Intake-Formular aus: ' + intakeUrl,
     { htmlBody: html });
   Logger.log('[INTAKE] Form sent to ' + email);
 }
 
-// ─── STRIPE WEBHOOK (Bug #2 fix: defined ss variable properly) ────────────────
+// \u{2500}\u{2500}\u{2500} STRIPE WEBHOOK (Bug #2 fix: defined ss variable properly) \u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}
 function handleStripeWebhook(event) {
   try {
     var cfg = getConfig();
@@ -1044,7 +1044,7 @@ function jsonResponse(obj) {
   return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
 }
 
-// ─── 4. STRIPE AUTO-CREATION (Bug #3 fix: correct sheet name + column mapping) ─
+// \u{2500}\u{2500}\u{2500} 4. STRIPE AUTO-CREATION (Bug #3 fix: correct sheet name + column mapping) \u{2500}
 function onEdit(e) {
   if (MANUAL_MODE) return;
   try {
@@ -1098,7 +1098,7 @@ function onEdit(e) {
   }
 }
 
-// ─── COLOR HELPERS ────────────────────────────────────────────────────────────
+// \u{2500}\u{2500}\u{2500} COLOR HELPERS \u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}
 function getOrCreateIdColor(id) {
   var props = PropertiesService.getScriptProperties();
   var mapJson = props.getProperty('ID_COLOR_MAP') || '{}';
@@ -1231,7 +1231,7 @@ function createStripePaymentLink(programName, priceInCents) {
     return '';
   }
 }
-// ─── Bug #13 fix: correct tab name + column mapping for createAllStripeLinks ──
+// \u{2500}\u{2500}\u{2500} Bug #13 fix: correct tab name + column mapping for createAllStripeLinks \u{2500}\u{2500}
 function createAllStripeLinks() {
   var ss   = SpreadsheetApp.getActiveSpreadsheet();
   var prog = ss.getSheetByName('\u{1F9D8} Kursplanung') || ss.getSheetByName('Programs');
@@ -1254,7 +1254,7 @@ function createAllStripeLinks() {
   safeAlert('InneREvolution', 'Stripe links created: ' + created);
 }
 
-// ─── 5. FORMAT SHEET (Bug #4 fix: correct tab names + column counts) ──────────
+// \u{2500}\u{2500}\u{2500} 5. FORMAT SHEET (Bug #4 fix: correct tab names + column counts) \u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}
 function formatSheet() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   // Bug #4 FIX: Use actual emoji tab names and correct column counts
@@ -1301,7 +1301,7 @@ function formatSheet() {
   safeAlert('InneREvolution', 'All tabs formatted successfully!');
 }
 
-// ─── 6. CONDITIONAL FORMATTING (Bug #5 fix: correct column positions) ─────────
+// \u{2500}\u{2500}\u{2500} 6. CONDITIONAL FORMATTING (Bug #5 fix: correct column positions) \u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}
 function applyConditionalFormatting(ss) {
   var prog = ss.getSheetByName('\u{1F9D8} Kursplanung') || ss.getSheetByName('Programs');
   var book = ss.getSheetByName('\u{1F4CB} Buchungen')    || ss.getSheetByName('Bookings');
@@ -1358,7 +1358,7 @@ function applyConditionalFormatting(ss) {
   book.setConditionalFormatRules(bookRules);
 }
 
-// ─── 7. DATA VALIDATIONS (Bug #6 fix: correct tab names + positions) ──────────
+// \u{2500}\u{2500}\u{2500} 7. DATA VALIDATIONS (Bug #6 fix: correct tab names + positions) \u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}
 function applyDataValidations(ss) {
   var prog = ss.getSheetByName('\u{1F9D8} Kursplanung') || ss.getSheetByName('Programs');
   var book = ss.getSheetByName('\u{1F4CB} Buchungen')    || ss.getSheetByName('Bookings');
@@ -1385,7 +1385,7 @@ function applyDataValidations(ss) {
   book.getRange(2, 19, n, 1).setDataValidation(dv(['YES', 'NO'], false));
 }
 
-// ─── 8. DASHBOARD (Bug #7 fix: correct formula references with emoji tab names) ─
+// \u{2500}\u{2500}\u{2500} 8. DASHBOARD (Bug #7 fix: correct formula references with emoji tab names) \u{2500}
 function buildDashboard() {
   var ss   = SpreadsheetApp.getActiveSpreadsheet();
   var dash = ss.getSheetByName('\u{1F4CA} Buchungs-Dashboard') || ss.getSheetByName('Dashboard');
@@ -1505,7 +1505,7 @@ function buildDashboard() {
   safeAlert('InneREvolution', 'Dashboard rebuilt!');
 }
 
-// ─── 9. FRIEND REFERRAL CHECK (Bug #8 fix: verified indices + safeAlert) ──────
+// \u{2500}\u{2500}\u{2500} 9. FRIEND REFERRAL CHECK (Bug #8 fix: verified indices + safeAlert) \u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}
 function checkFriendReferrals() {
   if (MANUAL_MODE) return;
   var cfg  = getConfig();
@@ -1541,7 +1541,7 @@ function checkFriendReferrals() {
   safeAlert('InneREvolution', 'Referral check complete.\n' + updates + ' cell(s) updated.');
 }
 
-// ─── 10. PAYMENT REMINDERS (Bug #9 fix: correct column mapping + safeAlert) ───
+// \u{2500}\u{2500}\u{2500} 10. PAYMENT REMINDERS (Bug #9 fix: correct column mapping + safeAlert) \u{2500}\u{2500}\u{2500}
 function sendPaymentReminders() {
   if (MANUAL_MODE) return;
   var cfg  = getConfig();
@@ -1585,7 +1585,7 @@ function sendPaymentReminders() {
   safeAlert('InneREvolution', 'Payment reminders sent: ' + sent);
 }
 
-// ─── 11. DAILY REPORT (Bug #10 fix: correct sheet/column references + safeAlert) ─
+// \u{2500}\u{2500}\u{2500} 11. DAILY REPORT (Bug #10 fix: correct sheet/column references + safeAlert) \u{2500}
 function sendDailyReport() {
   if (MANUAL_MODE) return;
   var cfg = getConfig();
@@ -1648,7 +1648,7 @@ function sendDailyReport() {
   safeAlert('InneREvolution', 'Daily report sent to ' + cfg.INSTRUCTOR_EMAIL);
 }
 
-// ─── 12. TRIGGER SETUP ───────────────────────────────────────────────────────
+// \u{2500}\u{2500}\u{2500} 12. TRIGGER SETUP \u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}
 function setupTriggers() {
   ScriptApp.getProjectTriggers().forEach(function(t) { ScriptApp.deleteTrigger(t); });
   ScriptApp.newTrigger('sendDailyReport'       ).timeBased().atHour(8 ).everyDays(1).create();
@@ -1665,7 +1665,7 @@ function setupTriggers() {
     + 'All run daily automatically.');
 }
 
-// ─── 13. AUTHORIZE & TEST ─────────────────────────────────────────────────────
+// \u{2500}\u{2500}\u{2500} 13. AUTHORIZE & TEST \u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}
 function authorizeAndTest() {
   var cfg = getConfig();
   var ok = [], errors = [];
@@ -1688,7 +1688,7 @@ function authorizeAndTest() {
   safeAlert('Authorization Test', ok.join('\n') + (errors.length ? '\n\n' + errors.join('\n') : ''));
 }
 
-// ─── 14. CALENDAR SYNC (Bug #11 fix: correct column mapping + safeAlert) ─────
+// \u{2500}\u{2500}\u{2500} 14. CALENDAR SYNC (Bug #11 fix: correct column mapping + safeAlert) \u{2500}\u{2500}\u{2500}\u{2500}\u{2500}
 function syncSessionsToCalendar() {
   if (MANUAL_MODE) return;
   var cfg = getConfig();
@@ -1749,7 +1749,7 @@ function syncSessionsToCalendar() {
     'Calendar sync complete:\nCreated: ' + created + '\nUpdated: ' + updated + '\nSkipped: ' + skipped);
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// \u{2500}\u{2500}\u{2500} Helpers \u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}
 function parseSheetDate(val) {
   if (!val) return null;
   if (val instanceof Date) return val;
@@ -1775,7 +1775,7 @@ function buildDateTime(base, timeVal) {
   return d;
 }
 
-// ─── 14. GOOGLE FORMS BRIDGE (form-link mode — Option A) ─────────────────────
+// \u{2500}\u{2500}\u{2500} 14. GOOGLE FORMS BRIDGE (form-link mode — Option A) \u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}
 // The website runs in "form-link mode": the Register button opens an external
 // Google Form, while the old payment pipeline (doPost) stays disabled via
 // MANUAL_MODE. This bridge imports every form response into \u{1F4CB} Buchungen so
@@ -1784,14 +1784,14 @@ function buildDateTime(base, timeVal) {
 // the FORM_BRIDGE flag below.
 //
 // Setup (one time):
-//   1. In your Google Form: Responses → ⋮ → "Link to Sheets" (creates the
+//   1. In your Google Form: Responses \u{2192} \u{22EE} \u{2192} "Link to Sheets" (creates the
 //      response sheet; its column A header is "Timestamp"/"Zeitstempel")
 //   2. If that response spreadsheet is DIFFERENT from the booking sheet, set
 //      the Script Property RESPONSE_SHEET_ID to the response spreadsheet ID.
-//   3. Menu InneREvolution → "Form Bridge: Setup Trigger"
+//   3. Menu InneREvolution \u{2192} "Form Bridge: Setup Trigger"
 //   4. Optional: "Form Bridge: Dry Run Check" previews the column mapping.
 
-var FORM_BRIDGE = true; // master switch for the form→sheet bridge
+var FORM_BRIDGE = true; // master switch for the form\u{2192}sheet bridge
 
 // Header keywords (lowercase substring match). Columns whose header contains
 // "freund"/"friend" are always ignored (friend-name fields).
@@ -1899,7 +1899,7 @@ function setupFormBridge() {
   if (!findResponseSheet_(ss)) {
     safeAlert('Form Bridge',
       'Keine Formular-Antworten-Tabelle gefunden (Spalte A = Zeitstempel).\n\n'
-      + '1) Google Form → Antworten → ⋮ → "Mit Sheets verknüpfen"\n'
+      + '1) Google Form \u{2192} Antworten \u{2192} \u{22EE} \u{2192} "Mit Sheets verknüpfen"\n'
       + '   (oder Script Property RESPONSE_SHEET_ID setzen)\n'
       + '2) Setup erneut ausführen');
     return;
@@ -1923,7 +1923,7 @@ function testFormBridgeDryRun() {
   var map = mapFormColumns(headers);
   var lines = ['Spalten-Zuordnung (' + resp.getName() + '):'];
   for (var f in map) {
-    lines.push('  ' + f + ' → ' + (map[f] >= 0 ? headers[map[f]] : 'NICHT GEFUNDEN')); 
+    lines.push('  ' + f + ' \u{2192} ' + (map[f] >= 0 ? headers[map[f]] : 'NICHT GEFUNDEN')); 
   }
   var lastRow = resp.getLastRow();
   if (lastRow > 1) {
