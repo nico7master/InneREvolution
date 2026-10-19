@@ -341,14 +341,6 @@ function doPost(e) {
 
     if (MANUAL_MODE) { Logger.log('[MANUAL_MODE] doPost blocked'); return jsonResponse({ success: false, error: 'Booking system is in manual mode. Please contact us directly.' }); }
 
-    // Route: Stripe webhook events (authenticity re-verified inside)
-    if (data.type && (data.type.indexOf('payment_intent') === 0 ||
-                      data.type === 'checkout.session.completed' ||
-                      data.type.indexOf('charge.') === 0)) {
-      Logger.log('[REQUEST] Routing to Stripe webhook handler');
-      return handleStripeWebhook(data);
-    }
-
     // Bookings — protected path
     // R6: rate limit — 30 bookings/min globally is plenty for a yoga business
     if (!checkRateLimit('booking', 30)) {
@@ -474,7 +466,7 @@ function handleBooking(data) {
           var stI = String(bookData[ib][B.STATUS] || 'active').toLowerCase();
           if (stI !== 'cancelled') {
             Logger.log('[BOOKING] Idempotent replay for ' + clientBid);
-            var payI = String(progRow[K.STRIPE_LINK] || '');
+            var payI = ''; // MANUAL PAYMENT MODE - no Stripe links until a real rail is re-enabled
             if (payI) {
               payI += (payI.indexOf('?') >= 0 ? '&' : '?') + 'client_reference_id=' + encodeURIComponent(clientBid) +
                       '&prefilled_email=' + encodeURIComponent(String(data.email || ''));
@@ -557,7 +549,7 @@ function handleBooking(data) {
       friendsPct,              // I: Freunde %
       totalDisc,               // J: Total Rabatt %
       finalPrice,              // K: Final EUR
-      'YES',                   // L: Payment Sent
+      'MANUAL',                // L: Payment Sent - MANUAL MODE: payment handled by email
       'NO',                    // M: Bezahlt
       'NO',                    // N: Intake gesendet
       data.friendsCount || 0,  // O: Freunde Anz.
@@ -574,14 +566,10 @@ function handleBooking(data) {
     // Capacity decrement (ANGEMELDET +1 / FREIE_PLATZE -1, respects formulas)
     updateCapacityAfterBooking_(prog, progRowIndex);
 
-    // R3: append client_reference_id (=stored bookingId) + prefilled_email to pay URL
-    // so Stripe Checkout echoes the SAME id back in webhook event.
-    var payUrl = stripeLink;
-    if (payUrl) {
-      var sep = payUrl.indexOf('?') >= 0 ? '&' : '?';
-      payUrl += sep + 'client_reference_id=' + encodeURIComponent(clientBid || bookingId);
-      if (data.email) payUrl += '&prefilled_email=' + encodeURIComponent(data.email);
-    }
+    // MANUAL PAYMENT MODE (interim): Stripe not functional - payment details are
+    // sent manually by email. To re-enable Stripe Checkout later, restore:
+    //   var payUrl = stripeLink; + client_reference_id + prefilled_email append
+    var payUrl = '';
 
     // Build formatted session list from Sessions tab for the confirmation email
     var sessionsStr = '';
@@ -836,7 +824,9 @@ function sendClientConfirmation(data, programName, finalPrice, discountPct, payU
     + '<table style="width:100%;border-collapse:collapse">' + infoRows + '</table>'
     + '</div>'
     + btnHtml
-    + '<p style="font-size:13px;color:#999;text-align:center;margin:0 0 24px">Zahle sofort und sichere deine Teilnahme.</p>'
+    + (payUrl
+      ? '<p style="font-size:13px;color:#999;text-align:center;margin:0 0 24px">Zahle sofort und sichere deine Teilnahme.</p>'
+      : '<div style="background:#f8f5ff;border-radius:10px;padding:16px 20px;margin:0 0 24px;text-align:center"><p style="margin:0 0 4px;font-size:14px;color:#371964;font-weight:600">📝 Zahlung</p><p style="margin:0;font-size:13px;color:#555;line-height:1.6">Die Zahlungsdetails (Bankverbindung) schicke ich dir in Kürze separat per E-Mail zu. Dein Platz ist bereits reserviert.</p></div>')
     + '<div style="border-top:1px solid #eee;margin:24px 0"></div>'
     + '<p style="font-size:14px;color:#555;line-height:1.7">Hast du Fragen? Antworte einfach auf diese E-Mail — ich helfe dir gerne.</p>'
     + '<p style="font-size:15px;color:#371964;margin:24px 0 8px">Pranam,</p>'

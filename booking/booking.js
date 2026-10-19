@@ -59,6 +59,7 @@ var BOOKING_STRINGS = {
     successSpamTip:     'If nothing arrives within 2 minutes, please check your spam folder.',
     successContactFallback: function(mail) { return 'Still nothing? Email us directly at ' + mail + '.'; },
     payNowBtn: 'Pay now & confirm your spot',
+    successManual: function (email) { return 'Your spot is reserved! ✉️ I will email you the payment details (' + email + ') within 24 hours — your place is already secured.'; },
     alertTimeout:       'The request is taking longer than expected. Your booking may still go through \u2014 please check your email in a few minutes before retrying.',
     alertNetwork:       'We couldn\u2019t reach the booking server. Please check your internet connection and try again.',
     alertInvalidEmail:  'Please enter a valid email address (e.g. name@example.com).',
@@ -117,6 +118,7 @@ var BOOKING_STRINGS = {
     successSpamTip:     'Falls innerhalb von 2 Minuten nichts ankommt, schau bitte auch im Spam-Ordner nach.',
     successContactFallback: function(mail) { return 'Immer noch nichts? Schreib uns direkt an ' + mail + '.'; },
     payNowBtn: 'Jetzt zahlen & Platz sichern',
+    successManual: function (email) { return 'Dein Platz ist reserviert! ✉️ Ich schicke dir die Zahlungsdetails (' + email + ') innerhalb von 24 Stunden per E-Mail — dein Platz ist bereits gesichert.'; },
     alertTimeout:       'Die Anfrage dauert l\u00e4nger als gewohnt. Deine Buchung k\u00f6nnte trotzdem durchgehen \u2014 bitte pr\u00fcfe in ein paar Minuten dein Postfach, bevor du es erneut versuchst.',
     alertNetwork:       'Der Buchungsserver ist gerade nicht erreichbar. Bitte pr\u00fcfe deine Internetverbindung und versuche es erneut.',
     alertInvalidEmail:  'Bitte gib eine g\u00fcltige E-Mail-Adresse ein (z.\u202fB. name@beispiel.com).',
@@ -818,7 +820,8 @@ async function handleSubmit(event) {
       payBtn.style.display = '';
       payBtn.textContent = bs('payNowBtn');
     } else {
-      detail.textContent = bs('successFallback')(email) + ' ' + bs('successSpamTip') + ' ' + bs('successContactFallback')(INSTRUCTOR_CONTACT_EMAIL);
+      // MANUAL PAYMENT MODE: clear promise - payment details arrive by email
+      detail.textContent = bs('successManual')(email) + ' ' + bs('successSpamTip');
       const staleBtn = document.getElementById('success-pay-btn');
       if (staleBtn) staleBtn.style.display = 'none';
     }
