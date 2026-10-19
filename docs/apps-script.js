@@ -260,6 +260,8 @@ function doGet(e) {
     if (params.action === 'health') {
       return jsonResponse({ ok: true, version: 'v75', ts: new Date().toISOString() });
     }
+
+
   } catch (err) {
     logError('doGet', err, e && e.parameter);
   }
@@ -334,6 +336,9 @@ function doPost(e) {
 
     // Newsletter signup — passive sheet write only (no emails, Stripe or
     // triggers involved), therefore exempt from MANUAL_MODE (N1).
+
+
+
     if (data.action === 'newsletter') {
       Logger.log('[REQUEST] Routing to newsletter handler');
       return handleNewsletter(data);
@@ -397,6 +402,42 @@ function resolvePackages_(spec, basePrice) {
   return out;
 }
 
+// Build the formatted session list (DE day/month names) for confirmation
+// emails. Shared by the normal booking path and DEV-TEST mode.
+function buildSessionsStr_(ss, programId) {
+  var S = COLS.SESSIONS;
+  var sessSheet = ss.getSheetByName('\u{1F4C5} Sessions') || ss.getSheetByName('Sessions');
+  if (!sessSheet) return '';
+  var DAYS_DE   = ['So','Mo','Di','Mi','Do','Fr','Sa'];
+  var MONTHS_DE = ['Jan','Feb','\u00e4r','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
+  var fmtTime = function(t) {
+    if (t instanceof Date) return ('0'+t.getHours()).slice(-2)+':'+('0'+t.getMinutes()).slice(-2);
+    if (typeof t === 'number') {
+      // Round total minutes first, then split - avoids float drift where
+      // exact hours (e.g. 17:00) compute as 16.9999... -> "16:60".
+      var totalMin = Math.round(t * 24 * 60);
+      var h = Math.floor(totalMin / 60) % 24;
+      var m = totalMin % 60;
+      return ('0'+h).slice(-2)+':'+('0'+m).slice(-2);
+    }
+    if (typeof t === 'string' && /\d/.test(t)) return t.trim().substring(0,5);
+    return '';
+  };
+  var sessData = sessSheet.getDataRange().getValues();
+  var sesLines = [];
+  for (var si = 1; si < sessData.length; si++) {
+    var sRow = sessData[si];
+    if (String(sRow[S.INSTANCE_ID]).trim() !== String(programId).trim()) continue;
+    var sd = sRow[S.DATUM] instanceof Date ? sRow[S.DATUM] : new Date(sRow[S.DATUM]);
+    if (isNaN(sd.getTime())) continue;
+    var ts  = sRow[S.START] ? fmtTime(sRow[S.START]) : '';
+    var te  = sRow[S.END] ? fmtTime(sRow[S.END]) : '';
+    var timeStr = (ts && te) ? '<div style="color:#888;font-size:13px;margin-top:2px">' + ts + '\u2013' + te + '</div>' : '';
+    sesLines.push('<div style="margin-bottom:6px"><strong>' + DAYS_DE[sd.getDay()] + ', ' + sd.getDate() + '. ' + MONTHS_DE[sd.getMonth()] + '</strong>' + timeStr + '</div>');
+  }
+  return sesLines.join('');
+}
+
 function handleBooking(data) {
   Logger.log('[BOOKING] === START === programId=' + data.programId + ' name=' + data.fullName + ' email=' + data.email);
 
@@ -438,6 +479,19 @@ function handleBooking(data) {
       return jsonResponse({ success: false, error: 'Missing: ' + required[i] });
     }
   }
+
+  // DEV-TEST MODE: owner test bookings (name carries the marker words)
+  // run the full pipeline - validation, program lookup, price resolution,
+  // confirmation email - but skip the sheet row write and capacity
+  // decrement, so no spot is consumed and no test rows appear in \u{1F4CB}
+  // Buchungen. Detection uses the public name only (no emails in source).
+  var isDevTest = (function () {
+    var n = String(data.fullName || '').toLowerCase();
+    var e = String(data.email || '').toLowerCase();
+    // Name-only detection (owner decision): any booking whose name carries
+    // the marker words is treated as a developer test.
+    return (n.indexOf('nico') !== -1 && n.indexOf('schlager') !== -1);
+  })();
 
   var lock = LockService.getScriptLock();
   try {
@@ -537,6 +591,17 @@ function handleBooking(data) {
 
     var bookingId = 'BK-' + Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyyMMdd-HHmmss') + '-' + Math.random().toString(36).substr(2, 4).toUpperCase();
 
+    // DEV-TEST: owner test booking - send the real confirmation email
+    // (correct event, price, sessions, location) but skip the sheet row,
+    // capacity decrement and instructor notification.
+    if (isDevTest) {
+      var bookingIdT = 'BK-TEST-' + Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyyMMdd-HHmmss');
+      try { sendClientConfirmation(data, programName, finalPrice, totalDisc, '', buildSessionsStr_(ss, data.programId), progRow[K.ORT]); Logger.log('[DEV-TEST] client email sent'); }
+      catch (errT) { logError('devTestConfirmation', errT, data); }
+      Logger.log('[DEV-TEST] === SUCCESS (email only, no sheet write) === ' + data.fullName + ' / ' + programName);
+      return jsonResponse({ success: true, bookingId: bookingIdT, devTest: true, paymentUrl: '', programName: programName, finalPrice: finalPrice });
+    }
+
     book.appendRow([
       new Date(),              // A: Datum
       data.fullName,           // B: Name
@@ -571,40 +636,7 @@ function handleBooking(data) {
     //   var payUrl = stripeLink; + client_reference_id + prefilled_email append
     var payUrl = '';
 
-    // Build formatted session list from Sessions tab for the confirmation email
-    var sessionsStr = '';
-    var S = COLS.SESSIONS;
-    var sessSheet   = ss.getSheetByName('\u{1F4C5} Sessions') || ss.getSheetByName('Sessions');
-    if (sessSheet) {
-      var DAYS_DE   = ['So','Mo','Di','Mi','Do','Fr','Sa'];
-      var MONTHS_DE = ['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
-      var fmtTime = function(t) {
-        if (t instanceof Date) return ('0'+t.getHours()).slice(-2)+':'+('0'+t.getMinutes()).slice(-2);
-        if (typeof t === 'number') {
-          // Round total minutes first, then split — avoids float drift where
-          // exact hours (e.g. 17:00) compute as 16.9999... -> "16:60".
-          var totalMin = Math.round(t * 24 * 60);
-          var h = Math.floor(totalMin / 60) % 24;
-          var m = totalMin % 60;
-          return ('0'+h).slice(-2)+':'+('0'+m).slice(-2);
-        }
-        if (typeof t === 'string' && /\d/.test(t)) return t.trim().substring(0,5);
-        return '';
-      };
-      var sessData = sessSheet.getDataRange().getValues();
-      var sesLines = [];
-      for (var si = 1; si < sessData.length; si++) {
-        var sRow = sessData[si];
-        if (String(sRow[S.INSTANCE_ID]).trim() !== String(data.programId).trim()) continue;
-        var sd = sRow[S.DATUM] instanceof Date ? sRow[S.DATUM] : new Date(sRow[S.DATUM]);
-        if (isNaN(sd.getTime())) continue;
-        var ts  = sRow[S.START] ? fmtTime(sRow[S.START]) : '';
-        var te  = sRow[S.END] ? fmtTime(sRow[S.END]) : '';
-        var timeStr = (ts && te) ? '<div style="color:#888;font-size:13px;margin-top:2px">' + ts + '\u2013' + te + '</div>' : '';
-        sesLines.push('<div style="margin-bottom:6px"><strong>' + DAYS_DE[sd.getDay()] + ', ' + sd.getDate() + '. ' + MONTHS_DE[sd.getMonth()] + '</strong>' + timeStr + '</div>');
-      }
-      sessionsStr = sesLines.join('');
-    }
+    var sessionsStr = buildSessionsStr_(ss, data.programId);
 
     try { sendClientConfirmation(data, programName, finalPrice, totalDisc, payUrl, sessionsStr, progRow[K.ORT]); Logger.log('[BOOKING] Client email sent'); }
     catch (err) { logError('sendClientConfirmation', err, data); try { sendErrorAlert('sendClientConfirmation', err, data); } catch(e2) {} }
@@ -713,7 +745,7 @@ function sendNewsletterNotification(email, lang, data) {
     var html =
       '<div style="font-family:Arial,sans-serif;max-width:600px;background:#fff;border-radius:8px;overflow:hidden">'
       + '<div style="background:#1F4E36;padding:20px 24px">'
-      + '<h2 style="color:#ffffff;margin:0;font-size:18px">\u{1F4E7} New newsletter signup</h2>'
+      + '<h2 style="color:#ffffff;margin:0;font-size:18px">&#x1F4E7; New newsletter signup</h2>'
       + '</div>'
       + '<div style="padding:24px">'
       + '<table style="border-collapse:collapse;width:100%;font-size:14px">'
@@ -722,12 +754,12 @@ function sendNewsletterNotification(email, lang, data) {
       + '<tr><td style="padding:8px 0;color:#666">Source</td><td style="padding:8px 0">' + source + '</td></tr>'
       + '<tr><td style="padding:8px 0;color:#666">Time (Vienna)</td><td style="padding:8px 0">' + timestamp + '</td></tr>'
       + '</table>'
-      + '<p style="margin-top:20px;font-size:13px;color:#666">The subscriber is recorded in the \u201C\u{1F4E7} Newsletter\u201D tab of your main spreadsheet.</p>'
+      + '<p style="margin-top:20px;font-size:13px;color:#666">The subscriber is recorded in the \u201C&#x1F4E7; Newsletter\u201D tab of your main spreadsheet.</p>'
       + '</div>'
       + '</div>';
 
     GmailApp.sendEmail(instructorEmail,
-      '\u{1F4E7} Newsletter signup: ' + email,
+      '\u{2705} Newsletter signup: ' + email,
       'New newsletter signup\nEmail: ' + email + '\nLanguage: ' + lang + '\nSource: ' + source + '\nTime: ' + timestamp,
       { htmlBody: html, name: 'InneREvolution Website' }
     );
@@ -785,30 +817,35 @@ function sendClientConfirmation(data, programName, finalPrice, discountPct, payU
   if (sessionsStr) infoRows += '<tr><td style="padding:8px 0;color:#777;white-space:nowrap;vertical-align:top">&#x1F4C5; Datum</td><td style="padding:8px 0;padding-left:16px;line-height:2">' + sessionsStr + '</td></tr>';
   if (ort)         infoRows += '<tr><td style="padding:8px 0;color:#777;white-space:nowrap;vertical-align:top">&#x1F4CD; Ort</td><td style="padding:8px 0;padding-left:16px">' + ort + '</td></tr>';
   if (discountPct > 0) infoRows += '<tr><td style="padding:8px 0;color:#777;white-space:nowrap">&#x1F3F7;&#xFE0F; Rabatt</td><td style="padding:8px 0;padding-left:16px;color:#0A5A41;font-weight:600">-' + discountPct + '%</td></tr>';
-  infoRows += '<tr style="border-top:2px solid #e0d4f7"><td style="padding:12px 0 4px;font-weight:bold;font-size:15px;color:#371964">Gesamtbetrag</td><td style="padding:12px 0 4px;padding-left:16px;font-size:22px;font-weight:bold;color:#371964">EUR ' + finalPrice.toFixed(2) + '</td></tr>';
+  if (finalPrice > 0) {
+    infoRows += '<tr style="border-top:2px solid #e0d4f7"><td style="padding:12px 0 4px;font-weight:bold;font-size:15px;color:#371964">Gesamtbetrag</td><td style="padding:12px 0 4px;padding-left:16px;font-size:22px;font-weight:bold;color:#371964">EUR ' + finalPrice.toFixed(2) + '</td></tr>';
+  } else {
+    // free event: no amount, no payment talk
+    infoRows += '<tr style="border-top:2px solid #e0d4f7"><td style="padding:12px 0 4px;font-weight:bold;font-size:15px;color:#371964">Beitrag</td><td style="padding:12px 0 4px;padding-left:16px;font-size:18px;font-weight:bold;color:#0A5A41">Kostenlos</td></tr>';
+  }
   var btnHtml = payUrl
     ? '<div style="text-align:center;margin:32px 0"><a href="' + payUrl + '" style="display:inline-block;background:#e8562a;color:#ffffff;padding:16px 40px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:17px;letter-spacing:0.5px">&#x1F64F; Jetzt bezahlen</a></div>'
     : '';
   // Gmail-safe signature: solid bg per-td, fluid width — works on desktop + mobile
   var sig =
-    '<table cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#0d1830;border-radius:10px;overflow:hidden;border:1px solid #2e2a22;margin-top:8px;">'
+    '<table cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#0d1830;border-radius:10px;overflow:hidden;border:1px solid #2e2a22;margin-top:8px;table-layout:fixed">'
     + '<tr>'
-    + '<td width="80" bgcolor="#0d1830" style="background:#0d1830;padding:16px 0 16px 16px;vertical-align:middle;">'
-    + '<img src="https://innerevolutionyoga.life/images/signature/NicoSchlagerProfileYoga.png" width="64" height="64" style="display:block;border-radius:4px;" />'
+    + '<td width="56" bgcolor="#0d1830" style="background:#0d1830;padding:16px 0 16px 16px;vertical-align:middle;">'
+    + '<img src="https://innerevolutionyoga.life/images/signature/NicoSchlagerProfileYoga.png" width="38" height="38" style="display:block;border-radius:4px;" />'
     + '</td>'
-    + '<td bgcolor="#0d1830" style="background:#0d1830;padding:14px 12px;vertical-align:middle;">'
-    + '<div style="color:#D6CEBC;font-size:15px;font-weight:bold;letter-spacing:0.5px;margin:0 0 2px;font-family:Georgia,serif;">Nico Schlager</div>'
-    + '<div style="color:#a0987e;font-size:10px;letter-spacing:2px;text-transform:uppercase;margin:0 0 5px;font-family:Georgia,serif;">Klassisches Hatha Yoga</div>'
-    + '<div style="font-size:12px;font-weight:bold;letter-spacing:2px;color:#D6CEBC;margin:0 0 6px;font-family:Georgia,serif;">INNE<span style="font-size:18px;line-height:0;vertical-align:middle;position:relative;top:-1px;color:#fff;">&reg;</span>EVOLUTION</div>'
-    + '<a href="https://innerevolutionyoga.life/de" style="color:#9ab4d8;font-size:11px;text-decoration:none;font-weight:bold;display:block;margin:0 0 8px;font-family:Georgia,serif;">innerevolutionyoga.life</a>'
+    + '<td bgcolor="#0d1830" style="background:#0d1830;padding:12px 8px;vertical-align:middle;">'
+    + '<div style="color:#D6CEBC;font-size:14px;font-weight:bold;letter-spacing:0.5px;margin:0 0 2px;font-family:Georgia,serif;">Nico Schlager</div>'
+    + '<div style="color:#a0987e;font-size:9px;letter-spacing:1px;text-transform:uppercase;margin:0 0 4px;font-family:Georgia,serif;">Klassisches Hatha Yoga</div>'
+    + '<div style="font-size:10px;font-weight:bold;letter-spacing:0.5px;color:#D6CEBC;margin:0 0 5px;font-family:Georgia,serif;">INNE<span style="font-size:13px;line-height:0;vertical-align:middle;position:relative;top:-1px;color:#fff;">&reg;</span>EVOLUTION</div>'
+    + '<a href="https://innerevolutionyoga.life/de" style="color:#9ab4d8;font-size:11px;text-decoration:none;font-weight:bold;display:block;margin:0 0 6px;font-family:Georgia,serif;">innerevolutionyoga.life</a>'
     + '<table cellpadding="0" cellspacing="0" border="0"><tr>'
-    + '<td style="padding-right:8px;"><a href="https://wa.me/qr/3CTAALSBOSBXH1" target="_blank"><img src="https://innerevolutionyoga.life/images/signature/icon_whatsapp.png" width="20" height="20" style="display:block;" /></a></td>'
-    + '<td style="padding-right:8px;"><a href="https://www.instagram.com/innerevolution.yoga" target="_blank"><img src="https://innerevolutionyoga.life/images/signature/icon_instagram.png" width="20" height="20" style="display:block;" /></a></td>'
-    + '<td><a href="https://innerevolutionyoga.life/de" target="_blank"><img src="https://innerevolutionyoga.life/images/signature/icon_globe.png" width="20" height="20" style="display:block;" /></a></td>'
+    + '<td style="padding-right:6px;"><a href="https://wa.me/qr/3CTAALSBOSBXH1" target="_blank"><img src="https://innerevolutionyoga.life/images/signature/icon_whatsapp.png" width="18" height="18" style="display:block;" /></a></td>'
+    + '<td style="padding-right:6px;"><a href="https://www.instagram.com/innerevolution.yoga" target="_blank"><img src="https://innerevolutionyoga.life/images/signature/icon_instagram.png" width="18" height="18" style="display:block;" /></a></td>'
+    + '<td><a href="https://innerevolutionyoga.life/de" target="_blank"><img src="https://innerevolutionyoga.life/images/signature/icon_globe.png" width="18" height="18" style="display:block;" /></a></td>'
     + '</tr></table>'
     + '</td>'
-    + '<td width="72" bgcolor="#0d1830" style="background:#0d1830;padding:16px 16px 16px 0;vertical-align:middle;text-align:center;">'
-    + '<img src="https://innerevolutionyoga.life/images/signature/Logo%20Mystical%20Simple%20Cut%20Reduced.png" width="48" style="display:block;margin:0 auto;opacity:0.95;" />'
+    + '<td width="36" bgcolor="#0d1830" style="background:#0d1830;padding:12px 8px 12px 0;vertical-align:middle;text-align:center;">'
+    + '<img src="https://innerevolutionyoga.life/images/signature/Logo%20Mystical%20Simple%20Cut%20Reduced.png" width="30" style="display:block;margin:0 auto;opacity:0.95;" />'
     + '</td>'
     + '</tr>'
     + '</table>';
@@ -829,7 +866,9 @@ function sendClientConfirmation(data, programName, finalPrice, discountPct, payU
     + btnHtml
     + (payUrl
       ? '<p style="font-size:13px;color:#999;text-align:center;margin:0 0 24px">Zahle sofort und sichere deine Teilnahme.</p>'
-      : '<div style="background:#f8f5ff;border-radius:10px;padding:16px 20px;margin:0 0 24px;text-align:center"><p style="margin:0 0 4px;font-size:14px;color:#371964;font-weight:600">\u{1F4DD} Zahlung</p><p style="margin:0;font-size:13px;color:#555;line-height:1.6">Die Zahlungsdetails (Bankverbindung) schicke ich dir in Kürze separat per E-Mail zu. Dein Platz ist bereits reserviert.</p></div>')
+      : (finalPrice > 0
+        ? '<div style="background:#f8f5ff;border-radius:10px;padding:16px 20px;margin:0 0 24px;text-align:center"><p style="margin:0 0 4px;font-size:14px;color:#371964;font-weight:600">&#x1F4DD; Zahlung</p><p style="margin:0;font-size:13px;color:#555;line-height:1.6">Die Zahlungsdetails (Bankverbindung) schicke ich dir in Kürze separat per E-Mail zu. Dein Platz ist bereits reserviert.</p></div>'
+        : '<div style="background:#eef8f0;border-radius:10px;padding:16px 20px;margin:0 0 24px;text-align:center"><p style="margin:0 0 4px;font-size:14px;color:#0A5A41;font-weight:600">&#x1F33F; Kostenfrei</p><p style="margin:0;font-size:13px;color:#555;line-height:1.6">Dieser Workshop ist kostenlos — dein Platz ist bereits reserviert. Einfach kommen und genießen!</p></div>'))
     + '<div style="border-top:1px solid #eee;margin:24px 0"></div>'
     + '<p style="font-size:14px;color:#555;line-height:1.7">Hast du Fragen? Antworte einfach auf diese E-Mail — ich helfe dir gerne.</p>'
     + '<p style="font-size:15px;color:#371964;margin:24px 0 8px">Pranam,</p>'
@@ -837,8 +876,8 @@ function sendClientConfirmation(data, programName, finalPrice, discountPct, payU
     + '</div>'
     + '</div>';
   // Subject: use plain Unicode emoji — GmailApp handles UTF-8 subjects fine
-  GmailApp.sendEmail(data.email, '\u{1F64F} Anmeldung bestätigt — ' + programName,
-    'Namaskaram ' + data.fullName + ', dein Platz in ' + programName + ' ist reserviert. Gesamtbetrag: EUR ' + finalPrice.toFixed(2) + (payUrl ? ' — Jetzt bezahlen: ' + payUrl : ''),
+  GmailApp.sendEmail(data.email, '\u{2705} Anmeldung bestätigt — ' + programName,
+    'Namaskaram ' + data.fullName + ', dein Platz in ' + programName + ' ist reserviert. ' + (finalPrice > 0 ? 'Gesamtbetrag: EUR ' + finalPrice.toFixed(2) + (payUrl ? ' — Jetzt bezahlen: ' + payUrl : '') : 'Dieser Workshop ist kostenlos — wir freuen uns auf dich!'),
     { htmlBody: html });
   Logger.log('[EMAIL] Confirmation -> ' + data.email);
 }
@@ -885,24 +924,24 @@ function sendIntakeForm(name, email, programName) {
   var intakeUrl = cfg.INTAKE_FORM_URL || 'https://innerevolutionyoga.life/intake';
   // Signature — matches sendClientConfirmation style
   var sig =
-    '<table cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#0d1830;border-radius:10px;overflow:hidden;border:1px solid #2e2a22;margin-top:8px;">'
+    '<table cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#0d1830;border-radius:10px;overflow:hidden;border:1px solid #2e2a22;margin-top:8px;table-layout:fixed">'
     + '<tr>'
-    + '<td width="80" bgcolor="#0d1830" style="background:#0d1830;padding:16px 0 16px 16px;vertical-align:middle;">'
-    + '<img src="https://innerevolutionyoga.life/images/signature/NicoSchlagerProfileYoga.png" width="64" height="64" style="display:block;border-radius:4px;" />'
+    + '<td width="56" bgcolor="#0d1830" style="background:#0d1830;padding:16px 0 16px 16px;vertical-align:middle;">'
+    + '<img src="https://innerevolutionyoga.life/images/signature/NicoSchlagerProfileYoga.png" width="38" height="38" style="display:block;border-radius:4px;" />'
     + '</td>'
-    + '<td bgcolor="#0d1830" style="background:#0d1830;padding:14px 12px;vertical-align:middle;">'
-    + '<div style="color:#D6CEBC;font-size:15px;font-weight:bold;letter-spacing:0.5px;margin:0 0 2px;font-family:Georgia,serif;">Nico Schlager</div>'
-    + '<div style="color:#a0987e;font-size:10px;letter-spacing:2px;text-transform:uppercase;margin:0 0 5px;font-family:Georgia,serif;">Klassisches Hatha Yoga</div>'
-    + '<div style="font-size:12px;font-weight:bold;letter-spacing:2px;color:#D6CEBC;margin:0 0 6px;font-family:Georgia,serif;">INNE<span style="font-size:18px;line-height:0;vertical-align:middle;position:relative;top:-1px;color:#fff;">&reg;</span>EVOLUTION</div>'
-    + '<a href="https://innerevolutionyoga.life/de" style="color:#9ab4d8;font-size:11px;text-decoration:none;font-weight:bold;display:block;margin:0 0 8px;font-family:Georgia,serif;">innerevolutionyoga.life</a>'
+    + '<td bgcolor="#0d1830" style="background:#0d1830;padding:12px 8px;vertical-align:middle;">'
+    + '<div style="color:#D6CEBC;font-size:14px;font-weight:bold;letter-spacing:0.5px;margin:0 0 2px;font-family:Georgia,serif;">Nico Schlager</div>'
+    + '<div style="color:#a0987e;font-size:9px;letter-spacing:1px;text-transform:uppercase;margin:0 0 4px;font-family:Georgia,serif;">Klassisches Hatha Yoga</div>'
+    + '<div style="font-size:10px;font-weight:bold;letter-spacing:0.5px;color:#D6CEBC;margin:0 0 5px;font-family:Georgia,serif;">INNE<span style="font-size:13px;line-height:0;vertical-align:middle;position:relative;top:-1px;color:#fff;">&reg;</span>EVOLUTION</div>'
+    + '<a href="https://innerevolutionyoga.life/de" style="color:#9ab4d8;font-size:11px;text-decoration:none;font-weight:bold;display:block;margin:0 0 6px;font-family:Georgia,serif;">innerevolutionyoga.life</a>'
     + '<table cellpadding="0" cellspacing="0" border="0"><tr>'
-    + '<td style="padding-right:8px;"><a href="https://wa.me/qr/3CTAALSBOSBXH1" target="_blank"><img src="https://innerevolutionyoga.life/images/signature/icon_whatsapp.png" width="20" height="20" style="display:block;" /></a></td>'
-    + '<td style="padding-right:8px;"><a href="https://www.instagram.com/innerevolution.yoga" target="_blank"><img src="https://innerevolutionyoga.life/images/signature/icon_instagram.png" width="20" height="20" style="display:block;" /></a></td>'
-    + '<td><a href="https://innerevolutionyoga.life/de" target="_blank"><img src="https://innerevolutionyoga.life/images/signature/icon_globe.png" width="20" height="20" style="display:block;" /></a></td>'
+    + '<td style="padding-right:6px;"><a href="https://wa.me/qr/3CTAALSBOSBXH1" target="_blank"><img src="https://innerevolutionyoga.life/images/signature/icon_whatsapp.png" width="18" height="18" style="display:block;" /></a></td>'
+    + '<td style="padding-right:6px;"><a href="https://www.instagram.com/innerevolution.yoga" target="_blank"><img src="https://innerevolutionyoga.life/images/signature/icon_instagram.png" width="18" height="18" style="display:block;" /></a></td>'
+    + '<td><a href="https://innerevolutionyoga.life/de" target="_blank"><img src="https://innerevolutionyoga.life/images/signature/icon_globe.png" width="18" height="18" style="display:block;" /></a></td>'
     + '</tr></table>'
     + '</td>'
-    + '<td width="72" bgcolor="#0d1830" style="background:#0d1830;padding:16px 16px 16px 0;vertical-align:middle;text-align:center;">'
-    + '<img src="https://innerevolutionyoga.life/images/signature/Logo%20Mystical%20Simple%20Cut%20Reduced.png" width="48" style="display:block;margin:0 auto;opacity:0.95;" />'
+    + '<td width="36" bgcolor="#0d1830" style="background:#0d1830;padding:12px 8px 12px 0;vertical-align:middle;text-align:center;">'
+    + '<img src="https://innerevolutionyoga.life/images/signature/Logo%20Mystical%20Simple%20Cut%20Reduced.png" width="30" style="display:block;margin:0 auto;opacity:0.95;" />'
     + '</td>'
     + '</tr>'
     + '</table>';
